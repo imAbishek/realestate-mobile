@@ -21,6 +21,7 @@ export default function HomeScreen() {
 
   const [propertyIdQuery, setPropertyIdQuery] = useState('')
   const [recent, setRecent] = useState<PropertyCard[]>([])
+  const [totalListings, setTotalListings] = useState<number | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -28,6 +29,7 @@ export default function HomeScreen() {
       try {
         const { data } = await propertyApi.search({ citySlug: 'coimbatore', page: 0, size: 6 })
         setRecent(data.content)
+        setTotalListings(data.totalElements)
       } catch { /* swallow — home still renders */ }
       finally { setLoading(false) }
     })()
@@ -60,8 +62,16 @@ export default function HomeScreen() {
       </SafeAreaView>
 
       <ScrollView contentContainerStyle={{ paddingBottom: 32 }} showsVerticalScrollIndicator={false}>
-        {/* Scrollable hero — search + 2×2 quick tiles, blue background */}
+        {/* Scrollable hero — search + 2×2 quick tiles, layered blue background */}
         <View style={styles.hero}>
+          {/* Decorative depth shapes (no gradient lib — layered translucent circles) */}
+          <View pointerEvents="none" style={styles.heroBlobTop} />
+          <View pointerEvents="none" style={styles.heroBlobBottom} />
+
+          {/* Signature motif */}
+          <Text style={styles.heroTagline}>Unlock your Wealth</Text>
+          <View style={styles.heroAccentBar} />
+
           <View style={styles.searchWrap}>
             <Ionicons name="search" size={18} color="#94a3b8" />
             <TextInput
@@ -75,18 +85,27 @@ export default function HomeScreen() {
 
           <View style={styles.quickGrid}>
             <QuickTile icon="home"          label="Buy"           sub="Find the perfect plot for you." onPress={() => goBrowse('SALE')} />
-            <QuickTile icon="add-circle"    label="Post Property" sub="Let us find your buyer."        onPress={goPost} />
+            <QuickTile icon="add-circle"    label="Post Property" sub="Let us find your buyer."        onPress={goPost} accent />
             <QuickTile icon="key"           label="Rent"          sub="Live where you love."           onPress={() => goBrowse('RENT')} />
             <QuickTile icon="cash"          label="Loan"          sub="Make dreams come true."         onPress={goLoan} />
           </View>
         </View>
 
+        {/* Trust / stats band — overlaps hero bottom */}
+        <View style={styles.trustBand}>
+          <TrustStat icon="business"          value={totalListings != null ? `${totalListings}+` : '—'} label="Listings" />
+          <View style={styles.trustDivider} />
+          <TrustStat icon="shield-checkmark"  value="100%" label="Verified" />
+          <View style={styles.trustDivider} />
+          <TrustStat icon="location"          value="Coimbatore" label="& beyond" />
+        </View>
+
         {/* Featured Collections */}
-        <Section title="Featured Collections" subtitle="All in one best spaces.">
+        <Section title="Featured Collections" subtitle="All in one best spaces." bleed>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 16, gap: 12 }}>
-            <FeaturedCollectionCard label="Residential Plot/Land" tone="green" onPress={() => goBrowse('SALE')} />
-            <FeaturedCollectionCard label="Commercial Plot/Land"  tone="blue"  onPress={() => goBrowse('SALE')} />
-            <FeaturedCollectionCard label="Agricultural Land"     tone="amber" onPress={() => goBrowse('SALE')} />
+            <FeaturedCollectionCard label="Residential Plot/Land" tone="green" imageUrl={recent[0]?.primaryImageUrl} onPress={() => goBrowse('SALE')} />
+            <FeaturedCollectionCard label="Commercial Plot/Land"  tone="blue"  imageUrl={recent[1]?.primaryImageUrl} onPress={() => goBrowse('SALE')} />
+            <FeaturedCollectionCard label="Agricultural Land"     tone="amber" imageUrl={recent[2]?.primaryImageUrl} onPress={() => goBrowse('SALE')} />
           </ScrollView>
         </Section>
 
@@ -134,6 +153,7 @@ export default function HomeScreen() {
             <Text style={styles.ctaBody}>Reach thousands of buyers and renters effortlessly.</Text>
             <Pressable onPress={goPost} style={styles.ctaBtn}>
               <Text style={styles.ctaBtnText}>Post Now</Text>
+              <Ionicons name="arrow-forward" size={15} color={ACCENT} />
             </Pressable>
           </View>
           <Ionicons name="business" size={72} color="rgba(255,255,255,0.35)" />
@@ -161,7 +181,6 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        <Text style={styles.watermark}>Unlock your Wealth!</Text>
         <Text style={styles.footnote}>Made with <Text style={{ color: ACCENT }}>♥</Text> for real estate investments</Text>
       </ScrollView>
     </View>
@@ -170,9 +189,10 @@ export default function HomeScreen() {
 
 // ─── components ─────────────────────────────────────────────────
 
-function QuickTile({ icon, label, sub, onPress }: { icon: React.ComponentProps<typeof Ionicons>['name']; label: string; sub: string; onPress: () => void }) {
+function QuickTile({ icon, label, sub, onPress, accent }: { icon: React.ComponentProps<typeof Ionicons>['name']; label: string; sub: string; onPress: () => void; accent?: boolean }) {
   return (
     <Pressable onPress={onPress} style={({ pressed }) => [styles.quickTile, pressed && { opacity: 0.85 }]}>
+      {accent ? <View style={styles.quickAccentCorner} /> : null}
       <View style={styles.quickIconWrap}><Ionicons name={icon} size={22} color="#fff" /></View>
       <Text style={styles.quickLabel}>{label}</Text>
       <Text style={styles.quickSub} numberOfLines={2}>{sub}</Text>
@@ -180,29 +200,48 @@ function QuickTile({ icon, label, sub, onPress }: { icon: React.ComponentProps<t
   )
 }
 
-function Section({ title, subtitle, background = '#fff', children }: { title: string; subtitle?: string; background?: string; children: React.ReactNode }) {
+function TrustStat({ icon, value, label }: { icon: React.ComponentProps<typeof Ionicons>['name']; value: string; label: string }) {
   return (
-    <View style={[styles.section, { backgroundColor: background }]}>
-      <Text style={styles.sectionTitle}>{title}</Text>
-      {subtitle ? <Text style={styles.sectionSub}>{subtitle}</Text> : null}
+    <View style={styles.trustStat}>
+      <Ionicons name={icon} size={16} color={BRAND} />
+      <Text style={styles.trustValue} numberOfLines={1}>{value}</Text>
+      <Text style={styles.trustLabel} numberOfLines={1}>{label}</Text>
+    </View>
+  )
+}
+
+function Section({ title, subtitle, background = '#fff', bleed = false, children }: { title: string; subtitle?: string; background?: string; bleed?: boolean; children: React.ReactNode }) {
+  const headerPad = bleed ? { paddingHorizontal: 16 } : null
+  return (
+    <View style={[styles.section, bleed && { paddingHorizontal: 0 }, { backgroundColor: background }]}>
+      <Text style={[styles.sectionTitle, headerPad]}>{title}</Text>
+      <View style={[styles.sectionAccentBar, bleed && { marginLeft: 16 }]} />
+      {subtitle ? <Text style={[styles.sectionSub, headerPad]}>{subtitle}</Text> : null}
       <View style={{ marginTop: 12 }}>{children}</View>
     </View>
   )
 }
 
-function FeaturedCollectionCard({ label, tone, onPress }: { label: string; tone: 'green' | 'blue' | 'amber'; onPress: () => void }) {
+function FeaturedCollectionCard({ label, tone, imageUrl, onPress }: { label: string; tone: 'green' | 'blue' | 'amber'; imageUrl?: string | null; onPress: () => void }) {
   const palette = {
     green: { bg: '#d4ead2', accent: '#3b7a3b' },
     blue:  { bg: '#cde0f4', accent: '#1e5a9a' },
     amber: { bg: '#f5e3c2', accent: '#a06a1c' },
   }[tone]
   return (
-    <Pressable onPress={onPress} style={[styles.featured, { backgroundColor: palette.bg }]}>
-      <View style={[styles.featuredBadge, { backgroundColor: palette.accent }]}>
+    <Pressable onPress={onPress} style={({ pressed }) => [styles.featured, { backgroundColor: palette.bg }, pressed && { opacity: 0.9 }]}>
+      {imageUrl ? (
+        <>
+          <Image source={{ uri: imageUrl }} style={styles.featuredImg} resizeMode="cover" />
+          <View style={styles.featuredScrim} />
+        </>
+      ) : (
+        <Ionicons name="image-outline" size={36} color={palette.accent} style={{ opacity: 0.6 }} />
+      )}
+      <View style={[styles.featuredBadge, { backgroundColor: ACCENT }]}>
         <Ionicons name="ribbon" size={12} color="#fff" />
       </View>
-      <Ionicons name="image-outline" size={36} color={palette.accent} style={{ opacity: 0.6 }} />
-      <Text style={[styles.featuredLabel, { color: palette.accent }]}>{label}</Text>
+      <Text style={[styles.featuredLabel, imageUrl ? styles.featuredLabelOnImage : { color: palette.accent }]}>{label}</Text>
     </Pressable>
   )
 }
@@ -284,30 +323,46 @@ const styles = StyleSheet.create({
   bellDot:           { width: 8, height: 8, borderRadius: 4, backgroundColor: ACCENT, position: 'absolute', top: 8, right: 9, borderWidth: 1, borderColor: BRAND },
 
   // Scrollable hero (search + tiles)
-  hero:              { backgroundColor: BRAND, paddingHorizontal: 16, paddingTop: 4, paddingBottom: 20, borderBottomLeftRadius: 22, borderBottomRightRadius: 22 },
+  hero:              { backgroundColor: BRAND, paddingHorizontal: 16, paddingTop: 8, paddingBottom: 34, borderBottomLeftRadius: 22, borderBottomRightRadius: 22, overflow: 'hidden' },
+  heroBlobTop:       { position: 'absolute', top: -70, right: -50, width: 200, height: 200, borderRadius: 100, backgroundColor: BRAND_DARK, opacity: 0.55 },
+  heroBlobBottom:    { position: 'absolute', bottom: -60, left: -40, width: 160, height: 160, borderRadius: 80, backgroundColor: '#fff', opacity: 0.06 },
+  heroTagline:       { color: '#fff', fontSize: 22, fontWeight: '800', letterSpacing: 0.3 },
+  heroAccentBar:     { width: 38, height: 3, borderRadius: 2, backgroundColor: ACCENT, marginTop: 6, marginBottom: 14 },
   searchWrap:        { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#fff', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 11 },
   searchInput:       { flex: 1, fontSize: 14, color: '#0f172a', padding: 0 },
 
+  // Trust / stats band
+  trustBand:         { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', marginHorizontal: 16, marginTop: -18, borderRadius: 16, paddingVertical: 14, borderWidth: 1, borderColor: '#eef2f7', shadowColor: '#0f172a', shadowOpacity: 0.08, shadowRadius: 12, shadowOffset: { width: 0, height: 4 }, elevation: 4 },
+  trustStat:         { flex: 1, alignItems: 'center', gap: 3 },
+  trustValue:        { fontSize: 15, fontWeight: '800', color: '#0f172a' },
+  trustLabel:        { fontSize: 11, color: '#64748b', fontWeight: '500' },
+  trustDivider:      { width: 1, height: 34, backgroundColor: '#eef2f7' },
+
   // Quick tiles
   quickGrid:         { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 14 },
-  quickTile:         { flexBasis: '48%', flexGrow: 1, backgroundColor: BRAND_DARK, borderRadius: 14, padding: 14, minHeight: 90, justifyContent: 'space-between' },
+  quickTile:         { flexBasis: '48%', flexGrow: 1, backgroundColor: BRAND_DARK, borderRadius: 14, padding: 14, minHeight: 90, justifyContent: 'space-between', overflow: 'hidden', shadowColor: '#000', shadowOpacity: 0.18, shadowRadius: 8, shadowOffset: { width: 0, height: 3 }, elevation: 3 },
+  quickAccentCorner: { position: 'absolute', top: -16, right: -16, width: 40, height: 40, borderRadius: 20, backgroundColor: ACCENT, opacity: 0.9 },
   quickIconWrap:     { width: 32, height: 32, borderRadius: 8, backgroundColor: 'rgba(255,255,255,0.18)', alignItems: 'center', justifyContent: 'center' },
   quickLabel:        { color: '#fff', fontSize: 15, fontWeight: '700', marginTop: 8 },
   quickSub:          { color: 'rgba(255,255,255,0.75)', fontSize: 11, marginTop: 2, lineHeight: 14 },
 
   // Section
   section:           { paddingHorizontal: 16, paddingVertical: 18 },
+  sectionAccentBar:  { width: 28, height: 3, borderRadius: 2, backgroundColor: ACCENT, marginTop: 6 },
   sectionTitle:      { fontSize: 17, fontWeight: '700', color: '#0f172a' },
-  sectionSub:        { fontSize: 12, color: '#64748b', marginTop: 3 },
+  sectionSub:        { fontSize: 12, color: '#64748b', marginTop: 5 },
 
   // Featured collection cards
-  featured:          { width: 180, height: 140, borderRadius: 14, padding: 14, justifyContent: 'space-between' },
+  featured:          { width: 180, height: 140, borderRadius: 14, padding: 14, justifyContent: 'flex-end', overflow: 'hidden' },
+  featuredImg:       { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 },
+  featuredScrim:     { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(15,23,42,0.34)' },
   featuredBadge:     { position: 'absolute', top: 10, right: 10, width: 24, height: 24, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
   featuredLabel:     { fontSize: 14, fontWeight: '700' },
+  featuredLabelOnImage: { color: '#fff', textShadowColor: 'rgba(0,0,0,0.55)', textShadowRadius: 4, textShadowOffset: { width: 0, height: 1 } },
 
   // Services
   serviceRow:        { flexDirection: 'row', gap: 10 },
-  serviceTile:       { flex: 1, backgroundColor: '#fff', borderRadius: 12, paddingVertical: 18, alignItems: 'center', borderWidth: 1, borderColor: '#e2e8f0' },
+  serviceTile:       { flex: 1, backgroundColor: '#fff', borderRadius: 12, paddingVertical: 18, alignItems: 'center', borderWidth: 1, borderColor: '#e2e8f0', shadowColor: '#0f172a', shadowOpacity: 0.05, shadowRadius: 6, shadowOffset: { width: 0, height: 2 }, elevation: 2 },
   serviceLabel:      { fontSize: 11, fontWeight: '600', color: '#0f172a', marginTop: 8, textAlign: 'center' },
 
   // Budget
@@ -325,7 +380,7 @@ const styles = StyleSheet.create({
   ctaCard:           { flexDirection: 'row', alignItems: 'center', backgroundColor: BRAND, marginHorizontal: 16, marginVertical: 10, borderRadius: 16, padding: 18, overflow: 'hidden' },
   ctaTitle:          { color: '#fff', fontSize: 17, fontWeight: '700' },
   ctaBody:           { color: 'rgba(255,255,255,0.85)', fontSize: 12, marginTop: 6 },
-  ctaBtn:            { backgroundColor: '#fff', alignSelf: 'flex-start', paddingHorizontal: 18, paddingVertical: 8, borderRadius: 999, marginTop: 12 },
+  ctaBtn:            { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: '#fff', alignSelf: 'flex-start', paddingHorizontal: 18, paddingVertical: 8, borderRadius: 999, marginTop: 12 },
   ctaBtnText:        { color: BRAND, fontWeight: '700', fontSize: 13 },
 
   // Recent listings
@@ -347,6 +402,5 @@ const styles = StyleSheet.create({
   socialBtn:         { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff', borderWidth: 1, borderColor: '#e2e8f0' },
 
   // Footer
-  watermark:         { fontSize: 28, fontWeight: '800', textAlign: 'center', color: '#cbd5e1', marginTop: 24, letterSpacing: 0.5 },
-  footnote:          { fontSize: 11, textAlign: 'center', color: '#94a3b8', marginTop: 6, marginBottom: 20 },
+  footnote:          { fontSize: 11, textAlign: 'center', color: '#94a3b8', marginTop: 18, marginBottom: 20 },
 })
