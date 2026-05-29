@@ -35,7 +35,7 @@ export default function HomeScreen() {
 
   const goBrowse = (type: ListingType) => router.push({ pathname: '/search', params: { listingType: type } })
   const goPost   = () => router.push(isLoggedIn ? '/post' : '/auth/login')
-  const goLoan   = () => Alert.alert('Coming soon', 'Loan tools launch in a future update.')
+  const goLoan   = () => router.push('/emi-calculator')
   const goService = (name: string) => Alert.alert(name, 'Coming soon.')
   const goBudget  = (label: string) => Alert.alert(`Budget: ${label}`, 'Filtered browsing arrives in Phase B.')
 
@@ -93,7 +93,7 @@ export default function HomeScreen() {
         {/* Services */}
         <Section title="Services" subtitle="All your needs covered here." background={BRAND_TINT}>
           <View style={styles.serviceRow}>
-            <ServiceTile icon="calculator-outline" label="EMI Calculator" onPress={() => goService('EMI Calculator')} />
+            <ServiceTile icon="calculator-outline" label="EMI Calculator" onPress={() => router.push('/emi-calculator')} />
             <ServiceTile icon="cash-outline"        label="Home Loan"     onPress={() => goService('Home Loan')} />
             <ServiceTile icon="brush-outline"       label="Interior Design" onPress={() => goService('Interior Design')} />
           </View>

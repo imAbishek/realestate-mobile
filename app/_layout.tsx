@@ -21,6 +21,7 @@ export default function RootLayout() {
       >
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="post"   options={{ headerShown: false }} />
+        <Stack.Screen name="emi-calculator" options={{ headerShown: false }} />
       </Stack>
     </SafeAreaProvider>
   )
