@@ -47,7 +47,7 @@ export default function ProfileScreen() {
       </View>
 
       <View style={styles.list}>
-        <Row icon="home-outline"            label="My Listings"   onPress={() => router.push('/post')} />
+        <Row icon="home-outline"            label="My Listings"   onPress={() => router.push('/my-listings')} />
         <Row icon="heart-outline"           label="Favourites"     onPress={() => Alert.alert('Coming soon')} />
         <Row icon="calendar-outline"        label="Bookings"      onPress={() => router.push('/bookings')} />
         <Row icon="settings-outline"        label="Settings"       onPress={() => Alert.alert('Coming soon')} />

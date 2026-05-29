@@ -263,7 +263,7 @@ function Step2({ state, set }: { state: WizardState; set: <K extends keyof Wizar
 // ────────────────────────────────────────────────────────────
 
 function Step3({ state, set, localities }: { state: WizardState; set: <K extends keyof WizardState>(k: K, v: WizardState[K]) => void; localities: Locality[] }) {
-  if (state.listedBy === 'PROMOTER') return <PromoterForm state={state} set={set} />
+  if (state.listedBy === 'PROMOTER') return <PromoterForm state={state} set={set} localities={localities} />
 
   const buildingTypes: { value: PropertyType; label: string }[] = state.category === 'RESIDENTIAL'
     ? state.listingType === 'PG'
@@ -463,7 +463,15 @@ function MapPickerField({ state, set }: { state: WizardState; set: <K extends ke
   )
 }
 
-function PromoterForm({ state, set }: { state: WizardState; set: <K extends keyof WizardState>(k: K, v: WizardState[K]) => void }) {
+const PROMOTER_SUBTYPES: { value: PropertyType; label: string }[] = [
+  { value: 'APARTMENT',         label: 'Apartment' },
+  { value: 'VILLA',             label: 'Villa' },
+  { value: 'BUILDER_FLOOR',     label: 'Builder floor' },
+  { value: 'PLOT',              label: 'Plot' },
+  { value: 'COMMERCIAL_OFFICE', label: 'Commercial' },
+]
+
+function PromoterForm({ state, set, localities }: { state: WizardState; set: <K extends keyof WizardState>(k: K, v: WizardState[K]) => void; localities: Locality[] }) {
   return (
     <View>
       <Text style={styles.stepHero}>Tell us about your business</Text>
@@ -475,8 +483,30 @@ function PromoterForm({ state, set }: { state: WizardState; set: <K extends keyo
       </View>
       <FormField label="Cities active in" placeholder="Coimbatore, Tirupur" value={state.promoterCitiesActive} onChangeText={(t) => set('promoterCitiesActive', t)} />
       <FormField label="RERA ID (optional)" placeholder="TN/01/Building/0000/2024" value={state.promoterReraId} onChangeText={(t) => set('promoterReraId', t)} />
+
+      <ChipRow label="Project type" options={PROMOTER_SUBTYPES} value={state.propertyType ?? 'APARTMENT'} onChange={(v) => set('propertyType', v as PropertyType)} />
+
       <FormField label="Sample listing price (₹)" placeholder="0" keyboardType="numeric" value={state.price} onChangeText={(t) => set('price', t)} />
       <FormField label="Approx unit area (sqft)" placeholder="0" keyboardType="numeric" value={state.areaSqft} onChangeText={(t) => set('areaSqft', t)} />
+
+      {/* Locality picker — required so the project's sample listing has a location */}
+      <Text style={styles.stepHelp}>Locality (Coimbatore) *</Text>
+      <View style={styles.localityWrap}>
+        {localities.length === 0 ? (
+          <Text style={styles.dimText}>Loading localities…</Text>
+        ) : (
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+            {localities.map((loc) => {
+              const on = state.localityId === loc.id
+              return (
+                <Pressable key={loc.id} onPress={() => set('localityId', loc.id)} style={[styles.chip, on && styles.chipOn]}>
+                  <Text style={[styles.chipText, on && styles.chipTextOn]}>{loc.name}</Text>
+                </Pressable>
+              )
+            })}
+          </View>
+        )}
+      </View>
     </View>
   )
 }

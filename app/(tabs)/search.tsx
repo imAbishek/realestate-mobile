@@ -20,11 +20,11 @@ const TYPE_TABS: { key: ListingType | 'ALL'; label: string }[] = [
 
 export default function SearchScreen() {
   const router = useRouter()
-  const params = useLocalSearchParams<{ listingType?: string }>()
+  const params = useLocalSearchParams<{ listingType?: string; q?: string }>()
   const initial = TYPE_TABS.find((t) => t.key === params.listingType)?.key ?? 'ALL'
 
   const [active, setActive] = useState<typeof TYPE_TABS[number]['key']>(initial)
-  const [keyword, setKeyword] = useState('')
+  const [keyword, setKeyword] = useState(params.q ?? '')
   const [items, setItems] = useState<PropertyCard[]>([])
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)

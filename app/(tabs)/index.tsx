@@ -41,6 +41,10 @@ export default function HomeScreen() {
   }, [])
 
   const goBrowse = (type: ListingType) => router.push({ pathname: '/search', params: { listingType: type } })
+  const goSearch = () => {
+    const q = propertyIdQuery.trim()
+    router.push(q ? { pathname: '/search', params: { q } } : '/search')
+  }
   const goPost   = () => router.push(isLoggedIn ? '/post' : '/auth/login')
   const goLoan   = () => router.push('/emi-calculator')
   const goService = (name: string) => Alert.alert(name, 'Coming soon.')
@@ -78,6 +82,8 @@ export default function HomeScreen() {
             <TextInput
               value={propertyIdQuery}
               onChangeText={setPropertyIdQuery}
+              onSubmitEditing={goSearch}
+              returnKeyType="search"
               placeholder='Search by "Property ID"'
               placeholderTextColor="#94a3b8"
               style={styles.searchInput}

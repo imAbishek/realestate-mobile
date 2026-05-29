@@ -140,6 +140,8 @@ export const initialWizardState: WizardState = {
 // ── Derived helpers ─────────────────────────────────────────
 
 export function resolvePropertyType(s: WizardState): PropertyType | null {
+  // Promoters skip the category step — they pick a sub-type directly (defaults to apartment).
+  if (s.listedBy === 'PROMOTER') return s.propertyType ?? 'APARTMENT'
   if (s.category === 'PLOT_LAND')  return 'PLOT'
   if (s.category === 'AGRI_LAND')  return 'AGRICULTURAL_LAND'
   if (s.category === 'COMMERCIAL_BUILDING') return s.propertyType ?? 'COMMERCIAL_OFFICE'
@@ -175,6 +177,7 @@ export function validateStep(step: number, s: WizardState): string | null {
     if (s.listedBy === 'PROMOTER') {
       if (!s.promoterProjectName.trim()) return 'Project name is required.'
       if (!s.promoterYearsExperience)    return 'Years of experience is required.'
+      if (!s.localityId)                 return 'Choose a locality.'
       return null
     }
     if (!s.title.trim())     return 'Title is required.'
