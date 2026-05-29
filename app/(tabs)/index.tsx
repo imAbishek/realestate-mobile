@@ -6,7 +6,6 @@ import {
 import { useRouter } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
-import { BlurView } from 'expo-blur'
 import { propertyApi } from '../../src/lib/api'
 import { useAuthStore } from '../../src/store/authStore'
 import type { ListingType, PriceUnit, PropertyCard } from '../../src/types'
@@ -56,9 +55,7 @@ export default function HomeScreen() {
             <Ionicons name="chevron-down" size={14} color="#fff" />
           </Pressable>
           <Pressable style={styles.bellBtn}>
-            <BlurView intensity={28} tint="light" experimentalBlurMethod="dimezisBlurView" style={styles.bellBlur}>
-              <Ionicons name="notifications-outline" size={20} color="#fff" />
-            </BlurView>
+            <Ionicons name="notifications-outline" size={20} color="#fff" />
             <View style={styles.bellDot} />
           </Pressable>
         </View>
@@ -101,7 +98,7 @@ export default function HomeScreen() {
 
         {/* Featured Collections */}
         <Section title="Featured Collections" subtitle="All in one best spaces." bleed>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 16, gap: 12 }}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 8, gap: 12 }}>
             <FeaturedCollectionCard label="Residential Plot/Land" tone="green" imageUrl={recent[0]?.primaryImageUrl} onPress={() => goBrowse('SALE')} />
             <FeaturedCollectionCard label="Commercial Plot/Land"  tone="blue"  imageUrl={recent[1]?.primaryImageUrl} onPress={() => goBrowse('SALE')} />
             <FeaturedCollectionCard label="Agricultural Land"     tone="amber" imageUrl={recent[2]?.primaryImageUrl} onPress={() => goBrowse('SALE')} />
@@ -190,10 +187,8 @@ export default function HomeScreen() {
 
 function QuickTile({ icon, label, sub, onPress }: { icon: React.ComponentProps<typeof Ionicons>['name']; label: string; sub: string; onPress: () => void }) {
   return (
-    <Pressable onPress={onPress} style={({ pressed }) => [styles.quickTile, pressed && { opacity: 0.85 }]}>
-      {/* Frosted-blue glass */}
-      <BlurView intensity={40} tint="dark" experimentalBlurMethod="dimezisBlurView" style={StyleSheet.absoluteFill} />
-      <View style={styles.quickGlassTint} pointerEvents="none" />
+    <Pressable onPress={onPress} style={({ pressed }) => [styles.quickTile, pressed && { opacity: 0.9 }]}>
+      {/* Faux-glass: translucent fill (in styles) + top sheen highlight */}
       <View style={styles.quickSheen} pointerEvents="none" />
 
       <View style={styles.quickIconWrap}><Ionicons name={icon} size={22} color="#fff" /></View>
@@ -322,8 +317,7 @@ const styles = StyleSheet.create({
   locationPill:      { flexDirection: 'row', alignItems: 'center', gap: 8 },
   locationCity:      { color: '#fff', fontSize: 16, fontWeight: '700', lineHeight: 18 },
   subState:          { color: 'rgba(255,255,255,0.7)', fontSize: 10, fontWeight: '500', marginTop: 1 },
-  bellBtn:           { width: 40, height: 40, borderRadius: 20, overflow: 'hidden', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.25)' },
-  bellBlur:          { width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.12)' },
+  bellBtn:           { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.16)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.22)' },
   bellDot:           { width: 8, height: 8, borderRadius: 4, backgroundColor: ACCENT, position: 'absolute', top: 8, right: 9, borderWidth: 1, borderColor: BRAND },
 
   // Scrollable hero (search + glass tiles)
@@ -340,12 +334,11 @@ const styles = StyleSheet.create({
   trustLabel:        { fontSize: 12, color: '#64748b', fontWeight: '500' },
   trustDivider:      { width: 1, height: 40, backgroundColor: '#eef2f7' },
 
-  // Quick tiles (frosted glass over the blue hero)
+  // Quick tiles (faux-glass over the blue hero — translucent fill + sheen + hairline border)
   quickGrid:         { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginTop: 18 },
-  quickTile:         { flexBasis: '48%', flexGrow: 1, borderRadius: 18, padding: 16, minHeight: 110, justifyContent: 'space-between', overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(255,255,255,0.18)', shadowColor: '#000', shadowOpacity: 0.20, shadowRadius: 12, shadowOffset: { width: 0, height: 5 }, elevation: 5 },
-  quickGlassTint:    { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(12,68,122,0.30)' },
-  quickSheen:        { position: 'absolute', top: 0, left: 0, right: 0, height: '52%', backgroundColor: 'rgba(255,255,255,0.09)' },
-  quickIconWrap:     { width: 36, height: 36, borderRadius: 10, backgroundColor: 'rgba(255,255,255,0.22)', alignItems: 'center', justifyContent: 'center' },
+  quickTile:         { flexBasis: '48%', flexGrow: 1, borderRadius: 18, padding: 16, minHeight: 110, justifyContent: 'space-between', overflow: 'hidden', backgroundColor: 'rgba(255,255,255,0.12)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.22)' },
+  quickSheen:        { position: 'absolute', top: 0, left: 0, right: 0, height: '50%', backgroundColor: 'rgba(255,255,255,0.10)' },
+  quickIconWrap:     { width: 36, height: 36, borderRadius: 10, backgroundColor: 'rgba(255,255,255,0.20)', alignItems: 'center', justifyContent: 'center' },
   quickLabel:        { color: '#fff', fontSize: 17, fontWeight: '700', marginTop: 10 },
   quickSub:          { color: 'rgba(255,255,255,0.82)', fontSize: 12, marginTop: 3, lineHeight: 16 },
 
@@ -356,7 +349,7 @@ const styles = StyleSheet.create({
   sectionSub:        { fontSize: 13, color: '#64748b', marginTop: 6 },
 
   // Featured collection cards
-  featured:          { width: 200, height: 154, borderRadius: 18, padding: 16, justifyContent: 'flex-end', overflow: 'hidden', shadowColor: '#0f172a', shadowOpacity: 0.10, shadowRadius: 12, shadowOffset: { width: 0, height: 5 }, elevation: 4 },
+  featured:          { width: 200, height: 154, borderRadius: 18, padding: 16, justifyContent: 'flex-end', overflow: 'hidden', shadowColor: '#0f172a', shadowOpacity: 0.06, shadowRadius: 16, shadowOffset: { width: 0, height: 6 }, elevation: 2 },
   featuredImg:       { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 },
   featuredScrim:     { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(15,23,42,0.34)' },
   featuredBadge:     { position: 'absolute', top: 12, right: 12, width: 26, height: 26, borderRadius: 13, alignItems: 'center', justifyContent: 'center' },

@@ -6,7 +6,6 @@
     "@expo/vector-icons": "^15.1.1",
     "axios": "^1.16.1",
     "expo": "~56.0.6",
-    "expo-blur": "~56.0.3",
     "expo-constants": "~56.0.16",
     "expo-document-picker": "~56.0.4",
     "expo-image-picker": "~56.0.14",
