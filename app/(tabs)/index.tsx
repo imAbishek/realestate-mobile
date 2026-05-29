@@ -321,14 +321,14 @@ const styles = StyleSheet.create({
   bellDot:           { width: 8, height: 8, borderRadius: 4, backgroundColor: ACCENT, position: 'absolute', top: 8, right: 9, borderWidth: 1, borderColor: BRAND },
 
   // Scrollable hero (search + glass tiles)
-  hero:              { backgroundColor: BRAND, paddingHorizontal: 16, paddingTop: 10, paddingBottom: 38, borderBottomLeftRadius: 24, borderBottomRightRadius: 24, overflow: 'hidden' },
+  hero:              { backgroundColor: BRAND, paddingHorizontal: 16, paddingTop: 10, paddingBottom: 22, borderBottomLeftRadius: 24, borderBottomRightRadius: 24, overflow: 'hidden' },
   heroTagline:       { color: '#fff', fontSize: 25, fontWeight: '800', letterSpacing: 0.3 },
   heroAccentBar:     { width: 44, height: 3, borderRadius: 2, backgroundColor: ACCENT, marginTop: 8, marginBottom: 18 },
   searchWrap:        { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: '#fff', borderRadius: 14, paddingHorizontal: 16, paddingVertical: 14 },
   searchInput:       { flex: 1, fontSize: 15, color: '#0f172a', padding: 0 },
 
   // Trust / stats band
-  trustBand:         { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', marginHorizontal: 16, marginTop: -22, borderRadius: 18, paddingVertical: 18, borderWidth: 1, borderColor: '#eef2f7', shadowColor: '#0f172a', shadowOpacity: 0.10, shadowRadius: 16, shadowOffset: { width: 0, height: 6 }, elevation: 5 },
+  trustBand:         { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', marginHorizontal: 16, marginTop: 16, borderRadius: 18, paddingVertical: 18, borderWidth: 1, borderColor: '#eef2f7', shadowColor: '#0f172a', shadowOpacity: 0.05, shadowRadius: 10, shadowOffset: { width: 0, height: 3 }, elevation: 2 },
   trustStat:         { flex: 1, alignItems: 'center', gap: 5 },
   trustValue:        { fontSize: 18, fontWeight: '800', color: '#0f172a' },
   trustLabel:        { fontSize: 12, color: '#64748b', fontWeight: '500' },
@@ -336,8 +336,8 @@ const styles = StyleSheet.create({
 
   // Quick tiles (faux-glass over the blue hero — translucent fill + sheen + hairline border)
   quickGrid:         { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginTop: 18 },
-  quickTile:         { flexBasis: '48%', flexGrow: 1, borderRadius: 18, padding: 16, minHeight: 110, justifyContent: 'space-between', overflow: 'hidden', backgroundColor: 'rgba(255,255,255,0.12)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.22)' },
-  quickSheen:        { position: 'absolute', top: 0, left: 0, right: 0, height: '50%', backgroundColor: 'rgba(255,255,255,0.10)' },
+  quickTile:         { flexBasis: '48%', flexGrow: 1, borderRadius: 18, padding: 16, minHeight: 110, justifyContent: 'space-between', overflow: 'hidden', backgroundColor: 'rgba(9,44,86,0.55)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.20)' },
+  quickSheen:        { position: 'absolute', top: 0, left: 0, right: 0, height: '45%', backgroundColor: 'rgba(255,255,255,0.08)' },
   quickIconWrap:     { width: 36, height: 36, borderRadius: 10, backgroundColor: 'rgba(255,255,255,0.20)', alignItems: 'center', justifyContent: 'center' },
   quickLabel:        { color: '#fff', fontSize: 17, fontWeight: '700', marginTop: 10 },
   quickSub:          { color: 'rgba(255,255,255,0.82)', fontSize: 12, marginTop: 3, lineHeight: 16 },
