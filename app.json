@@ -1,25 +1,52 @@
 {
   "expo": {
-    "name": "realestate-mobile",
+    "name": "PropFind",
     "slug": "realestate-mobile",
+    "scheme": "propfind",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "apiUrl": "https://realestate-backend-tgbv.onrender.com/api"
+    },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.propfind.mobile",
+      "config": {
+        "googleMapsApiKey": "AIzaSyDRZQkyuI2qdrvk83SNWE-CJXq0hO2J5OY"
+      }
     },
     "android": {
+      "package": "com.propfind.mobile",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyDRZQkyuI2qdrvk83SNWE-CJXq0hO2J5OY"
+        }
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "PropFind uses your location to mark the exact spot of the property you're listing on the map. We only use it while the app is open and you tap \"Use my current location\"."
+        }
+      ]
+    ]
   }
 }
