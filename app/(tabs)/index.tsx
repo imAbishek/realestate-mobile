@@ -5,7 +5,9 @@ import {
 } from 'react-native'
 import { useRouter } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { LinearGradient } from 'expo-linear-gradient'
 import { Ionicons } from '@expo/vector-icons'
+import { HouseArt, KeyArt, SaleHouseArt, WalletArt } from '../../src/components/TileArt'
 import { propertyApi } from '../../src/lib/api'
 import { useAuthStore } from '../../src/store/authStore'
 import type { ListingType, PriceUnit, PropertyCard } from '../../src/types'
@@ -14,6 +16,9 @@ const BRAND       = '#185FA5'
 const BRAND_DARK  = '#0e447a'
 const BRAND_TINT  = '#eff4fb'
 const ACCENT      = '#D85A30'
+// Hero gradient — lighter blue up top (blends into the top bar) deepening toward the cards
+const HERO_TOP    = '#1c6cba'
+const HERO_GRADIENT = [HERO_TOP, '#15589c', '#0e447a'] as const
 
 export default function HomeScreen() {
   const router = useRouter()
@@ -62,8 +67,8 @@ export default function HomeScreen() {
       </SafeAreaView>
 
       <ScrollView contentContainerStyle={{ paddingBottom: 32 }} showsVerticalScrollIndicator={false}>
-        {/* Scrollable hero — search + 2×2 glass quick tiles, clean blue panel */}
-        <View style={styles.hero}>
+        {/* Scrollable hero — search + 2×2 glass quick tiles over a blue gradient */}
+        <LinearGradient colors={HERO_GRADIENT} style={styles.hero}>
           {/* Signature motif */}
           <Text style={styles.heroTagline}>Unlock your Wealth</Text>
           <View style={styles.heroAccentBar} />
@@ -80,12 +85,12 @@ export default function HomeScreen() {
           </View>
 
           <View style={styles.quickGrid}>
-            <QuickTile icon="home"          label="Buy"           sub="Find the perfect plot for you." onPress={() => goBrowse('SALE')} />
-            <QuickTile icon="add-circle"    label="Post Property" sub="Let us find your buyer."        onPress={goPost} />
-            <QuickTile icon="key"           label="Rent"          sub="Live where you love."           onPress={() => goBrowse('RENT')} />
-            <QuickTile icon="cash"          label="Loan"          sub="Make dreams come true."         onPress={goLoan} />
+            <QuickTile art={<HouseArt />}     label="Buy"           sub="Find the perfect plot for you." onPress={() => goBrowse('SALE')} />
+            <QuickTile art={<SaleHouseArt />} label="Post Property" sub="Let us find your buyer."        onPress={goPost} />
+            <QuickTile art={<KeyArt />}       label="Rent"          sub="Live where you love."           onPress={() => goBrowse('RENT')} />
+            <QuickTile art={<WalletArt />}    label="Loan"          sub="Make dreams come true."         onPress={goLoan} />
           </View>
-        </View>
+        </LinearGradient>
 
         {/* Trust / stats band — overlaps hero bottom */}
         <View style={styles.trustBand}>
@@ -185,15 +190,23 @@ export default function HomeScreen() {
 
 // ─── components ─────────────────────────────────────────────────
 
-function QuickTile({ icon, label, sub, onPress }: { icon: React.ComponentProps<typeof Ionicons>['name']; label: string; sub: string; onPress: () => void }) {
+function QuickTile({ art, label, sub, onPress }: { art: React.ReactNode; label: string; sub: string; onPress: () => void }) {
   return (
     <Pressable onPress={onPress} style={({ pressed }) => [styles.quickTile, pressed && { opacity: 0.9 }]}>
-      {/* Faux-glass: translucent fill (in styles) + top sheen highlight */}
-      <View style={styles.quickSheen} pointerEvents="none" />
+      {/* Faux-glass: translucent fill (in styles) + soft top→bottom sheen (no hard seam) */}
+      <LinearGradient
+        colors={['rgba(255,255,255,0.10)', 'rgba(255,255,255,0)']}
+        style={styles.quickSheen}
+        pointerEvents="none"
+      />
 
-      <View style={styles.quickIconWrap}><Ionicons name={icon} size={22} color="#fff" /></View>
-      <Text style={styles.quickLabel}>{label}</Text>
-      <Text style={styles.quickSub} numberOfLines={2}>{sub}</Text>
+      {/* Decorative illustration nestled bottom-right */}
+      <View style={styles.quickArt} pointerEvents="none">{art}</View>
+
+      <View style={styles.quickText}>
+        <Text style={styles.quickLabel}>{label}</Text>
+        <Text style={styles.quickSub} numberOfLines={3}>{sub}</Text>
+      </View>
     </Pressable>
   )
 }
@@ -311,8 +324,8 @@ function formatPrice(price: number, unit: PriceUnit): string {
 }
 
 const styles = StyleSheet.create({
-  // Fixed top bar
-  topBar:            { backgroundColor: BRAND },
+  // Fixed top bar — matches the hero gradient's top colour for a seamless blend
+  topBar:            { backgroundColor: HERO_TOP },
   topBarInner:       { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingTop: 6, paddingBottom: 10 },
   locationPill:      { flexDirection: 'row', alignItems: 'center', gap: 8 },
   locationCity:      { color: '#fff', fontSize: 16, fontWeight: '700', lineHeight: 18 },
@@ -321,14 +334,14 @@ const styles = StyleSheet.create({
   bellDot:           { width: 8, height: 8, borderRadius: 4, backgroundColor: ACCENT, position: 'absolute', top: 8, right: 9, borderWidth: 1, borderColor: BRAND },
 
   // Scrollable hero (search + glass tiles)
-  hero:              { backgroundColor: BRAND, paddingHorizontal: 16, paddingTop: 10, paddingBottom: 22, borderBottomLeftRadius: 24, borderBottomRightRadius: 24, overflow: 'hidden' },
+  hero:              { backgroundColor: BRAND, paddingHorizontal: 16, paddingTop: 10, paddingBottom: 40, borderBottomLeftRadius: 24, borderBottomRightRadius: 24, overflow: 'hidden' },
   heroTagline:       { color: '#fff', fontSize: 25, fontWeight: '800', letterSpacing: 0.3 },
   heroAccentBar:     { width: 44, height: 3, borderRadius: 2, backgroundColor: ACCENT, marginTop: 8, marginBottom: 18 },
   searchWrap:        { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: '#fff', borderRadius: 14, paddingHorizontal: 16, paddingVertical: 14 },
   searchInput:       { flex: 1, fontSize: 15, color: '#0f172a', padding: 0 },
 
   // Trust / stats band
-  trustBand:         { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', marginHorizontal: 16, marginTop: 16, borderRadius: 18, paddingVertical: 18, borderWidth: 1, borderColor: '#eef2f7', shadowColor: '#0f172a', shadowOpacity: 0.05, shadowRadius: 10, shadowOffset: { width: 0, height: 3 }, elevation: 2 },
+  trustBand:         { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', marginHorizontal: 16, marginTop: -24, zIndex: 2, borderRadius: 18, paddingVertical: 18, borderWidth: 1, borderColor: '#eef2f7', shadowColor: '#0f172a', shadowOpacity: 0.08, shadowRadius: 12, shadowOffset: { width: 0, height: 4 }, elevation: 4 },
   trustStat:         { flex: 1, alignItems: 'center', gap: 5 },
   trustValue:        { fontSize: 18, fontWeight: '800', color: '#0f172a' },
   trustLabel:        { fontSize: 12, color: '#64748b', fontWeight: '500' },
@@ -336,11 +349,12 @@ const styles = StyleSheet.create({
 
   // Quick tiles (faux-glass over the blue hero — translucent fill + sheen + hairline border)
   quickGrid:         { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginTop: 18 },
-  quickTile:         { flexBasis: '48%', flexGrow: 1, borderRadius: 18, padding: 16, minHeight: 110, justifyContent: 'space-between', overflow: 'hidden', backgroundColor: 'rgba(9,44,86,0.55)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.20)' },
-  quickSheen:        { position: 'absolute', top: 0, left: 0, right: 0, height: '45%', backgroundColor: 'rgba(255,255,255,0.08)' },
-  quickIconWrap:     { width: 36, height: 36, borderRadius: 10, backgroundColor: 'rgba(255,255,255,0.20)', alignItems: 'center', justifyContent: 'center' },
-  quickLabel:        { color: '#fff', fontSize: 17, fontWeight: '700', marginTop: 10 },
-  quickSub:          { color: 'rgba(255,255,255,0.82)', fontSize: 12, marginTop: 3, lineHeight: 16 },
+  quickTile:         { flexBasis: '48%', flexGrow: 1, borderRadius: 18, padding: 16, minHeight: 112, justifyContent: 'flex-start', overflow: 'hidden', backgroundColor: 'rgba(9,44,86,0.45)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.20)' },
+  quickSheen:        { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 },
+  quickArt:          { position: 'absolute', right: 6, bottom: 4 },
+  quickText:         { paddingRight: 40 },
+  quickLabel:        { color: '#fff', fontSize: 17, fontWeight: '700' },
+  quickSub:          { color: 'rgba(255,255,255,0.82)', fontSize: 12, marginTop: 4, lineHeight: 16 },
 
   // Section
   section:           { paddingHorizontal: 16, paddingVertical: 24 },
