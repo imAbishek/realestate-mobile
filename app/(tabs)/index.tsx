@@ -6,6 +6,7 @@ import {
 import { useRouter } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
+import { BlurView } from 'expo-blur'
 import { propertyApi } from '../../src/lib/api'
 import { useAuthStore } from '../../src/store/authStore'
 import type { ListingType, PriceUnit, PropertyCard } from '../../src/types'
@@ -55,19 +56,17 @@ export default function HomeScreen() {
             <Ionicons name="chevron-down" size={14} color="#fff" />
           </Pressable>
           <Pressable style={styles.bellBtn}>
-            <Ionicons name="notifications-outline" size={20} color="#fff" />
+            <BlurView intensity={28} tint="light" experimentalBlurMethod="dimezisBlurView" style={styles.bellBlur}>
+              <Ionicons name="notifications-outline" size={20} color="#fff" />
+            </BlurView>
             <View style={styles.bellDot} />
           </Pressable>
         </View>
       </SafeAreaView>
 
       <ScrollView contentContainerStyle={{ paddingBottom: 32 }} showsVerticalScrollIndicator={false}>
-        {/* Scrollable hero — search + 2×2 quick tiles, layered blue background */}
+        {/* Scrollable hero — search + 2×2 glass quick tiles, clean blue panel */}
         <View style={styles.hero}>
-          {/* Decorative depth shapes (no gradient lib — layered translucent circles) */}
-          <View pointerEvents="none" style={styles.heroBlobTop} />
-          <View pointerEvents="none" style={styles.heroBlobBottom} />
-
           {/* Signature motif */}
           <Text style={styles.heroTagline}>Unlock your Wealth</Text>
           <View style={styles.heroAccentBar} />
@@ -85,7 +84,7 @@ export default function HomeScreen() {
 
           <View style={styles.quickGrid}>
             <QuickTile icon="home"          label="Buy"           sub="Find the perfect plot for you." onPress={() => goBrowse('SALE')} />
-            <QuickTile icon="add-circle"    label="Post Property" sub="Let us find your buyer."        onPress={goPost} accent />
+            <QuickTile icon="add-circle"    label="Post Property" sub="Let us find your buyer."        onPress={goPost} />
             <QuickTile icon="key"           label="Rent"          sub="Live where you love."           onPress={() => goBrowse('RENT')} />
             <QuickTile icon="cash"          label="Loan"          sub="Make dreams come true."         onPress={goLoan} />
           </View>
@@ -189,10 +188,14 @@ export default function HomeScreen() {
 
 // ─── components ─────────────────────────────────────────────────
 
-function QuickTile({ icon, label, sub, onPress, accent }: { icon: React.ComponentProps<typeof Ionicons>['name']; label: string; sub: string; onPress: () => void; accent?: boolean }) {
+function QuickTile({ icon, label, sub, onPress }: { icon: React.ComponentProps<typeof Ionicons>['name']; label: string; sub: string; onPress: () => void }) {
   return (
     <Pressable onPress={onPress} style={({ pressed }) => [styles.quickTile, pressed && { opacity: 0.85 }]}>
-      {accent ? <View style={styles.quickAccentCorner} /> : null}
+      {/* Frosted-blue glass */}
+      <BlurView intensity={40} tint="dark" experimentalBlurMethod="dimezisBlurView" style={StyleSheet.absoluteFill} />
+      <View style={styles.quickGlassTint} pointerEvents="none" />
+      <View style={styles.quickSheen} pointerEvents="none" />
+
       <View style={styles.quickIconWrap}><Ionicons name={icon} size={22} color="#fff" /></View>
       <Text style={styles.quickLabel}>{label}</Text>
       <Text style={styles.quickSub} numberOfLines={2}>{sub}</Text>
@@ -319,88 +322,88 @@ const styles = StyleSheet.create({
   locationPill:      { flexDirection: 'row', alignItems: 'center', gap: 8 },
   locationCity:      { color: '#fff', fontSize: 16, fontWeight: '700', lineHeight: 18 },
   subState:          { color: 'rgba(255,255,255,0.7)', fontSize: 10, fontWeight: '500', marginTop: 1 },
-  bellBtn:           { width: 38, height: 38, borderRadius: 19, backgroundColor: 'rgba(255,255,255,0.18)', alignItems: 'center', justifyContent: 'center' },
+  bellBtn:           { width: 40, height: 40, borderRadius: 20, overflow: 'hidden', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.25)' },
+  bellBlur:          { width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.12)' },
   bellDot:           { width: 8, height: 8, borderRadius: 4, backgroundColor: ACCENT, position: 'absolute', top: 8, right: 9, borderWidth: 1, borderColor: BRAND },
 
-  // Scrollable hero (search + tiles)
-  hero:              { backgroundColor: BRAND, paddingHorizontal: 16, paddingTop: 8, paddingBottom: 34, borderBottomLeftRadius: 22, borderBottomRightRadius: 22, overflow: 'hidden' },
-  heroBlobTop:       { position: 'absolute', top: -70, right: -50, width: 200, height: 200, borderRadius: 100, backgroundColor: BRAND_DARK, opacity: 0.55 },
-  heroBlobBottom:    { position: 'absolute', bottom: -60, left: -40, width: 160, height: 160, borderRadius: 80, backgroundColor: '#fff', opacity: 0.06 },
-  heroTagline:       { color: '#fff', fontSize: 22, fontWeight: '800', letterSpacing: 0.3 },
-  heroAccentBar:     { width: 38, height: 3, borderRadius: 2, backgroundColor: ACCENT, marginTop: 6, marginBottom: 14 },
-  searchWrap:        { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#fff', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 11 },
-  searchInput:       { flex: 1, fontSize: 14, color: '#0f172a', padding: 0 },
+  // Scrollable hero (search + glass tiles)
+  hero:              { backgroundColor: BRAND, paddingHorizontal: 16, paddingTop: 10, paddingBottom: 38, borderBottomLeftRadius: 24, borderBottomRightRadius: 24, overflow: 'hidden' },
+  heroTagline:       { color: '#fff', fontSize: 25, fontWeight: '800', letterSpacing: 0.3 },
+  heroAccentBar:     { width: 44, height: 3, borderRadius: 2, backgroundColor: ACCENT, marginTop: 8, marginBottom: 18 },
+  searchWrap:        { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: '#fff', borderRadius: 14, paddingHorizontal: 16, paddingVertical: 14 },
+  searchInput:       { flex: 1, fontSize: 15, color: '#0f172a', padding: 0 },
 
   // Trust / stats band
-  trustBand:         { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', marginHorizontal: 16, marginTop: -18, borderRadius: 16, paddingVertical: 14, borderWidth: 1, borderColor: '#eef2f7', shadowColor: '#0f172a', shadowOpacity: 0.08, shadowRadius: 12, shadowOffset: { width: 0, height: 4 }, elevation: 4 },
-  trustStat:         { flex: 1, alignItems: 'center', gap: 3 },
-  trustValue:        { fontSize: 15, fontWeight: '800', color: '#0f172a' },
-  trustLabel:        { fontSize: 11, color: '#64748b', fontWeight: '500' },
-  trustDivider:      { width: 1, height: 34, backgroundColor: '#eef2f7' },
+  trustBand:         { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', marginHorizontal: 16, marginTop: -22, borderRadius: 18, paddingVertical: 18, borderWidth: 1, borderColor: '#eef2f7', shadowColor: '#0f172a', shadowOpacity: 0.10, shadowRadius: 16, shadowOffset: { width: 0, height: 6 }, elevation: 5 },
+  trustStat:         { flex: 1, alignItems: 'center', gap: 5 },
+  trustValue:        { fontSize: 18, fontWeight: '800', color: '#0f172a' },
+  trustLabel:        { fontSize: 12, color: '#64748b', fontWeight: '500' },
+  trustDivider:      { width: 1, height: 40, backgroundColor: '#eef2f7' },
 
-  // Quick tiles
-  quickGrid:         { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 14 },
-  quickTile:         { flexBasis: '48%', flexGrow: 1, backgroundColor: BRAND_DARK, borderRadius: 14, padding: 14, minHeight: 90, justifyContent: 'space-between', overflow: 'hidden', shadowColor: '#000', shadowOpacity: 0.18, shadowRadius: 8, shadowOffset: { width: 0, height: 3 }, elevation: 3 },
-  quickAccentCorner: { position: 'absolute', top: -16, right: -16, width: 40, height: 40, borderRadius: 20, backgroundColor: ACCENT, opacity: 0.9 },
-  quickIconWrap:     { width: 32, height: 32, borderRadius: 8, backgroundColor: 'rgba(255,255,255,0.18)', alignItems: 'center', justifyContent: 'center' },
-  quickLabel:        { color: '#fff', fontSize: 15, fontWeight: '700', marginTop: 8 },
-  quickSub:          { color: 'rgba(255,255,255,0.75)', fontSize: 11, marginTop: 2, lineHeight: 14 },
+  // Quick tiles (frosted glass over the blue hero)
+  quickGrid:         { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginTop: 18 },
+  quickTile:         { flexBasis: '48%', flexGrow: 1, borderRadius: 18, padding: 16, minHeight: 110, justifyContent: 'space-between', overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(255,255,255,0.18)', shadowColor: '#000', shadowOpacity: 0.20, shadowRadius: 12, shadowOffset: { width: 0, height: 5 }, elevation: 5 },
+  quickGlassTint:    { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(12,68,122,0.30)' },
+  quickSheen:        { position: 'absolute', top: 0, left: 0, right: 0, height: '52%', backgroundColor: 'rgba(255,255,255,0.09)' },
+  quickIconWrap:     { width: 36, height: 36, borderRadius: 10, backgroundColor: 'rgba(255,255,255,0.22)', alignItems: 'center', justifyContent: 'center' },
+  quickLabel:        { color: '#fff', fontSize: 17, fontWeight: '700', marginTop: 10 },
+  quickSub:          { color: 'rgba(255,255,255,0.82)', fontSize: 12, marginTop: 3, lineHeight: 16 },
 
   // Section
-  section:           { paddingHorizontal: 16, paddingVertical: 18 },
-  sectionAccentBar:  { width: 28, height: 3, borderRadius: 2, backgroundColor: ACCENT, marginTop: 6 },
-  sectionTitle:      { fontSize: 17, fontWeight: '700', color: '#0f172a' },
-  sectionSub:        { fontSize: 12, color: '#64748b', marginTop: 5 },
+  section:           { paddingHorizontal: 16, paddingVertical: 24 },
+  sectionAccentBar:  { width: 32, height: 3, borderRadius: 2, backgroundColor: ACCENT, marginTop: 8 },
+  sectionTitle:      { fontSize: 20, fontWeight: '800', color: '#0f172a' },
+  sectionSub:        { fontSize: 13, color: '#64748b', marginTop: 6 },
 
   // Featured collection cards
-  featured:          { width: 180, height: 140, borderRadius: 14, padding: 14, justifyContent: 'flex-end', overflow: 'hidden' },
+  featured:          { width: 200, height: 154, borderRadius: 18, padding: 16, justifyContent: 'flex-end', overflow: 'hidden', shadowColor: '#0f172a', shadowOpacity: 0.10, shadowRadius: 12, shadowOffset: { width: 0, height: 5 }, elevation: 4 },
   featuredImg:       { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 },
   featuredScrim:     { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(15,23,42,0.34)' },
-  featuredBadge:     { position: 'absolute', top: 10, right: 10, width: 24, height: 24, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
-  featuredLabel:     { fontSize: 14, fontWeight: '700' },
+  featuredBadge:     { position: 'absolute', top: 12, right: 12, width: 26, height: 26, borderRadius: 13, alignItems: 'center', justifyContent: 'center' },
+  featuredLabel:     { fontSize: 16, fontWeight: '700' },
   featuredLabelOnImage: { color: '#fff', textShadowColor: 'rgba(0,0,0,0.55)', textShadowRadius: 4, textShadowOffset: { width: 0, height: 1 } },
 
   // Services
-  serviceRow:        { flexDirection: 'row', gap: 10 },
-  serviceTile:       { flex: 1, backgroundColor: '#fff', borderRadius: 12, paddingVertical: 18, alignItems: 'center', borderWidth: 1, borderColor: '#e2e8f0', shadowColor: '#0f172a', shadowOpacity: 0.05, shadowRadius: 6, shadowOffset: { width: 0, height: 2 }, elevation: 2 },
-  serviceLabel:      { fontSize: 11, fontWeight: '600', color: '#0f172a', marginTop: 8, textAlign: 'center' },
+  serviceRow:        { flexDirection: 'row', gap: 12 },
+  serviceTile:       { flex: 1, backgroundColor: '#fff', borderRadius: 16, paddingVertical: 22, alignItems: 'center', borderWidth: 1, borderColor: '#eef2f7', shadowColor: '#0f172a', shadowOpacity: 0.07, shadowRadius: 12, shadowOffset: { width: 0, height: 4 }, elevation: 3 },
+  serviceLabel:      { fontSize: 13, fontWeight: '600', color: '#0f172a', marginTop: 10, textAlign: 'center' },
 
   // Budget
-  budgetRow:         { flexDirection: 'row', gap: 10 },
-  budget:            { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, backgroundColor: BRAND_TINT, borderRadius: 12, paddingVertical: 14 },
-  budgetLabel:       { fontSize: 12, fontWeight: '700', color: BRAND },
+  budgetRow:         { flexDirection: 'row', gap: 12 },
+  budget:            { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: BRAND_TINT, borderRadius: 16, paddingVertical: 18 },
+  budgetLabel:       { fontSize: 13, fontWeight: '700', color: BRAND },
 
   // Benefits
-  benefit:           { flexDirection: 'row', gap: 12, alignItems: 'flex-start', marginBottom: 14 },
-  benefitIcon:       { width: 38, height: 38, borderRadius: 19, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: '#dbeafe' },
-  benefitTitle:      { fontSize: 14, fontWeight: '700', color: '#0f172a' },
-  benefitBody:       { fontSize: 12, color: '#64748b', marginTop: 2, lineHeight: 17 },
+  benefit:           { flexDirection: 'row', gap: 14, alignItems: 'flex-start', marginBottom: 20 },
+  benefitIcon:       { width: 44, height: 44, borderRadius: 22, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: '#dbeafe', shadowColor: '#0f172a', shadowOpacity: 0.06, shadowRadius: 8, shadowOffset: { width: 0, height: 3 }, elevation: 2 },
+  benefitTitle:      { fontSize: 15, fontWeight: '700', color: '#0f172a' },
+  benefitBody:       { fontSize: 13, color: '#64748b', marginTop: 3, lineHeight: 20 },
 
   // CTA
-  ctaCard:           { flexDirection: 'row', alignItems: 'center', backgroundColor: BRAND, marginHorizontal: 16, marginVertical: 10, borderRadius: 16, padding: 18, overflow: 'hidden' },
-  ctaTitle:          { color: '#fff', fontSize: 17, fontWeight: '700' },
-  ctaBody:           { color: 'rgba(255,255,255,0.85)', fontSize: 12, marginTop: 6 },
-  ctaBtn:            { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: '#fff', alignSelf: 'flex-start', paddingHorizontal: 18, paddingVertical: 8, borderRadius: 999, marginTop: 12 },
-  ctaBtnText:        { color: BRAND, fontWeight: '700', fontSize: 13 },
+  ctaCard:           { flexDirection: 'row', alignItems: 'center', backgroundColor: BRAND, marginHorizontal: 16, marginVertical: 14, borderRadius: 20, padding: 22, overflow: 'hidden', shadowColor: BRAND_DARK, shadowOpacity: 0.30, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 6 },
+  ctaTitle:          { color: '#fff', fontSize: 19, fontWeight: '800' },
+  ctaBody:           { color: 'rgba(255,255,255,0.85)', fontSize: 13, marginTop: 7, lineHeight: 18 },
+  ctaBtn:            { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: '#fff', alignSelf: 'flex-start', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 999, marginTop: 14 },
+  ctaBtnText:        { color: BRAND, fontWeight: '700', fontSize: 14 },
 
   // Recent listings
   center:            { padding: 40, alignItems: 'center' },
-  recent:            { flexDirection: 'row', backgroundColor: '#fff', borderRadius: 12, marginBottom: 10, borderWidth: 1, borderColor: '#e2e8f0', overflow: 'hidden' },
-  recentImg:         { width: 100, height: 100, backgroundColor: '#e2e8f0' },
+  recent:            { flexDirection: 'row', backgroundColor: '#fff', borderRadius: 16, marginBottom: 12, borderWidth: 1, borderColor: '#eef2f7', overflow: 'hidden', shadowColor: '#0f172a', shadowOpacity: 0.06, shadowRadius: 10, shadowOffset: { width: 0, height: 3 }, elevation: 2 },
+  recentImg:         { width: 108, height: 108, backgroundColor: '#e2e8f0' },
   noImage:           { alignItems: 'center', justifyContent: 'center' },
-  recentBody:        { flex: 1, padding: 12, justifyContent: 'space-between' },
-  recentTitle:       { fontSize: 14, fontWeight: '700', color: '#0f172a' },
-  recentLoc:         { fontSize: 12, color: '#64748b' },
+  recentBody:        { flex: 1, padding: 14, justifyContent: 'space-between' },
+  recentTitle:       { fontSize: 15, fontWeight: '700', color: '#0f172a' },
+  recentLoc:         { fontSize: 13, color: '#64748b' },
   recentMetaRow:     { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' },
-  recentPrice:       { fontSize: 14, fontWeight: '700', color: BRAND },
-  recentMeta:        { fontSize: 11, color: '#64748b' },
+  recentPrice:       { fontSize: 16, fontWeight: '800', color: BRAND },
+  recentMeta:        { fontSize: 12, color: '#64748b' },
 
   // Social
-  social:            { alignItems: 'center', paddingTop: 18 },
+  social:            { alignItems: 'center', paddingTop: 24 },
   socialLabel:       { fontSize: 13, color: '#64748b', fontWeight: '600' },
-  socialRow:         { flexDirection: 'row', gap: 16, marginTop: 10 },
-  socialBtn:         { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff', borderWidth: 1, borderColor: '#e2e8f0' },
+  socialRow:         { flexDirection: 'row', gap: 16, marginTop: 12 },
+  socialBtn:         { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff', borderWidth: 1, borderColor: '#eef2f7', shadowColor: '#0f172a', shadowOpacity: 0.05, shadowRadius: 6, shadowOffset: { width: 0, height: 2 }, elevation: 1 },
 
   // Footer
-  footnote:          { fontSize: 11, textAlign: 'center', color: '#94a3b8', marginTop: 18, marginBottom: 20 },
+  footnote:          { fontSize: 12, textAlign: 'center', color: '#94a3b8', marginTop: 20, marginBottom: 24 },
 })
