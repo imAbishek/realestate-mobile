@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import {
-  ActivityIndicator, Alert, Image, Linking, Pressable, ScrollView, StyleSheet,
+  ActivityIndicator, Image, Linking, Pressable, ScrollView, StyleSheet,
   Text, TextInput, View,
 } from 'react-native'
 import { useRouter } from 'expo-router'
@@ -9,6 +9,7 @@ import { LinearGradient } from 'expo-linear-gradient'
 import { Ionicons } from '@expo/vector-icons'
 import { HouseArt, KeyArt, SaleHouseArt, WalletArt } from '../../src/components/TileArt'
 import { CityPickerSheet } from '../../src/components/CityPickerSheet'
+import { InfoSheet, type InfoSheetContent } from '../../src/components/InfoSheet'
 import { propertyApi } from '../../src/lib/api'
 import { useAuthStore } from '../../src/store/authStore'
 import { useLocationStore } from '../../src/store/locationStore'
@@ -51,8 +52,26 @@ export default function HomeScreen() {
   }
   const goPost   = () => router.push(isLoggedIn ? '/post' : '/auth/login')
   const goLoan   = () => router.push('/emi-calculator')
-  const goService = (name: string) => Alert.alert(name, 'Coming soon.')
-  const goBudget  = (label: string) => Alert.alert(`Budget: ${label}`, 'Filtered browsing arrives in Phase B.')
+
+  // Branded "coming soon" sheet instead of a bare Alert box.
+  const [info, setInfo] = useState<InfoSheetContent | null>(null)
+  const goService = (name: 'Home Loan' | 'Interior Design') => setInfo(
+    name === 'Home Loan'
+      ? {
+          icon: 'cash-outline', title: 'Home Loan',
+          body: 'Loan assistance through partner banks is on its way. Until then, plan your repayments with the EMI calculator.',
+          actionLabel: 'Try the EMI Calculator', onAction: () => router.push('/emi-calculator'),
+        }
+      : {
+          icon: 'brush-outline', title: 'Interior Design',
+          body: 'Interior design services are coming soon — get your new home styled right from the app.',
+        },
+  )
+  const goBudget = (label: string) => setInfo({
+    icon: 'wallet-outline', title: `Budget: ${label}`,
+    body: 'Budget-filtered browsing is coming soon. For now, explore every listing and sort by what fits you.',
+    actionLabel: 'Browse all listings', onAction: () => router.push('/search'),
+  })
 
   return (
     <View style={{ flex: 1, backgroundColor: '#f8fafc' }}>
@@ -196,6 +215,11 @@ export default function HomeScreen() {
       </ScrollView>
 
       <CityPickerSheet visible={cityPickerOpen} onClose={() => setCityPickerOpen(false)} />
+      <InfoSheet
+        visible={info !== null}
+        onClose={() => setInfo(null)}
+        {...(info ?? { title: '', body: '' })}
+      />
     </View>
   )
 }

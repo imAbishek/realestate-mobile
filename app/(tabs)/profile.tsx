@@ -1,7 +1,9 @@
+import { useState } from 'react'
 import { Alert, Pressable, StyleSheet, Text, View } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { Link, useRouter } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { InfoSheet, type InfoSheetContent } from '../../src/components/InfoSheet'
 import { useAuthStore } from '../../src/store/authStore'
 
 export default function ProfileScreen() {
@@ -9,6 +11,8 @@ export default function ProfileScreen() {
   const user = useAuthStore((s) => s.user)
   const isLoggedIn = useAuthStore((s) => s.isLoggedIn)
   const clearSession = useAuthStore((s) => s.clearSession)
+  // Branded "coming soon" sheet instead of a bare Alert box.
+  const [info, setInfo] = useState<InfoSheetContent | null>(null)
 
   const signOut = () => {
     Alert.alert('Sign out?', 'You will need to log in again to send inquiries or post listings.', [
@@ -48,11 +52,23 @@ export default function ProfileScreen() {
 
       <View style={styles.list}>
         <Row icon="home-outline"            label="My Listings"   onPress={() => router.push('/my-listings')} />
-        <Row icon="heart-outline"           label="Favourites"     onPress={() => Alert.alert('Coming soon')} />
+        <Row icon="heart-outline"           label="Favourites"     onPress={() => setInfo({
+          icon: 'heart-outline', title: 'Favourites',
+          body: 'Save the properties you love and find them all here — this is coming soon.',
+        })} />
         <Row icon="calendar-outline"        label="Bookings"      onPress={() => router.push('/bookings')} />
-        <Row icon="settings-outline"        label="Settings"       onPress={() => Alert.alert('Coming soon')} />
+        <Row icon="settings-outline"        label="Settings"       onPress={() => setInfo({
+          icon: 'settings-outline', title: 'Settings',
+          body: 'Profile and notification settings are coming soon.',
+        })} />
         <Row icon="log-out-outline"         label="Sign out"       onPress={signOut} danger />
       </View>
+
+      <InfoSheet
+        visible={info !== null}
+        onClose={() => setInfo(null)}
+        {...(info ?? { title: '', body: '' })}
+      />
     </SafeAreaView>
   )
 }
