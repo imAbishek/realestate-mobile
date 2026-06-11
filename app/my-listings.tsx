@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 import {
   ActivityIndicator, FlatList, Image, Pressable, RefreshControl,
   StyleSheet, Text, View,
@@ -31,6 +31,7 @@ export default function MyListingsScreen() {
   const [refreshing, setRefreshing] = useState(false)
 
   const load = useCallback(async () => {
+    if (!hydrated) return // wait for session restore; identity change re-fires the focus effect
     if (!isLoggedIn) { setItems([]); setLoading(false); return }
     try {
       const { data } = await propertyApi.myListings(0, 50)
@@ -41,11 +42,12 @@ export default function MyListingsScreen() {
       setLoading(false)
       setRefreshing(false)
     }
-  }, [isLoggedIn])
+  }, [hydrated, isLoggedIn])
 
   // Refresh on focus — a listing just posted from the wizard should appear on return.
+  // No separate mount effect: it double-fetched on first focus (#30); useFocusEffect alone
+  // covers mount, refocus, and the post-hydration re-run (load's identity changes).
   useFocusEffect(useCallback(() => { setLoading(true); load() }, [load]))
-  useEffect(() => { if (hydrated) load() }, [hydrated, load])
 
   const onRefresh = () => { setRefreshing(true); load() }
 
@@ -99,7 +101,7 @@ export default function MyListingsScreen() {
         ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={BRAND} />}
         renderItem={({ item }) => (
-          <ListingCard item={item} onPress={() => router.push(`/properties/${item.id}`)} />
+          <ListingCard item={item} onPress={() => router.push({ pathname: '/properties/[id]', params: { id: item.id, ownerView: '1' } })} />
         )}
       />
     </SafeAreaView>

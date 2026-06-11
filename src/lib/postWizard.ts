@@ -176,7 +176,9 @@ export function validateStep(step: number, s: WizardState): string | null {
   if (step === 3) {
     if (s.listedBy === 'PROMOTER') {
       if (!s.promoterProjectName.trim()) return 'Project name is required.'
-      if (!s.promoterYearsExperience)    return 'Years of experience is required.'
+      if (!s.promoterYearsExperience || Number(s.promoterYearsExperience) <= 0)
+        return 'Years of experience is required.'
+      if (!s.listingType)                return 'Choose the listing type (Sell, Rent or PG).'
       if (!s.localityId)                 return 'Choose a locality.'
       return null
     }

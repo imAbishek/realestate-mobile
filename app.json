@@ -15,10 +15,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.propfind.mobile",
-      "config": {
-        "googleMapsApiKey": "AIzaSyDRZQkyuI2qdrvk83SNWE-CJXq0hO2J5OY"
-      }
+      "bundleIdentifier": "com.propfind.mobile"
     },
     "android": {
       "package": "com.propfind.mobile",
@@ -28,12 +25,7 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false,
-      "config": {
-        "googleMaps": {
-          "apiKey": "AIzaSyDRZQkyuI2qdrvk83SNWE-CJXq0hO2J5OY"
-        }
-      }
+      "predictiveBackGestureEnabled": false
     },
     "web": {
       "favicon": "./assets/favicon.png"

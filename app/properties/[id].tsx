@@ -24,7 +24,7 @@ const COIMBATORE_FALLBACK = { latitude: 11.0168, longitude: 76.9558 }
 const SQFT_PER_CENT = 435.6
 
 export default function PropertyDetailScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>()
+  const { id, ownerView } = useLocalSearchParams<{ id: string; ownerView?: string }>()
   const router = useRouter()
   const isLoggedIn = useAuthStore((s) => s.isLoggedIn)
   const user = useAuthStore((s) => s.user)
@@ -41,7 +41,11 @@ export default function PropertyDetailScreen() {
     let mounted = true
     ;(async () => {
       try {
-        const { data } = await propertyApi.getById(id)
+        // ownerView (from My Listings) uses the owner endpoint so DRAFT/PENDING/
+        // REJECTED listings open instead of 404ing on the ACTIVE-only public one
+        const { data } = ownerView
+          ? await propertyApi.getByIdForOwner(id)
+          : await propertyApi.getById(id)
         if (mounted) setData(data)
       } catch (e: unknown) {
         if (mounted) setError(e instanceof Error ? e.message : 'Failed to load')
@@ -50,7 +54,7 @@ export default function PropertyDetailScreen() {
       }
     })()
     return () => { mounted = false }
-  }, [id])
+  }, [id, ownerView])
 
   // Sync the heart with the server's saved state once we know who's logged in.
   useEffect(() => {
@@ -565,8 +569,9 @@ function BookSiteVisitSheet({
     const trimmedName = guestName.trim()
     const trimmedPhone = guestPhone.trim()
     const trimmedEmail = guestEmail.trim()
-    // Name is always required by the booking API; guests must also leave a way to be reached.
-    if (!trimmedName || (!isLoggedIn && !trimmedPhone && !trimmedEmail)) {
+    // The booking API always requires a name plus phone OR email — logged-in users too
+    // (a profile registered without a phone would otherwise submit no reachable contact).
+    if (!trimmedName || (!trimmedPhone && !trimmedEmail)) {
       return Alert.alert('Contact details required', 'Please share your name and at least a phone or email.')
     }
 
@@ -582,7 +587,7 @@ function BookSiteVisitSheet({
       })
       onClose()
       // Reset transient fields
-      setDate(''); setTime(''); setNotes('')
+      setDate(''); setTime(''); setNotes(''); setGuestEmail('')
       Alert.alert('Visit requested', 'The owner will reach out to confirm a slot. Track it in the Bookings tab.')
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : 'Failed to send request'

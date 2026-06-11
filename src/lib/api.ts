@@ -54,6 +54,8 @@ export const authApi = {
 export const propertyApi = {
   search:      (params: SearchParams)     => api.get<Page<PropertyCard>>('/properties', { params }),
   getById:     (id: string)               => api.get<PropertyDetail>(`/properties/${id}`),
+  // Owner-only variant — returns the listing regardless of status (public getById is ACTIVE-only)
+  getByIdForOwner: (id: string)           => api.get<PropertyDetail>(`/properties/${id}/my`),
   getFeatured: ()                         => api.get<PropertyCard[]>('/properties/featured'),
   myListings:  (page = 0, size = 10)      =>
     api.get<Page<PropertyCard>>('/properties/my-listings', { params: { page, size } }),

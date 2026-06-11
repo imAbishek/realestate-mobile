@@ -110,8 +110,8 @@ export default function PostScreen() {
         'Your listing has been submitted for review. You will be notified once approved.',
         [{ text: 'OK', onPress: () => router.replace('/') }],
       )
-    } catch (e: any) {
-      const msg = e?.response?.data?.message ?? 'Could not submit listing. Please try again.'
+    } catch (e: unknown) {
+      const msg = extractError(e) ?? 'Could not submit listing. Please try again.'
       Alert.alert('Submission failed', msg)
     } finally {
       setSubmitting(false)
@@ -463,6 +463,12 @@ function MapPickerField({ state, set }: { state: WizardState; set: <K extends ke
   )
 }
 
+const PROMOTER_LISTING_TYPES: { value: ListingType; label: string }[] = [
+  { value: 'SALE', label: 'Sell' },
+  { value: 'RENT', label: 'Rent' },
+  { value: 'PG',   label: 'PG / Co-living' },
+]
+
 const PROMOTER_SUBTYPES: { value: PropertyType; label: string }[] = [
   { value: 'APARTMENT',         label: 'Apartment' },
   { value: 'VILLA',             label: 'Villa' },
@@ -484,6 +490,9 @@ function PromoterForm({ state, set, localities }: { state: WizardState; set: <K 
       <FormField label="Cities active in" placeholder="Coimbatore, Tirupur" value={state.promoterCitiesActive} onChangeText={(t) => set('promoterCitiesActive', t)} />
       <FormField label="RERA ID (optional)" placeholder="TN/01/Building/0000/2024" value={state.promoterReraId} onChangeText={(t) => set('promoterReraId', t)} />
 
+      {/* Promoters skip Step 2, so the listing type must be picked here — without it
+          every promoter listing silently defaulted to SALE in buildCreateRequest */}
+      <ChipRow label="Listing type *" options={PROMOTER_LISTING_TYPES} value={state.listingType} onChange={(v) => set('listingType', v as ListingType)} />
       <ChipRow label="Project type" options={PROMOTER_SUBTYPES} value={state.propertyType ?? 'APARTMENT'} onChange={(v) => set('propertyType', v as PropertyType)} />
 
       <FormField label="Sample listing price (₹)" placeholder="0" keyboardType="numeric" value={state.price} onChangeText={(t) => set('price', t)} />
@@ -684,6 +693,16 @@ function Toggle({ label, value, onChange }: { label: string; value: boolean; onC
       <Switch value={value} onValueChange={onChange} trackColor={{ true: BRAND }} thumbColor="#fff" />
     </View>
   )
+}
+
+/** API error message if present, else plain-Error message (buildCreateRequest throws those). */
+function extractError(e: unknown): string | null {
+  if (typeof e === 'object' && e && 'response' in e) {
+    const r = (e as { response?: { data?: { message?: string } } }).response
+    return r?.data?.message ?? null
+  }
+  if (e instanceof Error && e.message) return e.message
+  return null
 }
 
 const styles = StyleSheet.create({

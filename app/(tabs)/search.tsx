@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import {
   ActivityIndicator, FlatList, Image, Pressable, RefreshControl, StyleSheet, Text, TextInput, View,
 } from 'react-native'
@@ -6,7 +6,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
 import { propertyApi } from '../../src/lib/api'
-import type { ListingType, PriceUnit, PropertyCard } from '../../src/types'
+import type { ListingType, PriceUnit, PropertyCard, SearchParams } from '../../src/types'
 
 const BRAND = '#185FA5'
 const ACCENT = '#D85A30'
@@ -25,30 +25,25 @@ export default function SearchScreen() {
 
   const [active, setActive] = useState<typeof TYPE_TABS[number]['key']>(initial)
   const [keyword, setKeyword] = useState(params.q ?? '')
+  // Submitted keyword — sent to the server so matches beyond the fetched page are found
+  // (the old client-only filter silently missed anything past the first 30 results).
+  const [query, setQuery] = useState(params.q ?? '')
   const [items, setItems] = useState<PropertyCard[]>([])
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
 
-  const load = async () => {
+  const load = useCallback(async () => {
     try {
-      const apiParams: Record<string, unknown> = { citySlug: 'coimbatore', page: 0, size: 30 }
+      const apiParams: SearchParams = { citySlug: 'coimbatore', page: 0, size: 30 }
       if (active !== 'ALL') apiParams.listingType = active
+      if (query.trim()) apiParams.keyword = query.trim()
       const { data } = await propertyApi.search(apiParams)
       setItems(data.content)
     } catch { setItems([]) }
     finally { setLoading(false); setRefreshing(false) }
-  }
+  }, [active, query])
 
-  useEffect(() => { setLoading(true); void load() }, [active])
-
-  const filtered = useMemo(() => {
-    const q = keyword.trim().toLowerCase()
-    if (!q) return items
-    return items.filter((p) =>
-      p.title.toLowerCase().includes(q) ||
-      p.localityName.toLowerCase().includes(q),
-    )
-  }, [items, keyword])
+  useEffect(() => { setLoading(true); void load() }, [load])
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
@@ -67,10 +62,17 @@ export default function SearchScreen() {
         <TextInput
           value={keyword}
           onChangeText={setKeyword}
+          onSubmitEditing={() => setQuery(keyword)}
+          returnKeyType="search"
           placeholder="Search by title or locality"
           placeholderTextColor="#94a3b8"
           style={styles.searchInput}
         />
+        {query.trim() ? (
+          <Pressable onPress={() => { setKeyword(''); setQuery('') }} hitSlop={8}>
+            <Ionicons name="close-circle" size={18} color="#94a3b8" />
+          </Pressable>
+        ) : null}
       </View>
 
       {/* Type tabs */}
@@ -89,7 +91,7 @@ export default function SearchScreen() {
         <View style={styles.center}><ActivityIndicator size="large" color={BRAND} /></View>
       ) : (
         <FlatList
-          data={filtered}
+          data={items}
           keyExtractor={(item) => item.id}
           contentContainerStyle={{ padding: 16, paddingBottom: 24 }}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); void load() }} tintColor={BRAND} />}

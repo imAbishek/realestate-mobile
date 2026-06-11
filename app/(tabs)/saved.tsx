@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 import {
   ActivityIndicator, FlatList, Image, Pressable, RefreshControl,
   StyleSheet, Text, View,
@@ -22,6 +22,7 @@ export default function SavedScreen() {
   const [refreshing, setRefreshing] = useState(false)
 
   const load = useCallback(async () => {
+    if (!hydrated) return // wait for session restore; identity change re-fires the focus effect
     if (!isLoggedIn) { setItems([]); setLoading(false); return }
     try {
       const { data } = await favoritesApi.listMine(0, 50)
@@ -32,11 +33,12 @@ export default function SavedScreen() {
       setLoading(false)
       setRefreshing(false)
     }
-  }, [isLoggedIn])
+  }, [hydrated, isLoggedIn])
 
-  // Refresh every time the tab gains focus — favorites can change from the detail screen
+  // Refresh every time the tab gains focus — favorites can change from the detail screen.
+  // No separate mount effect: it double-fetched on first focus (#30); useFocusEffect alone
+  // covers mount, refocus, and the post-hydration re-run (load's identity changes).
   useFocusEffect(useCallback(() => { setLoading(true); load() }, [load]))
-  useEffect(() => { if (hydrated) load() }, [hydrated, load])
 
   const onRefresh = () => { setRefreshing(true); load() }
 

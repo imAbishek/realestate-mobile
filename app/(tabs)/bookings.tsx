@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 import {
   ActivityIndicator, Alert, FlatList, Image, Pressable, RefreshControl,
   StyleSheet, Text, View,
@@ -30,6 +30,7 @@ export default function BookingsScreen() {
   const [cancelling, setCancelling] = useState<string | null>(null)
 
   const load = useCallback(async () => {
+    if (!hydrated) return // wait for session restore; identity change re-fires the focus effect
     if (!isLoggedIn) { setItems([]); setLoading(false); return }
     try {
       const { data } = await bookingsApi.listMine(0, 50)
@@ -40,11 +41,12 @@ export default function BookingsScreen() {
       setLoading(false)
       setRefreshing(false)
     }
-  }, [isLoggedIn])
+  }, [hydrated, isLoggedIn])
 
   // Re-fetch on focus — a booking can be made from the detail screen.
+  // No separate mount effect: it double-fetched on first focus (#30); useFocusEffect alone
+  // covers mount, refocus, and the post-hydration re-run (load's identity changes).
   useFocusEffect(useCallback(() => { setLoading(true); load() }, [load]))
-  useEffect(() => { if (hydrated) load() }, [hydrated, load])
 
   const onRefresh = () => { setRefreshing(true); load() }
 
