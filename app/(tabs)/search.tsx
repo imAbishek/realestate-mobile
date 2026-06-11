@@ -6,6 +6,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
 import { propertyApi } from '../../src/lib/api'
+import { useLocationStore } from '../../src/store/locationStore'
 import type { ListingType, PriceUnit, PropertyCard, SearchParams } from '../../src/types'
 
 const BRAND = '#185FA5'
@@ -23,6 +24,7 @@ export default function SearchScreen() {
   const params = useLocalSearchParams<{ listingType?: string; q?: string }>()
   const initial = TYPE_TABS.find((t) => t.key === params.listingType)?.key ?? 'ALL'
 
+  const city = useLocationStore((s) => s.city)
   const [active, setActive] = useState<typeof TYPE_TABS[number]['key']>(initial)
   const [keyword, setKeyword] = useState(params.q ?? '')
   // Submitted keyword — sent to the server so matches beyond the fetched page are found
@@ -34,14 +36,14 @@ export default function SearchScreen() {
 
   const load = useCallback(async () => {
     try {
-      const apiParams: SearchParams = { citySlug: 'coimbatore', page: 0, size: 30 }
+      const apiParams: SearchParams = { citySlug: city.slug, page: 0, size: 30 }
       if (active !== 'ALL') apiParams.listingType = active
       if (query.trim()) apiParams.keyword = query.trim()
       const { data } = await propertyApi.search(apiParams)
       setItems(data.content)
     } catch { setItems([]) }
     finally { setLoading(false); setRefreshing(false) }
-  }, [active, query])
+  }, [active, query, city.slug])
 
   useEffect(() => { setLoading(true); void load() }, [load])
 
@@ -52,7 +54,7 @@ export default function SearchScreen() {
         <Pressable onPress={() => router.back()} hitSlop={8}>
           <Ionicons name="arrow-back" size={22} color="#fff" />
         </Pressable>
-        <Text style={styles.headerTitle}>Coimbatore Listings</Text>
+        <Text style={styles.headerTitle}>{city.name} Listings</Text>
         <View style={{ width: 22 }} />
       </View>
 
@@ -99,7 +101,7 @@ export default function SearchScreen() {
           ListEmptyComponent={
             <View style={styles.center}>
               <Ionicons name="search" size={36} color="#cbd5e1" />
-              <Text style={styles.empty}>No matches in Coimbatore for this filter.</Text>
+              <Text style={styles.empty}>No matches in {city.name} for this filter.</Text>
             </View>
           }
         />

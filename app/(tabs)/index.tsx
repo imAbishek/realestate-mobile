@@ -8,8 +8,10 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { LinearGradient } from 'expo-linear-gradient'
 import { Ionicons } from '@expo/vector-icons'
 import { HouseArt, KeyArt, SaleHouseArt, WalletArt } from '../../src/components/TileArt'
+import { CityPickerSheet } from '../../src/components/CityPickerSheet'
 import { propertyApi } from '../../src/lib/api'
 import { useAuthStore } from '../../src/store/authStore'
+import { useLocationStore } from '../../src/store/locationStore'
 import type { ListingType, PriceUnit, PropertyCard } from '../../src/types'
 
 const BRAND       = '#185FA5'
@@ -23,8 +25,10 @@ const HERO_GRADIENT = [HERO_TOP, '#15589c', '#0e447a'] as const
 export default function HomeScreen() {
   const router = useRouter()
   const isLoggedIn = useAuthStore((s) => s.isLoggedIn)
+  const city = useLocationStore((s) => s.city)
 
   const [propertyIdQuery, setPropertyIdQuery] = useState('')
+  const [cityPickerOpen, setCityPickerOpen] = useState(false)
   const [recent, setRecent] = useState<PropertyCard[]>([])
   const [totalListings, setTotalListings] = useState<number | null>(null)
   const [loading, setLoading] = useState(true)
@@ -32,13 +36,13 @@ export default function HomeScreen() {
   useEffect(() => {
     (async () => {
       try {
-        const { data } = await propertyApi.search({ citySlug: 'coimbatore', page: 0, size: 6 })
+        const { data } = await propertyApi.search({ citySlug: city.slug, page: 0, size: 6 })
         setRecent(data.content)
         setTotalListings(data.totalElements)
       } catch { /* swallow — home still renders */ }
       finally { setLoading(false) }
     })()
-  }, [])
+  }, [city.slug])
 
   const goBrowse = (type: ListingType) => router.push({ pathname: '/search', params: { listingType: type } })
   const goSearch = () => {
@@ -55,11 +59,11 @@ export default function HomeScreen() {
       {/* Thin fixed top bar — location pill + bell */}
       <SafeAreaView style={styles.topBar} edges={['top']}>
         <View style={styles.topBarInner}>
-          <Pressable style={styles.locationPill}>
+          <Pressable style={styles.locationPill} onPress={() => setCityPickerOpen(true)}>
             <Ionicons name="location" size={14} color="#fff" />
             <View>
-              <Text style={styles.locationCity}>Coimbatore</Text>
-              <Text style={styles.subState}>Tamil Nadu</Text>
+              <Text style={styles.locationCity}>{city.name}</Text>
+              <Text style={styles.subState}>{city.state}</Text>
             </View>
             <Ionicons name="chevron-down" size={14} color="#fff" />
           </Pressable>
@@ -104,7 +108,7 @@ export default function HomeScreen() {
           <View style={styles.trustDivider} />
           <TrustStat icon="shield-checkmark"  value="100%" label="Verified" />
           <View style={styles.trustDivider} />
-          <TrustStat icon="location"          value="Coimbatore" label="& beyond" />
+          <TrustStat icon="location"          value={city.name} label="& expanding" />
         </View>
 
         {/* Featured Collections */}
@@ -144,7 +148,7 @@ export default function HomeScreen() {
           <Benefit
             icon="earth"
             title="Wide Reach"
-            body="Explore properties in prime locations across Coimbatore and beyond."
+            body="Explore properties in prime locations — city by city, we're expanding."
           />
           <Benefit
             icon="people"
@@ -170,7 +174,7 @@ export default function HomeScreen() {
         {loading ? (
           <View style={styles.center}><ActivityIndicator color={BRAND} /></View>
         ) : recent.length > 0 ? (
-          <Section title="Recent in Coimbatore" background="#fff">
+          <Section title={`Recent in ${city.name}`} background="#fff">
             {recent.map((p) => (
               <RecentRow key={p.id} item={p} onPress={() => router.push(`/properties/${p.id}`)} />
             ))}
@@ -190,6 +194,8 @@ export default function HomeScreen() {
 
         <Text style={styles.footnote}>Made with <Text style={{ color: ACCENT }}>♥</Text> for real estate investments</Text>
       </ScrollView>
+
+      <CityPickerSheet visible={cityPickerOpen} onClose={() => setCityPickerOpen(false)} />
     </View>
   )
 }

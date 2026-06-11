@@ -7,6 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
 import MapView, { Marker, PROVIDER_GOOGLE, type Region } from 'react-native-maps'
 import { propertyApi } from '../../src/lib/api'
+import { useLocationStore } from '../../src/store/locationStore'
 import type { PriceUnit, PropertyCard } from '../../src/types'
 
 const BRAND  = '#185FA5'
@@ -22,13 +23,14 @@ const COIMBATORE: Region = {
 
 export default function MapScreen() {
   const router = useRouter()
+  const city = useLocationStore((s) => s.city)
   const [items, setItems] = useState<PropertyCard[]>([])
   const [loading, setLoading] = useState(true)
   const [selected, setSelected] = useState<PropertyCard | null>(null)
 
   const load = useCallback(async () => {
     try {
-      const { data } = await propertyApi.search({ citySlug: 'coimbatore', size: 100 })
+      const { data } = await propertyApi.search({ citySlug: city.slug, size: 100 })
       // Only listings with real coordinates can be plotted.
       setItems(data.content.filter((p) => p.latitude != null && p.longitude != null))
     } catch {
@@ -36,7 +38,7 @@ export default function MapScreen() {
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [city.slug])
 
   useFocusEffect(useCallback(() => { load() }, [load]))
 
@@ -76,7 +78,7 @@ export default function MapScreen() {
           <View style={styles.emptyOverlay} pointerEvents="none">
             <View style={styles.emptyCard}>
               <Ionicons name="map-outline" size={28} color="#94a3b8" />
-              <Text style={styles.emptyText}>No mapped listings in Coimbatore yet</Text>
+              <Text style={styles.emptyText}>No mapped listings in {city.name} yet</Text>
             </View>
           </View>
         ) : null}
