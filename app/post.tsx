@@ -188,6 +188,7 @@ function Step1({ state, set }: { state: WizardState; set: <K extends keyof Wizar
   const options: { value: ListedBy; title: string; sub: string; icon: keyof typeof Ionicons.glyphMap }[] = [
     { value: 'OWNER',    title: 'Owner',    sub: "I'm posting my own property", icon: 'person-circle-outline' },
     { value: 'PROMOTER', title: 'Promoter', sub: "I'm a builder / developer",   icon: 'business-outline' },
+    { value: 'AGENT',    title: 'Agent',    sub: "I'm listing on behalf of an owner", icon: 'briefcase-outline' },
   ]
   return (
     <View>

@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
-import { ActivityIndicator, Modal, Pressable, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import * as Location from 'expo-location'
 import { searchApi } from '../lib/api'
+import { DraggableSheet } from './DraggableSheet'
 import { useLocationStore, DEFAULT_CITY, type SelectedCity } from '../store/locationStore'
 import type { City } from '../types'
 
@@ -76,64 +77,57 @@ export function CityPickerSheet({ visible, onClose }: { visible: boolean; onClos
   }
 
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <Pressable style={styles.backdrop} onPress={onClose} />
-      <View style={styles.sheet}>
-        <View style={styles.handle} />
-        <Text style={styles.title}>Choose your city</Text>
+    <DraggableSheet visible={visible} onClose={onClose}>
+      <Text style={styles.title}>Choose your city</Text>
 
-        {/* GPS detect */}
-        <Pressable style={styles.detectRow} onPress={detect} disabled={detecting}>
-          {detecting
-            ? <ActivityIndicator size="small" color={BRAND} />
-            : <Ionicons name="navigate" size={18} color={BRAND} />}
-          <Text style={styles.detectText}>{detecting ? 'Detecting…' : 'Use my current location'}</Text>
-        </Pressable>
+      {/* GPS detect */}
+      <Pressable style={styles.detectRow} onPress={detect} disabled={detecting}>
+        {detecting
+          ? <ActivityIndicator size="small" color={BRAND} />
+          : <Ionicons name="navigate" size={18} color={BRAND} />}
+        <Text style={styles.detectText}>{detecting ? 'Detecting…' : 'Use my current location'}</Text>
+      </Pressable>
 
-        {/* Expanding-soon state for unsupported detections */}
-        {notHereYet ? (
-          <View style={styles.soonBox}>
-            <Ionicons name="rocket-outline" size={20} color={ACCENT} />
-            <View style={{ flex: 1 }}>
-              <Text style={styles.soonTitle}>We&apos;re not in {notHereYet} yet</Text>
-              <Text style={styles.soonBody}>
-                PropFind is expanding city by city. Browse {DEFAULT_CITY.name} for now — we&apos;ll be in more cities soon.
-              </Text>
-            </View>
+      {/* Expanding-soon state for unsupported detections */}
+      {notHereYet ? (
+        <View style={styles.soonBox}>
+          <Ionicons name="rocket-outline" size={20} color={ACCENT} />
+          <View style={{ flex: 1 }}>
+            <Text style={styles.soonTitle}>We&apos;re not in {notHereYet} yet</Text>
+            <Text style={styles.soonBody}>
+              PropFind is expanding city by city. Browse {DEFAULT_CITY.name} for now — we&apos;ll be in more cities soon.
+            </Text>
           </View>
-        ) : null}
+        </View>
+      ) : null}
 
-        <Text style={styles.sectionLabel}>Available now</Text>
-        {loading ? (
-          <ActivityIndicator color={BRAND} style={{ marginVertical: 16 }} />
-        ) : (
-          (cities.length ? cities : [{ id: 'default', name: DEFAULT_CITY.name, slug: DEFAULT_CITY.slug, state: DEFAULT_CITY.state, active: true }]).map((c) => {
-            const on = selected.slug === c.slug
-            return (
-              <Pressable key={c.id} style={[styles.cityRow, on && styles.cityRowOn]}
-                onPress={() => pick({ name: c.name, slug: c.slug, state: c.state })}>
-                <Ionicons name="location" size={16} color={on ? '#fff' : BRAND} />
-                <View style={{ flex: 1 }}>
-                  <Text style={[styles.cityName, on && { color: '#fff' }]}>{c.name}</Text>
-                  <Text style={[styles.cityState, on && { color: '#dbeafe' }]}>{c.state}</Text>
-                </View>
-                {on ? <Ionicons name="checkmark" size={18} color="#fff" /> : null}
-              </Pressable>
-            )
-          })
-        )}
+      <Text style={styles.sectionLabel}>Available now</Text>
+      {loading ? (
+        <ActivityIndicator color={BRAND} style={{ marginVertical: 16 }} />
+      ) : (
+        (cities.length ? cities : [{ id: 'default', name: DEFAULT_CITY.name, slug: DEFAULT_CITY.slug, state: DEFAULT_CITY.state, active: true }]).map((c) => {
+          const on = selected.slug === c.slug
+          return (
+            <Pressable key={c.id} style={[styles.cityRow, on && styles.cityRowOn]}
+              onPress={() => pick({ name: c.name, slug: c.slug, state: c.state })}>
+              <Ionicons name="location" size={16} color={on ? '#fff' : BRAND} />
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.cityName, on && { color: '#fff' }]}>{c.name}</Text>
+                <Text style={[styles.cityState, on && { color: '#dbeafe' }]}>{c.state}</Text>
+              </View>
+              {on ? <Ionicons name="checkmark" size={18} color="#fff" /> : null}
+            </Pressable>
+          )
+        })
+      )}
 
-        <Text style={styles.footerNote}>More cities coming soon</Text>
-      </View>
-    </Modal>
+      <Text style={styles.footerNote}>More cities coming soon</Text>
+    </DraggableSheet>
   )
 }
 
 const styles = StyleSheet.create({
-  backdrop:    { flex: 1, backgroundColor: 'rgba(15,23,42,0.45)' },
-  sheet:       { backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 20, paddingBottom: 32 },
-  handle:      { alignSelf: 'center', width: 40, height: 4, borderRadius: 2, backgroundColor: '#e2e8f0', marginBottom: 14 },
-  title:       { fontSize: 18, fontWeight: '700', color: '#0f172a', marginBottom: 12 },
+  title:       { fontSize: 18, fontWeight: '700', color: '#0f172a', marginTop: 6, marginBottom: 12 },
 
   detectRow:   { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 12, paddingHorizontal: 14, borderRadius: 12, borderWidth: 1, borderColor: '#bfdbfe', backgroundColor: '#eff6ff', marginBottom: 12 },
   detectText:  { fontSize: 14, fontWeight: '600', color: BRAND },

@@ -164,7 +164,7 @@ export function isBuilding(s: WizardState): boolean {
 
 export function validateStep(step: number, s: WizardState): string | null {
   if (step === 1) {
-    if (!s.listedBy) return 'Choose Owner or Promoter to continue.'
+    if (!s.listedBy) return 'Choose Owner, Promoter or Agent to continue.'
     return null
   }
   if (step === 2) {

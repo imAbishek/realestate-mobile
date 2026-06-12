@@ -3,7 +3,7 @@
 
 export type ListingType     = 'SALE' | 'RENT' | 'PG'
 export type PropertyType    = 'APARTMENT' | 'INDEPENDENT_HOUSE' | 'VILLA' | 'PLOT' | 'COMMERCIAL_OFFICE' | 'COMMERCIAL_SHOP' | 'BUILDER_FLOOR' | 'PG_HOSTEL' | 'AGRICULTURAL_LAND'
-export type ListedBy        = 'OWNER' | 'PROMOTER'
+export type ListedBy        = 'OWNER' | 'PROMOTER' | 'AGENT'
 export type ApprovalAuthority = 'DTCP' | 'CMDA' | 'TNHB' | 'CMA' | 'RERA' | 'LOCAL' | 'OTHER' | 'NONE'
 export type OwnershipType   = 'SINGLE' | 'JOINT' | 'GIFT' | 'INHERITED' | 'COMPANY' | 'TRUST'
 export type SoilType        = 'RED' | 'BLACK' | 'ALLUVIAL' | 'LATERITE' | 'SANDY' | 'CLAY' | 'LOAM' | 'OTHER'
