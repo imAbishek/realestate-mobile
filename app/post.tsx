@@ -13,12 +13,13 @@ import { FormField } from '../src/components/FormField'
 import { ChipRow } from '../src/components/ChipRow'
 import { PrimaryButton } from '../src/components/PrimaryButton'
 import { MapLocationPicker } from '../src/components/MapLocationPicker'
+import { ConfirmSheet } from '../src/components/ConfirmSheet'
 import { useAuthStore } from '../src/store/authStore'
 import { propertyApi, searchApi } from '../src/lib/api'
 import {
   initialWizardState, buildCreateRequest, validateStep,
   resolvePropertyType, isPlotOrLand, isBuilding,
-  type Category, type WizardState,
+  type Category, type CategoryGroup, type WizardState,
 } from '../src/lib/postWizard'
 import type { Locality, Amenity, ListingType, ListedBy, PropertyType } from '../src/types'
 
@@ -34,6 +35,7 @@ export default function PostScreen() {
   const [submitting, setSubmitting] = useState(false)
   const [localities, setLocalities] = useState<Locality[]>([])
   const [amenities, setAmenities] = useState<Amenity[]>([])
+  const [discardOpen, setDiscardOpen] = useState(false)
 
   const set = <K extends keyof WizardState>(key: K, v: WizardState[K]) =>
     setState((s) => ({ ...s, [key]: v }))
@@ -133,17 +135,22 @@ export default function PostScreen() {
           <Text style={styles.headerTitle}>{headerTitle}</Text>
           <Text style={styles.headerSub}>Step {step} of {totalSteps}</Text>
         </View>
-        <Pressable
-          onPress={() => Alert.alert(
-            'Discard listing?',
-            'Your progress will be lost.',
-            [{ text: 'Keep editing' }, { text: 'Discard', style: 'destructive', onPress: () => router.replace('/') }],
-          )}
-          hitSlop={8}
-        >
+        <Pressable onPress={() => setDiscardOpen(true)} hitSlop={8}>
           <Ionicons name="close" size={22} color="#fff" />
         </Pressable>
       </View>
+
+      <ConfirmSheet
+        visible={discardOpen}
+        onClose={() => setDiscardOpen(false)}
+        icon="trash-outline"
+        title="Discard listing?"
+        body="Your progress will be lost."
+        confirmLabel="Discard"
+        cancelLabel="Keep editing"
+        destructive
+        onConfirm={() => router.replace('/')}
+      />
 
       {/* Progress bar */}
       <View style={styles.progressBar}>
@@ -229,13 +236,43 @@ function Step2({ state, set }: { state: WizardState; set: <K extends keyof Wizar
     { value: 'RENT', label: 'Rent' },
     { value: 'PG',   label: 'PG'   },
   ]
-  const categories: { value: Category; label: string; allowed: (l: ListingType) => boolean }[] = [
-    { value: 'RESIDENTIAL',         label: 'Residential',           allowed: () => true },
-    { value: 'COMMERCIAL_BUILDING', label: 'Commercial — Building', allowed: (l) => l !== 'PG' },
-    { value: 'PLOT_LAND',           label: 'Plot / Land',           allowed: (l) => l === 'SALE' },
-    { value: 'AGRI_LAND',           label: 'Agricultural Land',     allowed: (l) => l === 'SALE' },
+  // Top-level segment. Commercial isn't offered for PG listings.
+  const groups: { value: CategoryGroup; label: string; allowed: (l: ListingType) => boolean }[] = [
+    { value: 'RESIDENTIAL', label: 'Residential', allowed: () => true },
+    { value: 'COMMERCIAL',  label: 'Commercial',  allowed: (l) => l !== 'PG' },
   ]
-  const allowedCats = categories.filter((c) => state.listingType && c.allowed(state.listingType))
+  const allowedGroups = groups.filter((g) => state.listingType && g.allowed(state.listingType))
+
+  // Building default each segment maps to when no land type is picked.
+  const buildingFor = (g: CategoryGroup): Category =>
+    g === 'RESIDENTIAL' ? 'RESIDENTIAL' : 'COMMERCIAL_BUILDING'
+
+  // Land options inside "Property Type" — sale-only. Residential offers Plot/Land;
+  // Commercial offers Plot/Land + Agricultural Land.
+  const landOptions: { value: Category; label: string }[] =
+    state.listingType !== 'SALE' || !state.categoryGroup
+      ? []
+      : state.categoryGroup === 'RESIDENTIAL'
+        ? [{ value: 'PLOT_LAND', label: 'Plot / Land' }]
+        : [
+            { value: 'PLOT_LAND', label: 'Plot / Land' },
+            { value: 'AGRI_LAND', label: 'Agricultural Land' },
+          ]
+
+  // Property Type chip is "on" only when the resolved category is a land type.
+  const landValue: Category | null =
+    state.category === 'PLOT_LAND' || state.category === 'AGRI_LAND' ? state.category : null
+
+  const selectGroup = (g: CategoryGroup) => {
+    set('categoryGroup', g)
+    set('category', buildingFor(g))
+  }
+
+  const selectLand = (v: Category) => {
+    // Tapping the already-selected land chip toggles it off → back to building.
+    if (v === landValue && state.categoryGroup) set('category', buildingFor(state.categoryGroup))
+    else set('category', v)
+  }
 
   return (
     <View>
@@ -243,18 +280,26 @@ function Step2({ state, set }: { state: WizardState; set: <K extends keyof Wizar
         label="You are looking to"
         options={listingTypes}
         value={state.listingType}
-        onChange={(v) => { set('listingType', v); set('category', null) }}
+        onChange={(v) => { set('listingType', v); set('categoryGroup', null); set('category', null) }}
       />
       {state.listingType ? (
         <ChipRow
           label="Property category"
-          options={allowedCats.map((c) => ({ label: c.label, value: c.value }))}
-          value={state.category}
-          onChange={(v) => set('category', v as Category)}
+          options={allowedGroups.map((g) => ({ label: g.label, value: g.value }))}
+          value={state.categoryGroup}
+          onChange={(v) => selectGroup(v as CategoryGroup)}
         />
       ) : (
         <Text style={styles.stepHelp}>Pick a listing type to see categories.</Text>
       )}
+      {landOptions.length ? (
+        <ChipRow
+          label="Property Type"
+          options={landOptions}
+          value={landValue}
+          onChange={(v) => selectLand(v as Category)}
+        />
+      ) : null}
     </View>
   )
 }

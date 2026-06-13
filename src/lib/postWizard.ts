@@ -9,6 +9,11 @@ import type {
 
 export type Category = 'RESIDENTIAL' | 'COMMERCIAL_BUILDING' | 'PLOT_LAND' | 'AGRI_LAND'
 
+// Top-level segment chosen on Step 2. UI-only: `category` (above) stays the
+// resolved value used everywhere else. We keep this because PLOT_LAND/AGRI_LAND
+// alone can't tell us whether the user came in via Residential or Commercial.
+export type CategoryGroup = 'RESIDENTIAL' | 'COMMERCIAL'
+
 export type WizardImage = { uri: string; name: string; type: string }
 export type WizardDoc   = { uri: string; name: string; type: string; docType: 'FMB_SKETCH' | 'EC' | 'PATTA' | 'APPROVAL_LETTER' | 'OTHER' }
 
@@ -17,8 +22,9 @@ export type WizardState = {
   listedBy: ListedBy | null
 
   // Step 2
-  listingType: ListingType | null
-  category:    Category    | null
+  listingType:   ListingType   | null
+  categoryGroup: CategoryGroup | null  // UI-only top segment (Residential / Commercial)
+  category:      Category      | null  // resolved value used by helpers + payload
 
   // Step 3 — common
   title:        string
@@ -84,6 +90,7 @@ export type WizardState = {
 export const initialWizardState: WizardState = {
   listedBy: null,
   listingType: null,
+  categoryGroup: null,
   category: null,
 
   title: '',
@@ -169,8 +176,9 @@ export function validateStep(step: number, s: WizardState): string | null {
   }
   if (step === 2) {
     if (s.listedBy === 'PROMOTER') return null // promoter skips this gate
-    if (!s.listingType) return 'Choose Sell, Rent or PG.'
-    if (!s.category)    return 'Choose a property category.'
+    if (!s.listingType)   return 'Choose Sell, Rent or PG.'
+    if (!s.categoryGroup) return 'Choose a property category.'
+    if (!s.category)      return 'Choose a property category.'
     return null
   }
   if (step === 3) {

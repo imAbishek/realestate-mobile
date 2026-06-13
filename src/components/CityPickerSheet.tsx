@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, Dimensions, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import * as Location from 'expo-location'
 import { searchApi } from '../lib/api'
@@ -105,20 +105,24 @@ export function CityPickerSheet({ visible, onClose }: { visible: boolean; onClos
       {loading ? (
         <ActivityIndicator color={BRAND} style={{ marginVertical: 16 }} />
       ) : (
-        (cities.length ? cities : [{ id: 'default', name: DEFAULT_CITY.name, slug: DEFAULT_CITY.slug, state: DEFAULT_CITY.state, active: true }]).map((c) => {
-          const on = selected.slug === c.slug
-          return (
-            <Pressable key={c.id} style={[styles.cityRow, on && styles.cityRowOn]}
-              onPress={() => pick({ name: c.name, slug: c.slug, state: c.state })}>
-              <Ionicons name="location" size={16} color={on ? '#fff' : BRAND} />
-              <View style={{ flex: 1 }}>
-                <Text style={[styles.cityName, on && { color: '#fff' }]}>{c.name}</Text>
-                <Text style={[styles.cityState, on && { color: '#dbeafe' }]}>{c.state}</Text>
-              </View>
-              {on ? <Ionicons name="checkmark" size={18} color="#fff" /> : null}
-            </Pressable>
-          )
-        })
+        // Bounded scroll area keeps the drag-handle reachable and the backdrop
+        // visible even when the supported-city list grows long.
+        <ScrollView style={{ maxHeight: Dimensions.get('window').height * 0.4 }} showsVerticalScrollIndicator={false}>
+          {(cities.length ? cities : [{ id: 'default', name: DEFAULT_CITY.name, slug: DEFAULT_CITY.slug, state: DEFAULT_CITY.state, active: true }]).map((c) => {
+            const on = selected.slug === c.slug
+            return (
+              <Pressable key={c.id} style={[styles.cityRow, on && styles.cityRowOn]}
+                onPress={() => pick({ name: c.name, slug: c.slug, state: c.state })}>
+                <Ionicons name="location" size={16} color={on ? '#fff' : BRAND} />
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.cityName, on && { color: '#fff' }]}>{c.name}</Text>
+                  <Text style={[styles.cityState, on && { color: '#dbeafe' }]}>{c.state}</Text>
+                </View>
+                {on ? <Ionicons name="checkmark" size={18} color="#fff" /> : null}
+              </Pressable>
+            )
+          })}
+        </ScrollView>
       )}
 
       <Text style={styles.footerNote}>More cities coming soon</Text>

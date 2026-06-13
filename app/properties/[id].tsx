@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   ActivityIndicator, Alert, Dimensions, Image, KeyboardAvoidingView, Linking,
   Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View,
@@ -10,6 +10,7 @@ import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps'
 import { propertyApi, favoritesApi, bookingsApi } from '../../src/lib/api'
 import { useAuthStore } from '../../src/store/authStore'
 import { getLandmarks, landmarkIcon } from '../../src/lib/landmarks'
+import { ConfirmSheet } from '../../src/components/ConfirmSheet'
 import type { PriceUnit, PropertyDetail, PropertyType } from '../../src/types'
 
 const BRAND = '#185FA5'
@@ -35,6 +36,9 @@ export default function PropertyDetailScreen() {
   const [liked, setLiked] = useState(false)
   const [likeBusy, setLikeBusy] = useState(false)
   const [visitOpen, setVisitOpen] = useState(false)
+  const [activeImg, setActiveImg] = useState(0)
+  const [signInPromptOpen, setSignInPromptOpen] = useState(false)
+  const galleryRef = useRef<ScrollView>(null)
 
   useEffect(() => {
     if (!id) return
@@ -71,10 +75,8 @@ export default function PropertyDetailScreen() {
 
   const toggleLike = async () => {
     if (!isLoggedIn) {
-      return Alert.alert('Sign in to save', 'Create an account or sign in to save properties.', [
-        { text: 'Not now', style: 'cancel' },
-        { text: 'Sign in', onPress: () => router.push('/auth/login') },
-      ])
+      setSignInPromptOpen(true)
+      return
     }
     if (!id || likeBusy) return
     const next = !liked
@@ -141,14 +143,68 @@ export default function PropertyDetailScreen() {
       <ScrollView contentContainerStyle={{ paddingBottom: 110 }}>
         {/* ── Image gallery ───────────────────────── */}
         {ordered.length > 0 ? (
-          <ScrollView horizontal pagingEnabled showsHorizontalScrollIndicator={false} style={styles.gallery}>
-            {ordered.map((img) => (
-              <Image key={img.id} source={{ uri: img.url }} style={styles.galleryImg} resizeMode="cover" />
-            ))}
-          </ScrollView>
+          <View style={styles.galleryWrap}>
+            <ScrollView
+              ref={galleryRef}
+              horizontal
+              pagingEnabled
+              showsHorizontalScrollIndicator={false}
+              style={styles.gallery}
+              onMomentumScrollEnd={(e) =>
+                setActiveImg(Math.round(e.nativeEvent.contentOffset.x / screenW))
+              }
+            >
+              {ordered.map((img) => (
+                <Image key={img.id} source={{ uri: img.url }} style={styles.galleryImg} resizeMode="cover" />
+              ))}
+            </ScrollView>
+            {ordered.length > 1 ? (
+              <>
+                <View style={styles.imgCount}>
+                  <Ionicons name="images-outline" size={12} color="#fff" />
+                  <Text style={styles.imgCountText}>{activeImg + 1}/{ordered.length}</Text>
+                </View>
+                {/* Slider track — active segment shows scroll position */}
+                <View style={styles.sliderTrack}>
+                  <View
+                    style={[
+                      styles.sliderFill,
+                      { width: `${100 / ordered.length}%`, left: `${(100 / ordered.length) * activeImg}%` },
+                    ]}
+                  />
+                </View>
+              </>
+            ) : null}
+          </View>
         ) : (
           <View style={[styles.galleryImg, styles.noImage]}><Text style={styles.noImageText}>No photos</Text></View>
         )}
+
+        {/* ── Thumbnail strip ─────────────────────── */}
+        {ordered.length > 1 ? (
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.thumbStrip}
+            contentContainerStyle={styles.thumbStripContent}
+          >
+            {ordered.map((img, i) => (
+              <Pressable
+                key={img.id}
+                onPress={() => {
+                  galleryRef.current?.scrollTo({ x: i * screenW, animated: true })
+                  setActiveImg(i)
+                }}
+              >
+                <Image
+                  source={{ uri: img.url }}
+                  style={[styles.thumb, i === activeImg && styles.thumbOn]}
+                  resizeMode="cover"
+                />
+              </Pressable>
+            ))}
+          </ScrollView>
+        ) : null}
 
         <View style={styles.floatHeader}>
           <Pressable onPress={() => router.back()} style={styles.floatBtn}>
@@ -270,6 +326,17 @@ export default function PropertyDetailScreen() {
         isLoggedIn={isLoggedIn}
         userName={user?.name ?? ''}
         userPhone={user?.phone ?? ''}
+      />
+
+      <ConfirmSheet
+        visible={signInPromptOpen}
+        onClose={() => setSignInPromptOpen(false)}
+        icon="heart-outline"
+        title="Sign in to save"
+        body="Create an account or sign in to save properties."
+        confirmLabel="Sign in"
+        cancelLabel="Not now"
+        onConfirm={() => router.push('/auth/login')}
       />
     </SafeAreaView>
   )
@@ -702,10 +769,21 @@ const styles = StyleSheet.create({
   backBtn:        { marginTop: 14, backgroundColor: BRAND, paddingHorizontal: 18, paddingVertical: 10, borderRadius: 8 },
   backBtnText:    { color: '#fff', fontWeight: '700' },
 
+  galleryWrap:    { position: 'relative' },
   gallery:        { width: screenW, height: 260 },
   galleryImg:     { width: screenW, height: 260, backgroundColor: '#e2e8f0' },
   noImage:        { alignItems: 'center', justifyContent: 'center' },
   noImageText:    { color: '#64748b' },
+
+  imgCount:       { position: 'absolute', top: 12, right: 12, flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: 'rgba(15,23,42,0.65)', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 12 },
+  imgCountText:   { color: '#fff', fontSize: 11, fontWeight: '700' },
+  sliderTrack:    { position: 'absolute', bottom: 10, left: 16, right: 16, height: 3, borderRadius: 3, backgroundColor: 'rgba(255,255,255,0.4)' },
+  sliderFill:     { position: 'absolute', top: 0, bottom: 0, borderRadius: 3, backgroundColor: '#fff' },
+
+  thumbStrip:        { borderBottomWidth: 1, borderBottomColor: '#f1f5f9' },
+  thumbStripContent: { paddingHorizontal: 12, paddingVertical: 10, gap: 8 },
+  thumb:             { width: 60, height: 60, borderRadius: 8, backgroundColor: '#e2e8f0', borderWidth: 2, borderColor: 'transparent' },
+  thumbOn:           { borderColor: BRAND },
 
   floatHeader:    { position: 'absolute', top: 12, left: 12, right: 12, flexDirection: 'row', justifyContent: 'space-between' },
   floatBtn:       { width: 38, height: 38, borderRadius: 19, backgroundColor: 'rgba(255,255,255,0.95)', alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOpacity: 0.15, shadowRadius: 4, elevation: 3 },

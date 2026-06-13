@@ -1,9 +1,10 @@
 import { useState } from 'react'
-import { Alert, Pressable, StyleSheet, Text, View } from 'react-native'
+import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { Link, useRouter } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { InfoSheet, type InfoSheetContent } from '../../src/components/InfoSheet'
+import { ConfirmSheet } from '../../src/components/ConfirmSheet'
 import { useAuthStore } from '../../src/store/authStore'
 
 export default function ProfileScreen() {
@@ -13,13 +14,7 @@ export default function ProfileScreen() {
   const clearSession = useAuthStore((s) => s.clearSession)
   // Branded "coming soon" sheet instead of a bare Alert box.
   const [info, setInfo] = useState<InfoSheetContent | null>(null)
-
-  const signOut = () => {
-    Alert.alert('Sign out?', 'You will need to log in again to send inquiries or post listings.', [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Sign out', style: 'destructive', onPress: () => void clearSession() },
-    ])
-  }
+  const [signOutOpen, setSignOutOpen] = useState(false)
 
   if (!isLoggedIn) {
     return (
@@ -61,13 +56,24 @@ export default function ProfileScreen() {
           icon: 'settings-outline', title: 'Settings',
           body: 'Profile and notification settings are coming soon.',
         })} />
-        <Row icon="log-out-outline"         label="Sign out"       onPress={signOut} danger />
+        <Row icon="log-out-outline"         label="Sign out"       onPress={() => setSignOutOpen(true)} danger />
       </View>
 
       <InfoSheet
         visible={info !== null}
         onClose={() => setInfo(null)}
         {...(info ?? { title: '', body: '' })}
+      />
+
+      <ConfirmSheet
+        visible={signOutOpen}
+        onClose={() => setSignOutOpen(false)}
+        icon="log-out-outline"
+        title="Sign out?"
+        body="You will need to log in again to send inquiries or post listings."
+        confirmLabel="Sign out"
+        destructive
+        onConfirm={() => void clearSession()}
       />
     </SafeAreaView>
   )

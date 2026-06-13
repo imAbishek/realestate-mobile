@@ -7,6 +7,7 @@ import { useRouter, useFocusEffect } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
 import { bookingsApi } from '../../src/lib/api'
+import { ConfirmSheet } from '../../src/components/ConfirmSheet'
 import { useAuthStore } from '../../src/store/authStore'
 import type { BookingStatus, SiteVisitBooking } from '../../src/types'
 
@@ -28,6 +29,7 @@ export default function BookingsScreen() {
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
   const [cancelling, setCancelling] = useState<string | null>(null)
+  const [cancelTarget, setCancelTarget] = useState<SiteVisitBooking | null>(null)
 
   const load = useCallback(async () => {
     if (!hydrated) return // wait for session restore; identity change re-fires the focus effect
@@ -50,33 +52,20 @@ export default function BookingsScreen() {
 
   const onRefresh = () => { setRefreshing(true); load() }
 
-  const confirmCancel = (b: SiteVisitBooking) => {
-    Alert.alert(
-      'Cancel site visit?',
-      `Cancel your visit request for "${b.propertyTitle}"?`,
-      [
-        { text: 'Keep it', style: 'cancel' },
-        {
-          text: 'Cancel visit',
-          style: 'destructive',
-          onPress: async () => {
-            setCancelling(b.id)
-            // Optimistic — flip to CANCELLED locally.
-            setItems((prev) => prev.map((x) =>
-              x.id === b.id ? { ...x, status: 'CANCELLED', cancelledBy: 'BUYER' } : x))
-            try {
-              await bookingsApi.cancel(b.id)
-            } catch (e: unknown) {
-              const msg = e instanceof Error ? e.message : 'Could not cancel'
-              Alert.alert('Cancel failed', msg)
-              load() // reconcile with server state
-            } finally {
-              setCancelling(null)
-            }
-          },
-        },
-      ],
-    )
+  const doCancel = async (b: SiteVisitBooking) => {
+    setCancelling(b.id)
+    // Optimistic — flip to CANCELLED locally.
+    setItems((prev) => prev.map((x) =>
+      x.id === b.id ? { ...x, status: 'CANCELLED', cancelledBy: 'BUYER' } : x))
+    try {
+      await bookingsApi.cancel(b.id)
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : 'Could not cancel'
+      Alert.alert('Cancel failed', msg)
+      load() // reconcile with server state
+    } finally {
+      setCancelling(null)
+    }
   }
 
   if (!hydrated || loading) {
@@ -131,9 +120,21 @@ export default function BookingsScreen() {
             item={item}
             cancelling={cancelling === item.id}
             onPress={() => router.push(`/properties/${item.propertyId}`)}
-            onCancel={() => confirmCancel(item)}
+            onCancel={() => setCancelTarget(item)}
           />
         )}
+      />
+
+      <ConfirmSheet
+        visible={cancelTarget !== null}
+        onClose={() => setCancelTarget(null)}
+        icon="calendar-outline"
+        title="Cancel site visit?"
+        body={cancelTarget ? `Cancel your visit request for "${cancelTarget.propertyTitle}"?` : undefined}
+        confirmLabel="Cancel visit"
+        cancelLabel="Keep it"
+        destructive
+        onConfirm={() => { if (cancelTarget) doCancel(cancelTarget) }}
       />
     </SafeAreaView>
   )
