@@ -11,7 +11,11 @@
       "typedRoutes": true
     },
     "extra": {
-      "apiUrl": "https://realestate-backend-tgbv.onrender.com/api"
+      "apiUrl": "https://realestate-backend-tgbv.onrender.com/api",
+      "router": {},
+      "eas": {
+        "projectId": "f104dd45-9e6c-4867-8063-1f200f0aabee"
+      }
     },
     "ios": {
       "supportsTablet": true,

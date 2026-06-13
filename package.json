@@ -7,6 +7,7 @@
     "axios": "^1.16.1",
     "expo": "~56.0.6",
     "expo-constants": "~56.0.16",
+    "expo-dev-client": "~56.0.20",
     "expo-document-picker": "~56.0.4",
     "expo-image-picker": "~56.0.14",
     "expo-linear-gradient": "~56.0.4",
