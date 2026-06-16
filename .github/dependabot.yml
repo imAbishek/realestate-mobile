@@ -1,0 +1,16 @@
+# Dependabot — automated dependency + security update PRs (OWASP A03: Supply Chain).
+# Note: Expo pins many deps to SDK-compatible versions — review RN/Expo bumps
+# against the SDK 56 compatibility table before merging.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    labels: ["dependencies", "mobile"]
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+    labels: ["dependencies", "ci"]
