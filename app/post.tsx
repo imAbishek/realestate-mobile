@@ -7,7 +7,7 @@ import * as ImagePicker from 'expo-image-picker'
 import * as DocumentPicker from 'expo-document-picker'
 import { Ionicons } from '@expo/vector-icons'
 import { Stack, useRouter } from 'expo-router'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { FormField } from '../src/components/FormField'
 import { ChipRow } from '../src/components/ChipRow'
@@ -29,6 +29,7 @@ const COIMBATORE_SLUG = 'coimbatore'
 
 export default function PostScreen() {
   const router = useRouter()
+  const insets = useSafeAreaInsets()
   const { isLoggedIn, user, hydrated } = useAuthStore()
   const [step, setStep] = useState(1)
   const [state, setState] = useState<WizardState>(initialWizardState)
@@ -162,7 +163,7 @@ export default function PostScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0}
       >
-        <ScrollView contentContainerStyle={styles.body} keyboardShouldPersistTaps="handled">
+        <ScrollView contentContainerStyle={[styles.body, { paddingBottom: 32 + insets.bottom }]} keyboardShouldPersistTaps="handled">
           {step === 1 && <Step1 state={state} set={set} />}
           {step === 2 && <Step2 state={state} set={set} />}
           {step === 3 && <Step3 state={state} set={set} localities={localities} />}

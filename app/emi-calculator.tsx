@@ -3,7 +3,7 @@ import {
   PanResponder, Pressable, ScrollView, StyleSheet, Text, View,
 } from 'react-native'
 import { useRouter } from 'expo-router'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
 
 const BRAND      = '#185FA5'
@@ -30,6 +30,7 @@ function formatINR(n: number): string {
 
 export default function EmiCalculatorScreen() {
   const router = useRouter()
+  const insets = useSafeAreaInsets()
 
   const [loan,   setLoan]   = useState(5_000_000)   // ₹50 L
   const [tenure, setTenure] = useState(20)          // years
@@ -61,7 +62,7 @@ export default function EmiCalculatorScreen() {
         </View>
       </SafeAreaView>
 
-      <ScrollView contentContainerStyle={{ paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={{ paddingBottom: 40 + insets.bottom }} showsVerticalScrollIndicator={false}>
         {/* Donut */}
         <View style={styles.donutWrap}>
           <RingProgress size={220} thickness={26} progress={principalFraction} color={PRINCIPAL} track={INTEREST}>

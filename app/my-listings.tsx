@@ -4,7 +4,7 @@ import {
   StyleSheet, Text, View,
 } from 'react-native'
 import { useRouter, useFocusEffect } from 'expo-router'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
 import { propertyApi } from '../src/lib/api'
 import { useAuthStore } from '../src/store/authStore'
@@ -24,6 +24,7 @@ const STATUS_STYLE: Record<ListingStatus, { bg: string; fg: string; label: strin
 
 export default function MyListingsScreen() {
   const router = useRouter()
+  const insets = useSafeAreaInsets()
   const { isLoggedIn, hydrated } = useAuthStore()
 
   const [items, setItems] = useState<PropertyCard[]>([])
@@ -97,7 +98,7 @@ export default function MyListingsScreen() {
       <FlatList
         data={items}
         keyExtractor={(p) => p.id}
-        contentContainerStyle={{ padding: 12, paddingBottom: 32 }}
+        contentContainerStyle={{ padding: 12, paddingBottom: 32 + insets.bottom }}
         ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={BRAND} />}
         renderItem={({ item }) => (

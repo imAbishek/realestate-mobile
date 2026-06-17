@@ -4,7 +4,7 @@ import {
   Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View,
 } from 'react-native'
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps'
 import { propertyApi, favoritesApi, bookingsApi } from '../../src/lib/api'
@@ -27,6 +27,7 @@ const SQFT_PER_CENT = 435.6
 export default function PropertyDetailScreen() {
   const { id, ownerView } = useLocalSearchParams<{ id: string; ownerView?: string }>()
   const router = useRouter()
+  const insets = useSafeAreaInsets()
   const isLoggedIn = useAuthStore((s) => s.isLoggedIn)
   const user = useAuthStore((s) => s.user)
 
@@ -140,7 +141,7 @@ export default function PropertyDetailScreen() {
     <SafeAreaView style={styles.safe} edges={['top']}>
       <Stack.Screen options={{ headerShown: false }} />
 
-      <ScrollView contentContainerStyle={{ paddingBottom: 110 }}>
+      <ScrollView contentContainerStyle={{ paddingBottom: 110 + insets.bottom }}>
         {/* ── Image gallery ───────────────────────── */}
         {ordered.length > 0 ? (
           <View style={styles.galleryWrap}>
@@ -303,7 +304,7 @@ export default function PropertyDetailScreen() {
       </ScrollView>
 
       {/* ── Bottom action bar ───────────────────── */}
-      <View style={styles.actionBar}>
+      <View style={[styles.actionBar, { paddingBottom: Math.max(insets.bottom, 12) }]}>
         <Pressable onPress={callOwner} style={[styles.actionBtn, styles.actionBtnOutline]}>
           <Ionicons name="call" size={16} color={BRAND} />
           <Text style={[styles.actionBtnText, { color: BRAND }]}>Call</Text>
@@ -397,7 +398,7 @@ function SpecStrip({ data }: { data: PropertyDetail }) {
   return (
     <View style={styles.specStrip}>
       <SpecCell label="Config"     value={data.bedrooms != null ? `${data.bedrooms} BHK` : 'PG'} />
-      <SpecCell label="Super Area" value={`${data.areaSqft} sqft`} />
+      <SpecCell label="Area"       value={`${data.areaSqft} sqft`} />
       <SpecCell label="Furnishing" value={prettyEnum(data.furnishing)} />
     </View>
   )
@@ -839,7 +840,7 @@ const styles = StyleSheet.create({
   ownerName:      { fontSize: 14, fontWeight: '700', color: '#0f172a' },
   ownerMeta:      { fontSize: 12, color: '#64748b', marginTop: 2 },
 
-  actionBar:      { position: 'absolute', left: 0, right: 0, bottom: 0, flexDirection: 'row', gap: 8, paddingHorizontal: 12, paddingTop: 10, paddingBottom: Platform.OS === 'ios' ? 22 : 12, backgroundColor: '#fff', borderTopWidth: 1, borderTopColor: '#e2e8f0' },
+  actionBar:      { position: 'absolute', left: 0, right: 0, bottom: 0, flexDirection: 'row', gap: 8, paddingHorizontal: 12, paddingTop: 10, backgroundColor: '#fff', borderTopWidth: 1, borderTopColor: '#e2e8f0' },
   actionBtn:      { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: 12, borderRadius: 10 },
   actionBtnOutline:{ borderWidth: 1, borderColor: BRAND, backgroundColor: '#fff' },
   actionBtnWhatsApp:{ borderWidth: 1, borderColor: '#25D366', backgroundColor: '#f0fdf4' },
