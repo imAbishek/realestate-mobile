@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
-import { Link, Stack, useLocalSearchParams, useRouter } from 'expo-router'
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { z } from 'zod'
 import { authApi } from '../../src/lib/api'
+import { useAuthStore } from '../../src/store/authStore'
 import { FormField } from '../../src/components/FormField'
 import { PrimaryButton } from '../../src/components/PrimaryButton'
 
@@ -22,6 +23,7 @@ type Errors = Partial<Record<'email' | 'otp' | 'newPassword' | 'confirm', string
 export default function ResetPasswordScreen() {
   const router = useRouter()
   const params = useLocalSearchParams<{ email?: string }>()
+  const setSession = useAuthStore((s) => s.setSession)
 
   const [email, setEmail] = useState(params.email ?? '')
   const [otp, setOtp] = useState('')
@@ -29,6 +31,31 @@ export default function ResetPasswordScreen() {
   const [confirm, setConfirm] = useState('')
   const [errors, setErrors] = useState<Errors>({})
   const [submitting, setSubmitting] = useState(false)
+  const [resending, setResending] = useState(false)
+  const [cooldown, setCooldown] = useState(0)
+
+  useEffect(() => {
+    if (cooldown <= 0) return
+    const t = setTimeout(() => setCooldown((c) => c - 1), 1000)
+    return () => clearTimeout(t)
+  }, [cooldown])
+
+  const resend = async () => {
+    if (!z.string().email().safeParse(email).success) {
+      Alert.alert('Enter your email', 'Please enter a valid email address first.')
+      return
+    }
+    setResending(true)
+    try {
+      await authApi.forgotPassword(email)
+    } catch {
+      // Neutral response either way (anti-enumeration, mirrors the backend).
+    } finally {
+      setResending(false)
+      setCooldown(30)
+      Alert.alert('OTP resent', `A new OTP has been sent to ${email}.`)
+    }
+  }
 
   const submit = async () => {
     const parsed = schema.safeParse({ email, otp, newPassword, confirm })
@@ -45,11 +72,19 @@ export default function ResetPasswordScreen() {
     setSubmitting(true)
     try {
       await authApi.resetPassword(parsed.data.email, parsed.data.otp, parsed.data.newPassword)
-      Alert.alert('Password reset', 'Your password has been reset. You can now sign in.')
-      router.replace('/auth/login')
     } catch (e: unknown) {
-      const msg = extractError(e) || 'Invalid or expired OTP. Please try again.'
-      Alert.alert('Reset failed', msg)
+      Alert.alert('Reset failed', extractError(e) || 'Invalid or expired OTP. Please try again.')
+      setSubmitting(false)
+      return
+    }
+    // Password changed — sign in with the new credentials so the user skips the login screen.
+    try {
+      const { data } = await authApi.login({ identifier: parsed.data.email, password: parsed.data.newPassword })
+      await setSession(data.accessToken, data.refreshToken, data.user)
+      router.replace('/')
+    } catch {
+      Alert.alert('Password reset', 'Your password has been reset. Please sign in.')
+      router.replace('/auth/login')
     } finally {
       setSubmitting(false)
     }
@@ -105,9 +140,11 @@ export default function ResetPasswordScreen() {
 
           <View style={styles.footer}>
             <Text style={styles.footerText}>Didn&apos;t get the OTP? </Text>
-            <Link href="/auth/forgot-password" asChild>
-              <Pressable><Text style={styles.link}>Resend</Text></Pressable>
-            </Link>
+            <Pressable onPress={resend} disabled={resending || cooldown > 0}>
+              <Text style={[styles.link, (resending || cooldown > 0) && styles.linkDisabled]}>
+                {cooldown > 0 ? `Resend in ${cooldown}s` : resending ? 'Resending…' : 'Resend'}
+              </Text>
+            </Pressable>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -132,4 +169,5 @@ const styles = StyleSheet.create({
   footer:     { flexDirection: 'row', justifyContent: 'center', marginTop: 18 },
   footerText: { color: '#64748b', fontSize: 14 },
   link:       { color: '#185FA5', fontWeight: '700', fontSize: 14 },
+  linkDisabled: { color: '#94a3b8' },
 })
