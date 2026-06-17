@@ -1,5 +1,6 @@
 import { Tabs } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 const BRAND = '#185FA5'
 const MUTED = '#94a3b8'
@@ -7,6 +8,10 @@ const MUTED = '#94a3b8'
 type IconName = React.ComponentProps<typeof Ionicons>['name']
 
 export default function TabsLayout() {
+  // SDK 56 draws edge-to-edge, so the Android system nav bar overlaps a
+  // fixed-height tab bar. Add the bottom inset so the bar sits above it.
+  const insets = useSafeAreaInsets()
+
   return (
     <Tabs
       screenOptions={{
@@ -15,7 +20,14 @@ export default function TabsLayout() {
         tabBarActiveTintColor: BRAND,
         tabBarInactiveTintColor: MUTED,
         tabBarLabelStyle: { fontSize: 11, fontWeight: '600' },
-        tabBarStyle: { height: 64, paddingBottom: 8, paddingTop: 6, borderTopWidth: 1, borderTopColor: '#e2e8f0', backgroundColor: '#fff' },
+        tabBarStyle: {
+          height: 64 + insets.bottom,
+          paddingBottom: 8 + insets.bottom,
+          paddingTop: 6,
+          borderTopWidth: 1,
+          borderTopColor: '#e2e8f0',
+          backgroundColor: '#fff',
+        },
       }}
     >
       <Tabs.Screen name="index"    options={{ title: 'Home',     tabBarIcon: (p) => <TabIcon name={p.focused ? 'home' : 'home-outline'} {...p} /> }} />
