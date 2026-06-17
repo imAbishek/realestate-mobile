@@ -75,6 +75,10 @@ export default function LoginScreen() {
             placeholder="••••••••"
           />
 
+          <Link href="/auth/forgot-password" asChild>
+            <Pressable style={styles.forgot}><Text style={styles.link}>Forgot password?</Text></Pressable>
+          </Link>
+
           <PrimaryButton label="Sign in" onPress={submit} loading={submitting} />
 
           <View style={styles.footer}>
@@ -103,6 +107,7 @@ const styles = StyleSheet.create({
   scroll:     { padding: 20 },
   heading:    { fontSize: 26, fontWeight: '700', color: '#0f172a' },
   sub:        { fontSize: 14, color: '#64748b', marginTop: 6, marginBottom: 24 },
+  forgot:     { alignSelf: 'flex-end', marginBottom: 18, marginTop: 2 },
   footer:     { flexDirection: 'row', justifyContent: 'center', marginTop: 18 },
   footerText: { color: '#64748b', fontSize: 14 },
   link:       { color: '#185FA5', fontWeight: '700', fontSize: 14 },
