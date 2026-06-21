@@ -1,9 +1,32 @@
 import { useEffect } from 'react'
-import { Stack } from 'expo-router'
+import { Text } from 'react-native'
+import { Stack, SplashScreen } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
+import {
+  useFonts,
+  PlusJakartaSans_400Regular,
+  PlusJakartaSans_500Medium,
+  PlusJakartaSans_600SemiBold,
+  PlusJakartaSans_700Bold,
+  PlusJakartaSans_800ExtraBold,
+} from '@expo-google-fonts/plus-jakarta-sans'
 import * as Sentry from '@sentry/react-native'
 import { useAuthStore } from '../src/store/authStore'
+import { colors, fonts } from '../src/theme'
+
+// Make Plus Jakarta Sans the default family for every <Text> so screens we
+// haven't restyled yet still pick up the new typeface. Headings/buttons override
+// with the bold/extra families via the theme presets.
+const TextWithDefault = Text as unknown as { defaultProps?: { style?: object } }
+TextWithDefault.defaultProps = TextWithDefault.defaultProps ?? {}
+TextWithDefault.defaultProps.style = [
+  TextWithDefault.defaultProps.style,
+  { fontFamily: fonts.regular },
+]
+
+// Hold the splash until the font assets are ready (avoids a flash of system font).
+void SplashScreen.preventAutoHideAsync()
 
 // Error monitoring (OWASP A09). Inert unless EXPO_PUBLIC_SENTRY_DSN is set,
 // and disabled in dev (__DEV__) so only release/OTA builds report.
@@ -21,16 +44,30 @@ if (sentryDsn) {
 function RootLayout() {
   const hydrate = useAuthStore((s) => s.hydrate)
 
+  const [fontsLoaded, fontError] = useFonts({
+    PlusJakartaSans_400Regular,
+    PlusJakartaSans_500Medium,
+    PlusJakartaSans_600SemiBold,
+    PlusJakartaSans_700Bold,
+    PlusJakartaSans_800ExtraBold,
+  })
+
   useEffect(() => { void hydrate() }, [hydrate])
+  useEffect(() => {
+    if (fontsLoaded || fontError) void SplashScreen.hideAsync()
+  }, [fontsLoaded, fontError])
+
+  // Keep the splash up until fonts resolve (or fail) — never block forever.
+  if (!fontsLoaded && !fontError) return null
 
   return (
     <SafeAreaProvider>
       <StatusBar style="dark" />
       <Stack
         screenOptions={{
-          headerStyle: { backgroundColor: '#185FA5' },
+          headerStyle: { backgroundColor: colors.brand },
           headerTintColor: '#fff',
-          headerTitleStyle: { fontWeight: '700' },
+          headerTitleStyle: { fontFamily: fonts.bold },
         }}
       >
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />

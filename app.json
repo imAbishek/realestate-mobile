@@ -51,7 +51,8 @@
           "locationWhenInUsePermission": "PropFind uses your location to mark the exact spot of the property you're listing on the map. We only use it while the app is open and you tap \"Use my current location\"."
         }
       ],
-      "@sentry/react-native"
+      "@sentry/react-native",
+      "expo-font"
     ],
     "runtimeVersion": {
       "policy": "appVersion"

@@ -95,7 +95,7 @@ export default function SearchScreen() {
         <FlatList
           data={items}
           keyExtractor={(item) => item.id}
-          contentContainerStyle={{ padding: 16, paddingBottom: 24 }}
+          contentContainerStyle={{ padding: 16, paddingBottom: 96 }}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); void load() }} tintColor={BRAND} />}
           renderItem={({ item }) => <Row item={item} onPress={() => router.push(`/properties/${item.id}`)} />}
           ListEmptyComponent={

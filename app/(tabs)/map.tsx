@@ -223,5 +223,5 @@ const styles = StyleSheet.create({
   emptyCard:      { alignItems: 'center', gap: 8, backgroundColor: '#fff', paddingHorizontal: 20, paddingVertical: 16, borderRadius: 12, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 6, elevation: 3 },
   emptyText:      { fontSize: 13, color: '#64748b', fontWeight: '500' },
 
-  carouselWrap: { position: 'absolute', left: 0, right: 0, bottom: 16 },
+  carouselWrap: { position: 'absolute', left: 0, right: 0, bottom: 84 },
 })

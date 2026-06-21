@@ -112,7 +112,7 @@ export default function BookingsScreen() {
       <FlatList
         data={items}
         keyExtractor={(b) => b.id}
-        contentContainerStyle={{ padding: 12, paddingBottom: 32 }}
+        contentContainerStyle={{ padding: 12, paddingBottom: 96 }}
         ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={BRAND} />}
         renderItem={({ item }) => (
