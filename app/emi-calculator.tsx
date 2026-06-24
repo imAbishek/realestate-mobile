@@ -5,13 +5,14 @@ import {
 import { useRouter } from 'expo-router'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
+import { colors, fonts, radius, shadow } from '../src/theme'
 
-const BRAND      = '#185FA5'
+const BRAND      = colors.brand
 const PRINCIPAL  = '#1b2f6b'   // dark navy — principal share
 const INTEREST   = '#cdd9f0'   // light blue — interest share
-const BG         = '#f8fafc'
-const INK        = '#0f172a'
-const MUTED      = '#64748b'
+const BG         = colors.bg
+const INK        = colors.ink
+const MUTED      = colors.muted
 
 // ── Indian-format currency (deterministic — no reliance on Intl/Hermes) ──
 function formatINR(n: number): string {
@@ -239,32 +240,32 @@ function RingProgress({
 
 const styles = StyleSheet.create({
   header:        { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingTop: 6, paddingBottom: 10 },
-  backBtn:       { width: 40, height: 40, borderRadius: 20, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: '#e2e8f0' },
-  headerTitle:   { fontSize: 18, fontWeight: '700', color: INK },
+  backBtn:       { width: 40, height: 40, borderRadius: 20, backgroundColor: colors.white, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: colors.border },
+  headerTitle:   { fontFamily: fonts.bold, fontSize: 18, color: INK },
 
   donutWrap:     { alignItems: 'center', paddingTop: 24, paddingBottom: 8 },
-  donutLabel:    { fontSize: 13, color: MUTED, fontWeight: '600' },
-  donutValue:    { fontSize: 26, fontWeight: '800', color: INK, marginTop: 2 },
-  donutUnit:     { fontSize: 12, color: MUTED, marginTop: 1 },
+  donutLabel:    { fontFamily: fonts.semibold, fontSize: 13, color: MUTED },
+  donutValue:    { fontFamily: fonts.extra, fontSize: 26, color: INK, marginTop: 2 },
+  donutUnit:     { fontFamily: fonts.regular, fontSize: 12, color: MUTED, marginTop: 1 },
 
-  card:          { backgroundColor: '#fff', marginHorizontal: 16, marginTop: 4, borderRadius: 18, padding: 18, borderWidth: 1, borderColor: '#eef2f7' },
+  card:          { backgroundColor: colors.white, marginHorizontal: 16, marginTop: 4, borderRadius: radius.lg, padding: 18, borderWidth: 1, borderColor: colors.borderLight, ...shadow.card },
   rowBetween:    { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  cardTotalLabel:{ fontSize: 14, color: INK, fontWeight: '600' },
-  cardTotalValue:{ fontSize: 16, color: INK, fontWeight: '800' },
-  divider:       { height: 1, backgroundColor: '#eef2f7', marginVertical: 14 },
+  cardTotalLabel:{ fontFamily: fonts.semibold, fontSize: 14, color: INK },
+  cardTotalValue:{ fontFamily: fonts.extra, fontSize: 16, color: INK },
+  divider:       { height: 1, backgroundColor: colors.borderLight, marginVertical: 14 },
   legendDot:     { width: 11, height: 11, borderRadius: 6 },
-  legendLabel:   { fontSize: 13, color: MUTED, fontWeight: '500' },
-  legendValue:   { fontSize: 14, color: INK, fontWeight: '700' },
+  legendLabel:   { fontFamily: fonts.medium, fontSize: 13, color: MUTED },
+  legendValue:   { fontFamily: fonts.bold, fontSize: 14, color: INK },
 
   controls:      { paddingHorizontal: 16, paddingTop: 18 },
   control:       { marginBottom: 26 },
-  controlLabel:  { fontSize: 15, fontWeight: '700', color: INK },
-  valueChip:     { backgroundColor: '#fff', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 8, borderWidth: 1, borderColor: '#e2e8f0' },
-  valueChipText: { fontSize: 14, fontWeight: '700', color: INK },
+  controlLabel:  { fontFamily: fonts.bold, fontSize: 15, color: INK },
+  valueChip:     { backgroundColor: colors.white, borderRadius: radius.sm, paddingHorizontal: 14, paddingVertical: 8, borderWidth: 1, borderColor: colors.border },
+  valueChipText: { fontFamily: fonts.bold, fontSize: 14, color: INK },
 
   sliderHit:     { paddingVertical: 14, marginTop: 4 },
-  sliderTrack:   { height: 6, borderRadius: 3, backgroundColor: '#e2e8f0', justifyContent: 'center' },
+  sliderTrack:   { height: 6, borderRadius: 3, backgroundColor: colors.border, justifyContent: 'center' },
   sliderFill:    { position: 'absolute', left: 0, height: 6, borderRadius: 3, backgroundColor: BRAND },
-  sliderThumb:   { position: 'absolute', width: 22, height: 22, borderRadius: 11, backgroundColor: '#fff', borderWidth: 2, borderColor: BRAND, marginLeft: -11, top: -8 },
-  endLabel:      { fontSize: 12, color: MUTED, marginTop: 6 },
+  sliderThumb:   { position: 'absolute', width: 22, height: 22, borderRadius: 11, backgroundColor: colors.white, borderWidth: 2, borderColor: BRAND, marginLeft: -11, top: -8 },
+  endLabel:      { fontFamily: fonts.regular, fontSize: 12, color: MUTED, marginTop: 6 },
 })

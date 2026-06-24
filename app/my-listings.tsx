@@ -6,12 +6,15 @@ import {
 import { useRouter, useFocusEffect } from 'expo-router'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
+import { LinearGradient } from 'expo-linear-gradient'
 import { propertyApi } from '../src/lib/api'
 import { useAuthStore } from '../src/store/authStore'
+import { colors, fonts, radius, shadow } from '../src/theme'
 import type { ListingStatus, PriceUnit, PropertyCard } from '../src/types'
 
-const BRAND  = '#185FA5'
-const ACCENT = '#D85A30'
+const BRAND  = colors.brand
+const ACCENT = colors.accent
+const HEADER_GRADIENT = ['#0c3a68', '#185FA5'] as const
 
 const STATUS_STYLE: Record<ListingStatus, { bg: string; fg: string; label: string }> = {
   DRAFT:          { bg: '#f1f5f9', fg: '#64748b', label: 'Draft' },
@@ -66,7 +69,7 @@ export default function MyListingsScreen() {
       <SafeAreaView style={styles.safe} edges={['top']}>
         <Header onBack={() => router.back()} />
         <View style={styles.center}>
-          <Ionicons name="home-outline" size={56} color="#cbd5e1" />
+          <View style={styles.emptyIcon}><Ionicons name="home-outline" size={44} color={colors.brand} /></View>
           <Text style={styles.emptyTitle}>Sign in to see your listings</Text>
           <Pressable onPress={() => router.push('/auth/login')} style={styles.cta}>
             <Text style={styles.ctaText}>Sign in</Text>
@@ -81,7 +84,7 @@ export default function MyListingsScreen() {
       <SafeAreaView style={styles.safe} edges={['top']}>
         <Header onBack={() => router.back()} />
         <View style={styles.center}>
-          <Ionicons name="home-outline" size={56} color="#cbd5e1" />
+          <View style={styles.emptyIcon}><Ionicons name="home-outline" size={44} color={colors.brand} /></View>
           <Text style={styles.emptyTitle}>No listings yet</Text>
           <Text style={styles.emptySub}>Post your first property to see it here.</Text>
           <Pressable onPress={() => router.push('/post')} style={styles.cta}>
@@ -111,11 +114,11 @@ export default function MyListingsScreen() {
 
 function Header({ onBack, count }: { onBack: () => void; count?: number }) {
   return (
-    <View style={styles.header}>
+    <LinearGradient colors={HEADER_GRADIENT} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.header}>
       <Pressable onPress={onBack} hitSlop={8}><Ionicons name="arrow-back" size={22} color="#fff" /></Pressable>
       <Text style={styles.headerTitle}>My Listings{count != null ? ` (${count})` : ''}</Text>
       <View style={{ width: 22 }} />
-    </View>
+    </LinearGradient>
   )
 }
 
@@ -128,7 +131,7 @@ function ListingCard({ item, onPress }: { item: PropertyCard; onPress: () => voi
           <Image source={{ uri: item.primaryImageUrl }} style={styles.thumb} />
         ) : (
           <View style={[styles.thumb, styles.thumbEmpty]}>
-            <Ionicons name="image-outline" size={22} color="#94a3b8" />
+            <Ionicons name="image-outline" size={22} color={colors.mutedLight} />
           </View>
         )}
       </View>
@@ -165,25 +168,26 @@ function formatPrice(price: number, unit: PriceUnit): string {
 }
 
 const styles = StyleSheet.create({
-  safe:         { flex: 1, backgroundColor: '#f8fafc' },
-  header:       { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: BRAND, paddingHorizontal: 16, paddingVertical: 14 },
-  headerTitle:  { fontSize: 16, fontWeight: '700', color: '#fff' },
+  safe:         { flex: 1, backgroundColor: colors.bg },
+  header:       { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 16 },
+  headerTitle:  { fontFamily: fonts.bold, fontSize: 18, color: '#fff' },
   center:       { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 28 },
-  emptyTitle:   { fontSize: 17, fontWeight: '700', color: '#0f172a', marginTop: 14 },
-  emptySub:     { fontSize: 13, color: '#64748b', marginTop: 6, textAlign: 'center', lineHeight: 19 },
-  cta:          { marginTop: 18, backgroundColor: ACCENT, paddingHorizontal: 22, paddingVertical: 11, borderRadius: 10 },
-  ctaText:      { color: '#fff', fontWeight: '700', fontSize: 14 },
+  emptyIcon:    { width: 84, height: 84, borderRadius: 42, backgroundColor: '#dbe7f5', alignItems: 'center', justifyContent: 'center', marginBottom: 14 },
+  emptyTitle:   { fontFamily: fonts.bold, fontSize: 17, color: colors.ink, marginTop: 2 },
+  emptySub:     { fontFamily: fonts.regular, fontSize: 13, color: colors.muted, marginTop: 6, textAlign: 'center', lineHeight: 19 },
+  cta:          { marginTop: 18, backgroundColor: ACCENT, paddingHorizontal: 24, paddingVertical: 12, borderRadius: radius.sm, ...shadow.cta },
+  ctaText:      { color: '#fff', fontFamily: fonts.bold, fontSize: 14 },
 
-  card:         { flexDirection: 'row', backgroundColor: '#fff', borderRadius: 12, overflow: 'hidden', borderWidth: 1, borderColor: '#e2e8f0' },
-  thumbWrap:    { width: 110, height: 110, backgroundColor: '#e2e8f0' },
+  card:         { flexDirection: 'row', backgroundColor: colors.white, borderRadius: radius.md, overflow: 'hidden', borderWidth: 1, borderColor: colors.borderLight, ...shadow.card },
+  thumbWrap:    { width: 110, height: 110, backgroundColor: colors.border },
   thumb:        { width: '100%', height: '100%' },
   thumbEmpty:   { alignItems: 'center', justifyContent: 'center' },
   badgeRow:     { flexDirection: 'row', gap: 6, marginBottom: 4 },
-  statusBadge:  { paddingHorizontal: 8, paddingVertical: 2, borderRadius: 999 },
-  statusText:   { fontSize: 10, fontWeight: '700' },
-  cardTitle:    { fontSize: 14, fontWeight: '700', color: '#0f172a' },
-  cardSub:      { fontSize: 12, color: '#64748b', marginTop: 3 },
+  statusBadge:  { paddingHorizontal: 8, paddingVertical: 2, borderRadius: radius.pill },
+  statusText:   { fontFamily: fonts.bold, fontSize: 10 },
+  cardTitle:    { fontFamily: fonts.bold, fontSize: 14, color: colors.ink },
+  cardSub:      { fontFamily: fonts.regular, fontSize: 12, color: colors.muted, marginTop: 3 },
   cardFooter:   { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' },
-  price:        { fontSize: 14, fontWeight: '800', color: BRAND },
-  meta:         { fontSize: 11, color: '#64748b' },
+  price:        { fontFamily: fonts.extra, fontSize: 15, color: BRAND },
+  meta:         { fontFamily: fonts.regular, fontSize: 11, color: colors.muted },
 })

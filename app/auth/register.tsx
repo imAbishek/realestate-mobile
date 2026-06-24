@@ -2,11 +2,13 @@ import { useState } from 'react'
 import { Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { Link, Stack, useRouter } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { Ionicons } from '@expo/vector-icons'
 import { z } from 'zod'
 import { authApi } from '../../src/lib/api'
 import { useAuthStore } from '../../src/store/authStore'
 import { FormField } from '../../src/components/FormField'
 import { PrimaryButton } from '../../src/components/PrimaryButton'
+import { colors, fonts } from '../../src/theme'
 
 const phoneRegex = /^[6-9]\d{9}$/
 
@@ -62,7 +64,9 @@ export default function RegisterScreen() {
       <Stack.Screen options={{ title: 'Create account' }} />
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.flex}>
         <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
+          <View style={styles.iconCircle}><Ionicons name="person-add-outline" size={28} color={colors.brand} /></View>
           <Text style={styles.heading}>Create your account</Text>
+          <View style={styles.accentBar} />
           <Text style={styles.sub}>Join PropFind to post listings or save favourites.</Text>
 
           <FormField label="Full name" value={form.name} onChangeText={update('name')} error={errors.name} placeholder="Asha Rao" />
@@ -93,12 +97,14 @@ function extractError(e: unknown): string | null {
 }
 
 const styles = StyleSheet.create({
-  safe:       { flex: 1, backgroundColor: '#f8fafc' },
+  safe:       { flex: 1, backgroundColor: colors.bg },
   flex:       { flex: 1 },
-  scroll:     { padding: 20 },
-  heading:    { fontSize: 26, fontWeight: '700', color: '#0f172a' },
-  sub:        { fontSize: 14, color: '#64748b', marginTop: 6, marginBottom: 24 },
-  footer:     { flexDirection: 'row', justifyContent: 'center', marginTop: 18 },
-  footerText: { color: '#64748b', fontSize: 14 },
-  link:       { color: '#185FA5', fontWeight: '700', fontSize: 14 },
+  scroll:     { padding: 22, paddingTop: 28 },
+  iconCircle: { width: 60, height: 60, borderRadius: 30, backgroundColor: '#dbe7f5', alignItems: 'center', justifyContent: 'center', marginBottom: 18 },
+  heading:    { fontFamily: fonts.extra, fontSize: 26, color: colors.ink },
+  accentBar:  { width: 38, height: 4, borderRadius: 2, backgroundColor: colors.accent, marginTop: 10 },
+  sub:        { fontFamily: fonts.regular, fontSize: 14, color: colors.muted, marginTop: 12, marginBottom: 24, lineHeight: 20 },
+  footer:     { flexDirection: 'row', justifyContent: 'center', marginTop: 20 },
+  footerText: { fontFamily: fonts.regular, color: colors.muted, fontSize: 14 },
+  link:       { fontFamily: fonts.bold, color: colors.brand, fontSize: 14 },
 })

@@ -9,10 +9,11 @@ import { Ionicons } from '@expo/vector-icons'
 import { bookingsApi } from '../../src/lib/api'
 import { ConfirmSheet } from '../../src/components/ConfirmSheet'
 import { useAuthStore } from '../../src/store/authStore'
+import { colors, fonts, radius, shadow } from '../../src/theme'
 import type { BookingStatus, SiteVisitBooking } from '../../src/types'
 
-const BRAND  = '#185FA5'
-const ACCENT = '#D85A30'
+const BRAND  = colors.brand
+const ACCENT = colors.accent
 
 const STATUS_STYLE: Record<BookingStatus, { bg: string; fg: string; label: string }> = {
   REQUESTED: { bg: '#fff7ed', fg: '#c2410c', label: 'Requested' },
@@ -82,7 +83,7 @@ export default function BookingsScreen() {
       <SafeAreaView style={styles.safe} edges={['top']}>
         <Header />
         <View style={styles.center}>
-          <Ionicons name="calendar-outline" size={56} color="#cbd5e1" />
+          <View style={styles.emptyIcon}><Ionicons name="calendar-outline" size={44} color={colors.brand} /></View>
           <Text style={styles.emptyTitle}>Sign in to see your bookings</Text>
           <Text style={styles.emptySub}>Site visits you request will show up here.</Text>
           <Pressable onPress={() => router.push('/auth/login')} style={styles.cta}>
@@ -98,7 +99,7 @@ export default function BookingsScreen() {
       <SafeAreaView style={styles.safe} edges={['top']}>
         <Header />
         <View style={styles.center}>
-          <Ionicons name="calendar-outline" size={56} color="#cbd5e1" />
+          <View style={styles.emptyIcon}><Ionicons name="calendar-outline" size={44} color={colors.brand} /></View>
           <Text style={styles.emptyTitle}>No site visits booked yet</Text>
           <Text style={styles.emptySub}>Tap “Book Visit” on any listing to request one.</Text>
         </View>
@@ -166,7 +167,7 @@ function BookingCard({
             <Image source={{ uri: item.propertyImageUrl }} style={styles.thumb} />
           ) : (
             <View style={[styles.thumb, styles.thumbEmpty]}>
-              <Ionicons name="image-outline" size={22} color="#94a3b8" />
+              <Ionicons name="image-outline" size={22} color={colors.mutedLight} />
             </View>
           )}
         </View>
@@ -183,7 +184,7 @@ function BookingCard({
             </Text>
           </View>
           <View style={styles.slotRow}>
-            <Ionicons name="time-outline" size={13} color="#64748b" />
+            <Ionicons name="time-outline" size={13} color={colors.muted} />
             <Text style={styles.slot}>{slot || 'Flexible slot'}</Text>
           </View>
         </View>
@@ -192,9 +193,9 @@ function BookingCard({
       {canCancel ? (
         <Pressable onPress={onCancel} disabled={cancelling} style={styles.cancelBtn}>
           {cancelling
-            ? <ActivityIndicator size="small" color="#dc2626" />
+            ? <ActivityIndicator size="small" color={colors.danger} />
             : <>
-                <Ionicons name="close-circle-outline" size={15} color="#dc2626" />
+                <Ionicons name="close-circle-outline" size={15} color={colors.danger} />
                 <Text style={styles.cancelText}>Cancel visit</Text>
               </>}
         </Pressable>
@@ -208,32 +209,33 @@ function BookingCard({
 }
 
 const styles = StyleSheet.create({
-  safe:        { flex: 1, backgroundColor: '#f8fafc' },
-  header:      { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 14, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#e2e8f0' },
-  headerTitle: { fontSize: 18, fontWeight: '700', color: '#0f172a' },
-  headerCount: { fontSize: 12, color: '#64748b', fontWeight: '600' },
+  safe:        { flex: 1, backgroundColor: colors.bg },
+  header:      { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 16, backgroundColor: colors.white, borderBottomWidth: 1, borderBottomColor: colors.borderLight },
+  headerTitle: { fontFamily: fonts.bold, fontSize: 20, color: colors.ink },
+  headerCount: { fontFamily: fonts.semibold, fontSize: 12, color: colors.muted },
   center:      { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 28 },
-  emptyTitle:  { fontSize: 17, fontWeight: '700', color: '#0f172a', marginTop: 14 },
-  emptySub:    { fontSize: 13, color: '#64748b', marginTop: 6, textAlign: 'center', lineHeight: 19 },
-  cta:         { marginTop: 18, backgroundColor: ACCENT, paddingHorizontal: 22, paddingVertical: 11, borderRadius: 10 },
-  ctaText:     { color: '#fff', fontWeight: '700', fontSize: 14 },
+  emptyIcon:   { width: 84, height: 84, borderRadius: 42, backgroundColor: '#dbe7f5', alignItems: 'center', justifyContent: 'center', marginBottom: 14 },
+  emptyTitle:  { fontFamily: fonts.bold, fontSize: 17, color: colors.ink, marginTop: 2 },
+  emptySub:    { fontFamily: fonts.regular, fontSize: 13, color: colors.muted, marginTop: 6, textAlign: 'center', lineHeight: 19 },
+  cta:         { marginTop: 18, backgroundColor: ACCENT, paddingHorizontal: 24, paddingVertical: 12, borderRadius: radius.sm, ...shadow.cta },
+  ctaText:     { color: '#fff', fontFamily: fonts.bold, fontSize: 14 },
 
-  card:        { backgroundColor: '#fff', borderRadius: 12, overflow: 'hidden', borderWidth: 1, borderColor: '#e2e8f0' },
+  card:        { backgroundColor: colors.white, borderRadius: radius.md, overflow: 'hidden', borderWidth: 1, borderColor: colors.borderLight, ...shadow.card },
   cardTop:     { flexDirection: 'row' },
-  thumbWrap:   { width: 104, height: 104, backgroundColor: '#e2e8f0' },
+  thumbWrap:   { width: 104, height: 104, backgroundColor: colors.border },
   thumb:       { width: '100%', height: '100%' },
   thumbEmpty:  { alignItems: 'center', justifyContent: 'center' },
   titleRow:    { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  cardTitle:   { flex: 1, fontSize: 14, fontWeight: '700', color: '#0f172a' },
-  cardSub:     { fontSize: 12, color: '#64748b', marginTop: 3 },
+  cardTitle:   { flex: 1, fontFamily: fonts.bold, fontSize: 14, color: colors.ink },
+  cardSub:     { fontFamily: fonts.regular, fontSize: 12, color: colors.muted, marginTop: 3 },
   slotRow:     { flexDirection: 'row', alignItems: 'center', gap: 5 },
-  slot:        { fontSize: 12, color: '#475569', fontWeight: '500' },
+  slot:        { fontFamily: fonts.medium, fontSize: 12, color: colors.muted },
 
-  pill:        { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 999 },
-  pillText:    { fontSize: 10, fontWeight: '700' },
+  pill:        { paddingHorizontal: 8, paddingVertical: 3, borderRadius: radius.pill },
+  pillText:    { fontFamily: fonts.bold, fontSize: 10 },
 
-  cancelBtn:   { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: 10, borderTopWidth: 1, borderTopColor: '#f1f5f9' },
-  cancelText:  { fontSize: 13, fontWeight: '600', color: '#dc2626' },
-  reasonRow:   { paddingHorizontal: 12, paddingVertical: 9, borderTopWidth: 1, borderTopColor: '#f1f5f9', backgroundColor: '#f8fafc' },
-  reasonText:  { fontSize: 12, color: '#64748b' },
+  cancelBtn:   { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: 10, borderTopWidth: 1, borderTopColor: colors.borderLight },
+  cancelText:  { fontFamily: fonts.semibold, fontSize: 13, color: colors.danger },
+  reasonRow:   { paddingHorizontal: 12, paddingVertical: 9, borderTopWidth: 1, borderTopColor: colors.borderLight, backgroundColor: colors.bg },
+  reasonText:  { fontFamily: fonts.regular, fontSize: 12, color: colors.muted },
 })

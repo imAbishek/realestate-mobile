@@ -8,10 +8,11 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
 import { favoritesApi } from '../../src/lib/api'
 import { useAuthStore } from '../../src/store/authStore'
+import { colors, fonts, radius, shadow } from '../../src/theme'
 import type { PropertyCard } from '../../src/types'
 
-const BRAND  = '#185FA5'
-const ACCENT = '#D85A30'
+const BRAND  = colors.brand
+const ACCENT = colors.accent
 
 export default function SavedScreen() {
   const router = useRouter()
@@ -56,7 +57,7 @@ export default function SavedScreen() {
       <SafeAreaView style={styles.safe} edges={['top']}>
         <Header />
         <View style={styles.center}>
-          <Ionicons name="heart-outline" size={56} color="#cbd5e1" />
+          <View style={styles.emptyIcon}><Ionicons name="heart-outline" size={44} color={colors.brand} /></View>
           <Text style={styles.emptyTitle}>Sign in to see saved properties</Text>
           <Text style={styles.emptySub}>Save listings you like and find them all in one place.</Text>
           <Pressable onPress={() => router.push('/auth/login')} style={styles.cta}>
@@ -72,7 +73,7 @@ export default function SavedScreen() {
       <SafeAreaView style={styles.safe} edges={['top']}>
         <Header />
         <View style={styles.center}>
-          <Ionicons name="heart-outline" size={56} color="#cbd5e1" />
+          <View style={styles.emptyIcon}><Ionicons name="heart-outline" size={44} color={colors.brand} /></View>
           <Text style={styles.emptyTitle}>No saved properties yet</Text>
           <Text style={styles.emptySub}>Tap the heart on any listing to save it for later.</Text>
         </View>
@@ -145,23 +146,24 @@ function formatPrice(price: number, unit: string): string {
 }
 
 const styles = StyleSheet.create({
-  safe:         { flex: 1, backgroundColor: '#f8fafc' },
-  header:       { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 14, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#e2e8f0' },
-  headerTitle:  { fontSize: 18, fontWeight: '700', color: '#0f172a' },
-  headerCount:  { fontSize: 12, color: '#64748b', fontWeight: '600' },
+  safe:         { flex: 1, backgroundColor: colors.bg },
+  header:       { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 16, backgroundColor: colors.white, borderBottomWidth: 1, borderBottomColor: colors.borderLight },
+  headerTitle:  { fontFamily: fonts.bold, fontSize: 20, color: colors.ink },
+  headerCount:  { fontFamily: fonts.semibold, fontSize: 12, color: colors.muted },
   center:       { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 28 },
-  emptyTitle:   { fontSize: 17, fontWeight: '700', color: '#0f172a', marginTop: 14 },
-  emptySub:     { fontSize: 13, color: '#64748b', marginTop: 6, textAlign: 'center', lineHeight: 19 },
-  cta:          { marginTop: 18, backgroundColor: ACCENT, paddingHorizontal: 22, paddingVertical: 11, borderRadius: 10 },
-  ctaText:      { color: '#fff', fontWeight: '700', fontSize: 14 },
+  emptyIcon:    { width: 84, height: 84, borderRadius: 42, backgroundColor: '#dbe7f5', alignItems: 'center', justifyContent: 'center', marginBottom: 14 },
+  emptyTitle:   { fontFamily: fonts.bold, fontSize: 17, color: colors.ink, marginTop: 2 },
+  emptySub:     { fontFamily: fonts.regular, fontSize: 13, color: colors.muted, marginTop: 6, textAlign: 'center', lineHeight: 19 },
+  cta:          { marginTop: 18, backgroundColor: ACCENT, paddingHorizontal: 24, paddingVertical: 12, borderRadius: radius.sm, ...shadow.cta },
+  ctaText:      { color: '#fff', fontFamily: fonts.bold, fontSize: 14 },
 
-  card:         { flexDirection: 'row', backgroundColor: '#fff', borderRadius: 12, overflow: 'hidden', borderWidth: 1, borderColor: '#e2e8f0' },
-  thumbWrap:    { width: 110, height: 100, backgroundColor: '#e2e8f0' },
+  card:         { flexDirection: 'row', backgroundColor: colors.white, borderRadius: radius.md, overflow: 'hidden', borderWidth: 1, borderColor: colors.borderLight, ...shadow.card },
+  thumbWrap:    { width: 110, height: 104, backgroundColor: colors.border },
   thumb:        { width: '100%', height: '100%' },
   thumbEmpty:   { alignItems: 'center', justifyContent: 'center' },
-  cardTitle:    { fontSize: 14, fontWeight: '700', color: '#0f172a' },
-  cardSub:      { fontSize: 12, color: '#64748b', marginTop: 3 },
+  cardTitle:    { fontFamily: fonts.bold, fontSize: 14, color: colors.ink },
+  cardSub:      { fontFamily: fonts.regular, fontSize: 12, color: colors.muted, marginTop: 3 },
   cardFooter:   { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' },
-  price:        { fontSize: 14, fontWeight: '800', color: BRAND },
-  meta:         { fontSize: 11, color: '#64748b' },
+  price:        { fontFamily: fonts.extra, fontSize: 15, color: BRAND },
+  meta:         { fontFamily: fonts.regular, fontSize: 11, color: colors.muted },
 })

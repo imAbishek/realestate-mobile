@@ -1,4 +1,5 @@
 import { ActivityIndicator, Pressable, StyleSheet, Text } from 'react-native'
+import { colors, fonts, radius, shadow } from '../theme'
 
 interface Props {
   label: string
@@ -9,7 +10,7 @@ interface Props {
 }
 
 export function PrimaryButton({ label, onPress, loading, disabled, variant = 'primary' }: Props) {
-  const bg = variant === 'accent' ? '#D85A30' : '#185FA5'
+  const bg = variant === 'accent' ? colors.accent : colors.brand
   const off = disabled || loading
   return (
     <Pressable
@@ -17,7 +18,8 @@ export function PrimaryButton({ label, onPress, loading, disabled, variant = 'pr
       disabled={off}
       style={({ pressed }) => [
         styles.btn,
-        { backgroundColor: bg, opacity: off ? 0.6 : pressed ? 0.85 : 1 },
+        shadow.cta,
+        { backgroundColor: bg, opacity: off ? 0.6 : pressed ? 0.9 : 1 },
       ]}
     >
       {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.text}>{label}</Text>}
@@ -26,6 +28,6 @@ export function PrimaryButton({ label, onPress, loading, disabled, variant = 'pr
 }
 
 const styles = StyleSheet.create({
-  btn:  { borderRadius: 10, paddingVertical: 14, alignItems: 'center', justifyContent: 'center' },
-  text: { color: '#fff', fontWeight: '700', fontSize: 15 },
+  btn:  { borderRadius: radius.sm, paddingVertical: 16, alignItems: 'center', justifyContent: 'center' },
+  text: { color: '#fff', fontFamily: fonts.bold, fontSize: 15, letterSpacing: 0.2 },
 })

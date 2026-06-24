@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { InfoSheet, type InfoSheetContent } from '../../src/components/InfoSheet'
 import { ConfirmSheet } from '../../src/components/ConfirmSheet'
 import { useAuthStore } from '../../src/store/authStore'
+import { colors, fonts, radius, shadow } from '../../src/theme'
 
 export default function ProfileScreen() {
   const router = useRouter()
@@ -20,7 +21,7 @@ export default function ProfileScreen() {
     return (
       <SafeAreaView style={styles.safe} edges={['top']}>
         <View style={styles.center}>
-          <Ionicons name="person-circle-outline" size={72} color="#cbd5e1" />
+          <View style={styles.guestIcon}><Ionicons name="person-circle-outline" size={56} color={colors.brand} /></View>
           <Text style={styles.title}>You're browsing as a guest</Text>
           <Text style={styles.sub}>Sign in to send inquiries and post listings.</Text>
           <Link href="/auth/login" asChild>
@@ -82,32 +83,36 @@ export default function ProfileScreen() {
 function Row({ icon, label, onPress, danger }: { icon: React.ComponentProps<typeof Ionicons>['name']; label: string; onPress: () => void; danger?: boolean }) {
   return (
     <Pressable onPress={onPress} style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}>
-      <Ionicons name={icon} size={20} color={danger ? '#dc2626' : '#185FA5'} />
-      <Text style={[styles.rowLabel, danger && { color: '#dc2626' }]}>{label}</Text>
-      <Ionicons name="chevron-forward" size={18} color="#94a3b8" />
+      <View style={[styles.rowIcon, danger && { backgroundColor: '#fde8e8' }]}>
+        <Ionicons name={icon} size={19} color={danger ? colors.danger : colors.brand} />
+      </View>
+      <Text style={[styles.rowLabel, danger && { color: colors.danger }]}>{label}</Text>
+      <Ionicons name="chevron-forward" size={18} color={colors.mutedLight} />
     </Pressable>
   )
 }
 
 const styles = StyleSheet.create({
-  safe:           { flex: 1, backgroundColor: '#f8fafc' },
+  safe:           { flex: 1, backgroundColor: colors.bg },
   center:         { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
-  title:          { fontSize: 18, fontWeight: '700', color: '#0f172a', marginTop: 16, textAlign: 'center' },
-  sub:            { fontSize: 13, color: '#64748b', marginTop: 6, textAlign: 'center', marginBottom: 20 },
-  primaryBtn:     { backgroundColor: '#185FA5', borderRadius: 10, paddingHorizontal: 28, paddingVertical: 12, marginTop: 8 },
-  primaryBtnText: { color: '#fff', fontWeight: '700', fontSize: 15 },
-  secondaryBtn:   { borderRadius: 10, paddingHorizontal: 28, paddingVertical: 12, marginTop: 10 },
-  secondaryBtnText:{ color: '#185FA5', fontWeight: '600', fontSize: 14 },
+  guestIcon:      { width: 96, height: 96, borderRadius: 48, backgroundColor: '#dbe7f5', alignItems: 'center', justifyContent: 'center' },
+  title:          { fontFamily: fonts.bold, fontSize: 18, color: colors.ink, marginTop: 16, textAlign: 'center' },
+  sub:            { fontFamily: fonts.regular, fontSize: 13, color: colors.muted, marginTop: 6, textAlign: 'center', marginBottom: 20, lineHeight: 19 },
+  primaryBtn:     { backgroundColor: colors.brand, borderRadius: radius.sm, paddingHorizontal: 28, paddingVertical: 13, marginTop: 8, ...shadow.cta },
+  primaryBtnText: { color: '#fff', fontFamily: fonts.bold, fontSize: 15 },
+  secondaryBtn:   { borderRadius: radius.sm, paddingHorizontal: 28, paddingVertical: 12, marginTop: 10 },
+  secondaryBtnText:{ color: colors.brand, fontFamily: fonts.semibold, fontSize: 14 },
 
-  header:         { alignItems: 'center', paddingVertical: 28, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#e2e8f0' },
-  avatar:         { width: 72, height: 72, borderRadius: 36, backgroundColor: '#185FA5', alignItems: 'center', justifyContent: 'center', marginBottom: 12 },
-  avatarText:     { color: '#fff', fontSize: 28, fontWeight: '700' },
-  name:           { fontSize: 18, fontWeight: '700', color: '#0f172a' },
-  email:          { fontSize: 13, color: '#64748b', marginTop: 2 },
-  roleChip:       { fontSize: 10, fontWeight: '700', color: '#185FA5', backgroundColor: '#eff6ff', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 999, marginTop: 8, overflow: 'hidden' },
+  header:         { alignItems: 'center', paddingVertical: 30, backgroundColor: colors.white, borderBottomWidth: 1, borderBottomColor: colors.borderLight },
+  avatar:         { width: 76, height: 76, borderRadius: 38, backgroundColor: colors.brand, alignItems: 'center', justifyContent: 'center', marginBottom: 12, ...shadow.card },
+  avatarText:     { color: '#fff', fontFamily: fonts.extra, fontSize: 30 },
+  name:           { fontFamily: fonts.bold, fontSize: 19, color: colors.ink },
+  email:          { fontFamily: fonts.regular, fontSize: 13, color: colors.muted, marginTop: 3 },
+  roleChip:       { fontFamily: fonts.bold, fontSize: 10, color: colors.brand, backgroundColor: colors.brandTint, paddingHorizontal: 10, paddingVertical: 4, borderRadius: radius.pill, marginTop: 10, overflow: 'hidden', letterSpacing: 0.5 },
 
-  list:           { paddingHorizontal: 16, marginTop: 12 },
-  row:            { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', paddingHorizontal: 14, paddingVertical: 14, borderRadius: 10, marginBottom: 8, borderWidth: 1, borderColor: '#e2e8f0' },
-  rowPressed:     { opacity: 0.6 },
-  rowLabel:       { flex: 1, fontSize: 14, fontWeight: '600', color: '#0f172a', marginLeft: 12 },
+  list:           { paddingHorizontal: 16, marginTop: 16 },
+  row:            { flexDirection: 'row', alignItems: 'center', backgroundColor: colors.white, paddingHorizontal: 14, paddingVertical: 13, borderRadius: radius.md, marginBottom: 10, borderWidth: 1, borderColor: colors.borderLight, ...shadow.card },
+  rowPressed:     { opacity: 0.7 },
+  rowIcon:        { width: 40, height: 40, borderRadius: 20, backgroundColor: '#dbe7f5', alignItems: 'center', justifyContent: 'center' },
+  rowLabel:       { flex: 1, fontFamily: fonts.semibold, fontSize: 14, color: colors.ink, marginLeft: 12 },
 })

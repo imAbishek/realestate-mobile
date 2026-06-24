@@ -1,6 +1,5 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
-
-const BRAND = '#185FA5'
+import { colors, fonts, radius } from '../theme'
 
 export type ChipOption<T extends string = string> = { label: string; value: T }
 
@@ -40,11 +39,11 @@ export function ChipRow<T extends string = string>({ label, options, value, onCh
 
 const styles = StyleSheet.create({
   wrap:      { marginBottom: 14 },
-  label:     { fontSize: 13, fontWeight: '600', color: '#334155', marginBottom: 8 },
+  label:     { fontFamily: fonts.semibold, fontSize: 13, color: colors.ink, marginBottom: 8 },
   wrapList:  { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   row:       { flexDirection: 'row', gap: 8 },
-  chip:      { borderWidth: 1, borderColor: '#cbd5e1', borderRadius: 999, paddingHorizontal: 14, paddingVertical: 8, backgroundColor: '#fff' },
-  chipOn:    { borderColor: BRAND, backgroundColor: '#eff4fb' },
-  chipText:  { fontSize: 13, color: '#334155', fontWeight: '500' },
-  chipTextOn:{ color: BRAND, fontWeight: '700' },
+  chip:      { borderWidth: 1, borderColor: colors.border, borderRadius: radius.pill, paddingHorizontal: 16, paddingVertical: 9, backgroundColor: colors.white },
+  chipOn:    { borderColor: colors.brand, backgroundColor: colors.brandTint },
+  chipText:  { fontFamily: fonts.medium, fontSize: 13, color: colors.muted },
+  chipTextOn:{ fontFamily: fonts.bold, color: colors.brand },
 })
