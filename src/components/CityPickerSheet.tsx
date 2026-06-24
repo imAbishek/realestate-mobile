@@ -5,10 +5,11 @@ import * as Location from 'expo-location'
 import { searchApi } from '../lib/api'
 import { DraggableSheet } from './DraggableSheet'
 import { useLocationStore, DEFAULT_CITY, type SelectedCity } from '../store/locationStore'
+import { colors, fonts, radius } from '../theme'
 import type { City } from '../types'
 
-const BRAND = '#185FA5'
-const ACCENT = '#D85A30'
+const BRAND = colors.brand
+const ACCENT = colors.accent
 
 /**
  * Bottom sheet for choosing your city. Supported cities load from the API
@@ -131,20 +132,20 @@ export function CityPickerSheet({ visible, onClose }: { visible: boolean; onClos
 }
 
 const styles = StyleSheet.create({
-  title:       { fontSize: 18, fontWeight: '700', color: '#0f172a', marginTop: 6, marginBottom: 12 },
+  title:       { fontFamily: fonts.bold, fontSize: 18, color: colors.ink, marginTop: 6, marginBottom: 12 },
 
-  detectRow:   { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 12, paddingHorizontal: 14, borderRadius: 12, borderWidth: 1, borderColor: '#bfdbfe', backgroundColor: '#eff6ff', marginBottom: 12 },
-  detectText:  { fontSize: 14, fontWeight: '600', color: BRAND },
+  detectRow:   { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 12, paddingHorizontal: 14, borderRadius: radius.sm, borderWidth: 1, borderColor: '#bfdbfe', backgroundColor: colors.brandTint, marginBottom: 12 },
+  detectText:  { fontFamily: fonts.semibold, fontSize: 14, color: BRAND },
 
-  soonBox:     { flexDirection: 'row', gap: 10, alignItems: 'flex-start', backgroundColor: '#fff7ed', borderWidth: 1, borderColor: '#fed7aa', borderRadius: 12, padding: 12, marginBottom: 12 },
-  soonTitle:   { fontSize: 14, fontWeight: '700', color: '#9a3412' },
-  soonBody:    { fontSize: 12, color: '#9a3412', marginTop: 2, lineHeight: 17 },
+  soonBox:     { flexDirection: 'row', gap: 10, alignItems: 'flex-start', backgroundColor: '#fff7ed', borderWidth: 1, borderColor: '#fed7aa', borderRadius: radius.sm, padding: 12, marginBottom: 12 },
+  soonTitle:   { fontFamily: fonts.bold, fontSize: 14, color: '#9a3412' },
+  soonBody:    { fontFamily: fonts.regular, fontSize: 12, color: '#9a3412', marginTop: 2, lineHeight: 17 },
 
-  sectionLabel:{ fontSize: 12, fontWeight: '600', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8, marginTop: 4 },
-  cityRow:     { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 12, paddingHorizontal: 14, borderRadius: 12, borderWidth: 1, borderColor: '#e2e8f0', marginBottom: 8 },
+  sectionLabel:{ fontFamily: fonts.semibold, fontSize: 12, color: colors.mutedLight, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8, marginTop: 4 },
+  cityRow:     { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 12, paddingHorizontal: 14, borderRadius: radius.sm, borderWidth: 1, borderColor: colors.border, marginBottom: 8 },
   cityRowOn:   { backgroundColor: BRAND, borderColor: BRAND },
-  cityName:    { fontSize: 15, fontWeight: '600', color: '#0f172a' },
-  cityState:   { fontSize: 12, color: '#64748b' },
+  cityName:    { fontFamily: fonts.semibold, fontSize: 15, color: colors.ink },
+  cityState:   { fontFamily: fonts.regular, fontSize: 12, color: colors.muted },
 
-  footerNote:  { textAlign: 'center', fontSize: 12, color: '#94a3b8', marginTop: 8 },
+  footerNote:  { textAlign: 'center', fontFamily: fonts.regular, fontSize: 12, color: colors.mutedLight, marginTop: 8 },
 })

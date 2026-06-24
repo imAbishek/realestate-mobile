@@ -11,15 +11,16 @@ import { propertyApi, favoritesApi, bookingsApi } from '../../src/lib/api'
 import { useAuthStore } from '../../src/store/authStore'
 import { getLandmarks, landmarkIcon } from '../../src/lib/landmarks'
 import { ConfirmSheet } from '../../src/components/ConfirmSheet'
+import { colors, fonts, radius, shadow } from '../../src/theme'
 import type { PriceUnit, PropertyDetail, PropertyType, PreferredTenant } from '../../src/types'
 
 const TENANT_LABELS: Record<PreferredTenant, string> = {
   FAMILY: 'Family', BACHELOR_MEN: 'Bachelors (Men)', BACHELOR_WOMEN: 'Bachelors (Women)', ANYONE: 'Anyone',
 }
 
-const BRAND = '#185FA5'
-const ACCENT = '#D85A30'
-const GREEN  = '#16a34a'
+const BRAND = colors.brand
+const ACCENT = colors.accent
+const GREEN  = colors.success
 const screenW = Dimensions.get('window').width
 
 // Coimbatore center — fallback when a property has no coords.
@@ -213,10 +214,10 @@ export default function PropertyDetailScreen() {
 
         <View style={styles.floatHeader}>
           <Pressable onPress={() => router.back()} style={styles.floatBtn}>
-            <Ionicons name="arrow-back" size={20} color="#0f172a" />
+            <Ionicons name="arrow-back" size={20} color={colors.ink} />
           </Pressable>
           <Pressable onPress={toggleLike} style={styles.floatBtn}>
-            <Ionicons name={liked ? 'heart' : 'heart-outline'} size={20} color={liked ? ACCENT : '#0f172a'} />
+            <Ionicons name={liked ? 'heart' : 'heart-outline'} size={20} color={liked ? ACCENT : colors.ink} />
           </Pressable>
         </View>
 
@@ -238,7 +239,7 @@ export default function PropertyDetailScreen() {
           </View>
           <Text style={styles.title} numberOfLines={2}>{data.title}</Text>
           <View style={styles.locRow}>
-            <Ionicons name="location" size={14} color="#64748b" />
+            <Ionicons name="location" size={14} color={colors.muted} />
             <Text style={styles.location}>{data.localityName}, {data.cityName}</Text>
           </View>
           <Text style={styles.price}>{formatPrice(data.price, data.priceUnit)}</Text>
@@ -676,39 +677,39 @@ function BookSiteVisitSheet({
       <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
         <View style={styles.modalHeader}>
           <Text style={styles.modalTitle}>Book a site visit</Text>
-          <Pressable onPress={onClose} hitSlop={8}><Ionicons name="close" size={24} color="#0f172a" /></Pressable>
+          <Pressable onPress={onClose} hitSlop={8}><Ionicons name="close" size={24} color={colors.ink} /></Pressable>
         </View>
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
           <ScrollView contentContainerStyle={{ padding: 20 }} keyboardShouldPersistTaps="handled">
             <Text style={styles.modalSub} numberOfLines={2}>{title}</Text>
 
             <Text style={styles.fieldLabel}>Preferred date</Text>
-            <TextInput placeholder="e.g. Sat, 31 May" placeholderTextColor="#94a3b8"
+            <TextInput placeholder="e.g. Sat, 31 May" placeholderTextColor={colors.mutedLight}
               value={date} onChangeText={setDate} style={styles.input} />
 
             <Text style={styles.fieldLabel}>Preferred time</Text>
-            <TextInput placeholder="e.g. 11:00 AM – 12:30 PM" placeholderTextColor="#94a3b8"
+            <TextInput placeholder="e.g. 11:00 AM – 12:30 PM" placeholderTextColor={colors.mutedLight}
               value={time} onChangeText={setTime} style={styles.input} />
 
             <Text style={styles.fieldLabel}>Your name</Text>
-            <TextInput placeholder="Full name" placeholderTextColor="#94a3b8"
+            <TextInput placeholder="Full name" placeholderTextColor={colors.mutedLight}
               value={guestName} onChangeText={setGuestName} style={styles.input} />
 
             <Text style={styles.fieldLabel}>Phone</Text>
-            <TextInput placeholder="10-digit mobile" placeholderTextColor="#94a3b8"
+            <TextInput placeholder="10-digit mobile" placeholderTextColor={colors.mutedLight}
               value={guestPhone} onChangeText={setGuestPhone} keyboardType="phone-pad" style={styles.input} />
 
             {!isLoggedIn ? (
               <>
                 <Text style={styles.fieldLabel}>Email (optional)</Text>
-                <TextInput placeholder="you@example.com" placeholderTextColor="#94a3b8"
+                <TextInput placeholder="you@example.com" placeholderTextColor={colors.mutedLight}
                   value={guestEmail} onChangeText={setGuestEmail}
                   autoCapitalize="none" keyboardType="email-address" style={styles.input} />
               </>
             ) : null}
 
             <Text style={styles.fieldLabel}>Notes (optional)</Text>
-            <TextInput placeholder="Any specific questions for the owner?" placeholderTextColor="#94a3b8"
+            <TextInput placeholder="Any specific questions for the owner?" placeholderTextColor={colors.mutedLight}
               value={notes} onChangeText={setNotes} multiline numberOfLines={4}
               style={[styles.input, styles.textArea]} />
 
@@ -770,95 +771,95 @@ function approvalShort(a: PropertyDetail['approvalAuthority']): string {
 }
 
 const styles = StyleSheet.create({
-  safe:           { flex: 1, backgroundColor: '#fff' },
+  safe:           { flex: 1, backgroundColor: colors.white },
   center:         { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
-  errorText:      { color: '#dc2626', fontWeight: '600', fontSize: 15, textAlign: 'center' },
-  backBtn:        { marginTop: 14, backgroundColor: BRAND, paddingHorizontal: 18, paddingVertical: 10, borderRadius: 8 },
-  backBtnText:    { color: '#fff', fontWeight: '700' },
+  errorText:      { color: colors.danger, fontFamily: fonts.semibold, fontSize: 15, textAlign: 'center' },
+  backBtn:        { marginTop: 14, backgroundColor: BRAND, paddingHorizontal: 18, paddingVertical: 10, borderRadius: radius.sm },
+  backBtnText:    { color: '#fff', fontFamily: fonts.bold },
 
   galleryWrap:    { position: 'relative' },
   gallery:        { width: screenW, height: 260 },
-  galleryImg:     { width: screenW, height: 260, backgroundColor: '#e2e8f0' },
+  galleryImg:     { width: screenW, height: 260, backgroundColor: colors.border },
   noImage:        { alignItems: 'center', justifyContent: 'center' },
-  noImageText:    { color: '#64748b' },
+  noImageText:    { fontFamily: fonts.regular, color: colors.muted },
 
-  imgCount:       { position: 'absolute', top: 12, right: 12, flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: 'rgba(15,23,42,0.65)', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 12 },
-  imgCountText:   { color: '#fff', fontSize: 11, fontWeight: '700' },
+  imgCount:       { position: 'absolute', top: 12, right: 12, flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: 'rgba(15,23,42,0.65)', paddingHorizontal: 8, paddingVertical: 4, borderRadius: radius.sm },
+  imgCountText:   { color: '#fff', fontFamily: fonts.bold, fontSize: 11 },
   sliderTrack:    { position: 'absolute', bottom: 10, left: 16, right: 16, height: 3, borderRadius: 3, backgroundColor: 'rgba(255,255,255,0.4)' },
   sliderFill:     { position: 'absolute', top: 0, bottom: 0, borderRadius: 3, backgroundColor: '#fff' },
 
-  thumbStrip:        { borderBottomWidth: 1, borderBottomColor: '#f1f5f9' },
+  thumbStrip:        { borderBottomWidth: 1, borderBottomColor: colors.borderLight },
   thumbStripContent: { paddingHorizontal: 12, paddingVertical: 10, gap: 8 },
-  thumb:             { width: 60, height: 60, borderRadius: 8, backgroundColor: '#e2e8f0', borderWidth: 2, borderColor: 'transparent' },
+  thumb:             { width: 60, height: 60, borderRadius: radius.sm, backgroundColor: colors.border, borderWidth: 2, borderColor: 'transparent' },
   thumbOn:           { borderColor: BRAND },
 
   floatHeader:    { position: 'absolute', top: 12, left: 12, right: 12, flexDirection: 'row', justifyContent: 'space-between' },
-  floatBtn:       { width: 38, height: 38, borderRadius: 19, backgroundColor: 'rgba(255,255,255,0.95)', alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOpacity: 0.15, shadowRadius: 4, elevation: 3 },
+  floatBtn:       { width: 38, height: 38, borderRadius: 19, backgroundColor: 'rgba(255,255,255,0.95)', alignItems: 'center', justifyContent: 'center', ...shadow.card },
 
-  section:        { paddingHorizontal: 16, paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: '#f1f5f9' },
+  section:        { paddingHorizontal: 16, paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: colors.borderLight },
   sectionHead:    { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
 
   badgeRow:       { flexDirection: 'row', gap: 6, marginBottom: 8 },
   badge:          { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6, borderWidth: 1 },
-  badgeText:      { fontSize: 11, fontWeight: '700' },
+  badgeText:      { fontFamily: fonts.bold, fontSize: 11 },
 
-  title:          { fontSize: 19, fontWeight: '700', color: '#0f172a' },
+  title:          { fontFamily: fonts.bold, fontSize: 19, color: colors.ink },
   locRow:         { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 6 },
-  location:       { fontSize: 13, color: '#64748b' },
-  price:          { fontSize: 22, fontWeight: '800', color: BRAND, marginTop: 10 },
-  deposit:        { fontSize: 12, color: '#64748b', marginTop: 3 },
+  location:       { fontFamily: fonts.regular, fontSize: 13, color: colors.muted },
+  price:          { fontFamily: fonts.extra, fontSize: 22, color: BRAND, marginTop: 10 },
+  deposit:        { fontFamily: fonts.regular, fontSize: 12, color: colors.muted, marginTop: 3 },
 
-  specStrip:      { flexDirection: 'row', paddingHorizontal: 16, paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: '#f1f5f9', backgroundColor: '#f8fafc' },
+  specStrip:      { flexDirection: 'row', paddingHorizontal: 16, paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: colors.borderLight, backgroundColor: colors.bg },
   specCell:       { flex: 1 },
-  specLabel:      { fontSize: 10, fontWeight: '600', color: '#94a3b8', letterSpacing: 0.6 },
-  specValue:      { fontSize: 14, fontWeight: '700', color: '#0f172a', marginTop: 4 },
+  specLabel:      { fontFamily: fonts.semibold, fontSize: 10, color: colors.mutedLight, letterSpacing: 0.6 },
+  specValue:      { fontFamily: fonts.bold, fontSize: 14, color: colors.ink, marginTop: 4 },
 
-  sectionTitle:   { fontSize: 16, fontWeight: '700', color: '#0f172a' },
-  linkText:       { fontSize: 13, color: BRAND, fontWeight: '600' },
+  sectionTitle:   { fontFamily: fonts.bold, fontSize: 16, color: colors.ink },
+  linkText:       { fontFamily: fonts.semibold, fontSize: 13, color: BRAND },
 
-  descBody:       { fontSize: 14, color: '#334155', lineHeight: 21, marginTop: 8 },
+  descBody:       { fontFamily: fonts.regular, fontSize: 14, color: '#334155', lineHeight: 21, marginTop: 8 },
 
   kvRow:          { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 9 },
-  kvKey:          { fontSize: 13, color: '#64748b' },
-  kvVal:          { fontSize: 13, fontWeight: '600', color: '#0f172a', maxWidth: '60%', textAlign: 'right' },
+  kvKey:          { fontFamily: fonts.regular, fontSize: 13, color: colors.muted },
+  kvVal:          { fontFamily: fonts.semibold, fontSize: 13, color: colors.ink, maxWidth: '60%', textAlign: 'right' },
 
   amenityWrap:    { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 10 },
-  amenityChip:    { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999, backgroundColor: '#eff6ff' },
-  amenityText:    { fontSize: 12, color: BRAND, fontWeight: '600' },
+  amenityChip:    { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 10, paddingVertical: 6, borderRadius: radius.pill, backgroundColor: colors.brandTint },
+  amenityText:    { fontFamily: fonts.semibold, fontSize: 12, color: BRAND },
 
   invRow:         { flexDirection: 'row', alignItems: 'flex-start', gap: 12 },
-  invDot:         { width: 28, height: 28, borderRadius: 14, backgroundColor: '#eff4fb', alignItems: 'center', justifyContent: 'center', marginTop: 1 },
-  invText:        { flex: 1, fontSize: 13, color: '#334155', lineHeight: 20 },
+  invDot:         { width: 28, height: 28, borderRadius: 14, backgroundColor: '#dbe7f5', alignItems: 'center', justifyContent: 'center', marginTop: 1 },
+  invText:        { flex: 1, fontFamily: fonts.regular, fontSize: 13, color: '#334155', lineHeight: 20 },
 
-  mapWrap:        { height: 170, marginTop: 10, borderRadius: 12, overflow: 'hidden', backgroundColor: '#e2e8f0', position: 'relative' },
+  mapWrap:        { height: 170, marginTop: 10, borderRadius: radius.md, overflow: 'hidden', backgroundColor: colors.border, position: 'relative' },
   mapNoticeWrap:  { position: 'absolute', left: 8, bottom: 8, backgroundColor: 'rgba(15,23,42,0.78)', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 },
-  mapNotice:     { color: '#fff', fontSize: 11 },
-  muted:         { fontSize: 12, color: '#64748b', marginTop: 8 },
+  mapNotice:     { color: '#fff', fontFamily: fonts.regular, fontSize: 11 },
+  muted:         { fontFamily: fonts.regular, fontSize: 12, color: colors.muted, marginTop: 8 },
 
-  landmarkRow:    { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 9, borderBottomWidth: 1, borderBottomColor: '#f1f5f9' },
-  landmarkIcon:   { width: 28, height: 28, borderRadius: 14, backgroundColor: '#eff4fb', alignItems: 'center', justifyContent: 'center' },
-  landmarkName:   { flex: 1, fontSize: 13, color: '#0f172a', fontWeight: '500' },
-  landmarkDist:   { fontSize: 12, color: '#64748b', fontWeight: '600' },
+  landmarkRow:    { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 9, borderBottomWidth: 1, borderBottomColor: colors.borderLight },
+  landmarkIcon:   { width: 28, height: 28, borderRadius: 14, backgroundColor: '#dbe7f5', alignItems: 'center', justifyContent: 'center' },
+  landmarkName:   { flex: 1, fontFamily: fonts.medium, fontSize: 13, color: colors.ink },
+  landmarkDist:   { fontFamily: fonts.semibold, fontSize: 12, color: colors.muted },
 
   ownerRow:       { flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 10 },
   ownerAvatar:    { width: 44, height: 44, borderRadius: 22, backgroundColor: BRAND, alignItems: 'center', justifyContent: 'center' },
-  ownerAvatarText:{ color: '#fff', fontWeight: '700', fontSize: 17 },
-  ownerName:      { fontSize: 14, fontWeight: '700', color: '#0f172a' },
-  ownerMeta:      { fontSize: 12, color: '#64748b', marginTop: 2 },
+  ownerAvatarText:{ color: '#fff', fontFamily: fonts.bold, fontSize: 17 },
+  ownerName:      { fontFamily: fonts.bold, fontSize: 14, color: colors.ink },
+  ownerMeta:      { fontFamily: fonts.regular, fontSize: 12, color: colors.muted, marginTop: 2 },
 
-  actionBar:      { position: 'absolute', left: 0, right: 0, bottom: 0, flexDirection: 'row', gap: 8, paddingHorizontal: 12, paddingTop: 10, backgroundColor: '#fff', borderTopWidth: 1, borderTopColor: '#e2e8f0' },
-  actionBtn:      { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: 12, borderRadius: 10 },
-  actionBtnOutline:{ borderWidth: 1, borderColor: BRAND, backgroundColor: '#fff' },
+  actionBar:      { position: 'absolute', left: 0, right: 0, bottom: 0, flexDirection: 'row', gap: 8, paddingHorizontal: 12, paddingTop: 10, backgroundColor: colors.white, borderTopWidth: 1, borderTopColor: colors.border },
+  actionBtn:      { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: 12, borderRadius: radius.sm },
+  actionBtnOutline:{ borderWidth: 1, borderColor: BRAND, backgroundColor: colors.white },
   actionBtnWhatsApp:{ borderWidth: 1, borderColor: '#25D366', backgroundColor: '#f0fdf4' },
   actionBtnPrimary:{ backgroundColor: ACCENT, flex: 1.3 },
-  actionBtnText:  { fontSize: 13, fontWeight: '700' },
+  actionBtnText:  { fontFamily: fonts.bold, fontSize: 13 },
 
-  modalHeader:    { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 18, paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: '#e2e8f0' },
-  modalTitle:     { fontSize: 17, fontWeight: '700', color: '#0f172a' },
-  modalSub:       { fontSize: 13, color: '#64748b', marginBottom: 16 },
-  fieldLabel:     { fontSize: 12, fontWeight: '600', color: '#475569', marginBottom: 6, marginTop: 4 },
-  input:          { borderWidth: 1, borderColor: '#cbd5e1', borderRadius: 10, paddingHorizontal: 12, paddingVertical: 11, fontSize: 14, color: '#0f172a', marginBottom: 10 },
+  modalHeader:    { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 18, paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: colors.border },
+  modalTitle:     { fontFamily: fonts.bold, fontSize: 17, color: colors.ink },
+  modalSub:       { fontFamily: fonts.regular, fontSize: 13, color: colors.muted, marginBottom: 16 },
+  fieldLabel:     { fontFamily: fonts.semibold, fontSize: 12, color: '#475569', marginBottom: 6, marginTop: 4 },
+  input:          { borderWidth: 1, borderColor: '#cbd5e1', borderRadius: radius.sm, paddingHorizontal: 12, paddingVertical: 11, fontFamily: fonts.regular, fontSize: 14, color: colors.ink, marginBottom: 10 },
   textArea:       { minHeight: 90, textAlignVertical: 'top' },
-  modalSubmit:    { backgroundColor: ACCENT, paddingVertical: 14, borderRadius: 10, alignItems: 'center', marginTop: 10 },
-  modalSubmitText:{ color: '#fff', fontWeight: '700', fontSize: 15 },
+  modalSubmit:    { backgroundColor: ACCENT, paddingVertical: 14, borderRadius: radius.sm, alignItems: 'center', marginTop: 10, ...shadow.cta },
+  modalSubmitText:{ color: '#fff', fontFamily: fonts.bold, fontSize: 15 },
 })

@@ -1,9 +1,10 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { DraggableSheet } from './DraggableSheet'
+import { colors, fonts, radius } from '../theme'
 
-const BRAND = '#185FA5'
-const ACCENT = '#D85A30'
+const BRAND = colors.brand
+const ACCENT = colors.accent
 
 export interface InfoSheetContent {
   icon?: React.ComponentProps<typeof Ionicons>['name']
@@ -53,12 +54,12 @@ const styles = StyleSheet.create({
   sheet:        { alignItems: 'center' },
 
   iconWrap:     { width: 56, height: 56, borderRadius: 28, backgroundColor: '#fff3ec', borderWidth: 1, borderColor: '#f6cdb9', alignItems: 'center', justifyContent: 'center', marginTop: 6, marginBottom: 14 },
-  title:        { fontSize: 18, fontWeight: '800', color: '#0f172a', textAlign: 'center' },
+  title:        { fontFamily: fonts.extra, fontSize: 18, color: colors.ink, textAlign: 'center' },
   accentBar:    { width: 36, height: 3, borderRadius: 2, backgroundColor: ACCENT, marginTop: 8, marginBottom: 10 },
-  body:         { fontSize: 14, color: '#64748b', textAlign: 'center', lineHeight: 21, marginBottom: 20, paddingHorizontal: 8 },
+  body:         { fontFamily: fonts.regular, fontSize: 14, color: colors.muted, textAlign: 'center', lineHeight: 21, marginBottom: 20, paddingHorizontal: 8 },
 
-  secondaryBtn: { alignSelf: 'stretch', borderRadius: 12, borderWidth: 1, borderColor: '#bfdbfe', backgroundColor: '#eff6ff', paddingVertical: 13, alignItems: 'center', marginBottom: 10 },
-  secondaryBtnText: { color: BRAND, fontWeight: '700', fontSize: 14 },
-  primaryBtn:   { alignSelf: 'stretch', borderRadius: 12, backgroundColor: BRAND, paddingVertical: 13, alignItems: 'center' },
-  primaryBtnText: { color: '#fff', fontWeight: '700', fontSize: 14 },
+  secondaryBtn: { alignSelf: 'stretch', borderRadius: radius.sm, borderWidth: 1, borderColor: '#bfdbfe', backgroundColor: colors.brandTint, paddingVertical: 13, alignItems: 'center', marginBottom: 10 },
+  secondaryBtnText: { color: BRAND, fontFamily: fonts.bold, fontSize: 14 },
+  primaryBtn:   { alignSelf: 'stretch', borderRadius: radius.sm, backgroundColor: BRAND, paddingVertical: 13, alignItems: 'center' },
+  primaryBtnText: { color: '#fff', fontFamily: fonts.bold, fontSize: 14 },
 })

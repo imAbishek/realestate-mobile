@@ -2,10 +2,11 @@ import { memo, useEffect, useState } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { Marker } from 'react-native-maps'
 import { formatPricePill } from '../lib/format'
+import { colors, fonts } from '../theme'
 import type { PropertyCard } from '../types'
 
-const BRAND  = '#185FA5'
-const ACCENT = '#D85A30'
+const BRAND  = colors.brand
+const ACCENT = colors.accent
 
 interface Props {
   item: PropertyCard
@@ -61,7 +62,7 @@ const styles = StyleSheet.create({
     shadowColor: '#000', shadowOpacity: 0.25, shadowRadius: 3, shadowOffset: { width: 0, height: 1 }, elevation: 4,
   },
   pillSelected:     { transform: [{ scale: 1.12 }], borderColor: '#fff' },
-  pillText:         { color: '#fff', fontSize: 12, fontWeight: '800' },
+  pillText:         { color: '#fff', fontFamily: fonts.extra, fontSize: 12 },
   pillTextSelected: { fontSize: 13 },
   tail: {
     width: 0, height: 0, marginTop: -1,

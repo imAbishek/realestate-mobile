@@ -10,9 +10,10 @@ import { propertyApi } from '../../src/lib/api'
 import { useLocationStore } from '../../src/store/locationStore'
 import { MapPriceMarker } from '../../src/components/MapPriceMarker'
 import { MapPropertyCarousel, SNAP } from '../../src/components/MapPropertyCarousel'
+import { colors, fonts, radius, shadow } from '../../src/theme'
 import type { PropertyCard, PropertyType } from '../../src/types'
 
-const BRAND = '#185FA5'
+const BRAND = colors.brand
 
 // Coimbatore city center — the only district currently seeded.
 const COIMBATORE: Region = {
@@ -118,18 +119,18 @@ export default function MapScreen() {
         <View style={styles.topOverlay} pointerEvents="box-none">
           <View style={styles.searchRow}>
             <View style={styles.searchField}>
-              <Ionicons name="search" size={18} color="#64748b" />
+              <Ionicons name="search" size={18} color={colors.muted} />
               <TextInput
                 style={styles.searchInput}
                 placeholder={`Search localities in ${city.name}`}
-                placeholderTextColor="#94a3b8"
+                placeholderTextColor={colors.mutedLight}
                 value={query}
                 onChangeText={(t) => { setQuery(t); setSelectedId(null) }}
                 returnKeyType="search"
               />
               {query.length > 0 ? (
                 <Pressable onPress={() => setQuery('')} hitSlop={8}>
-                  <Ionicons name="close-circle" size={18} color="#94a3b8" />
+                  <Ionicons name="close-circle" size={18} color={colors.mutedLight} />
                 </Pressable>
               ) : null}
             </View>
@@ -167,7 +168,7 @@ export default function MapScreen() {
         {!loading && visible.length === 0 ? (
           <View style={styles.emptyOverlay} pointerEvents="none">
             <View style={styles.emptyCard}>
-              <Ionicons name="map-outline" size={28} color="#94a3b8" />
+              <Ionicons name="map-outline" size={28} color={colors.mutedLight} />
               <Text style={styles.emptyText}>
                 {items.length === 0
                   ? `No mapped listings in ${city.name} yet`
@@ -193,35 +194,35 @@ export default function MapScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe:    { flex: 1, backgroundColor: '#f8fafc' },
+  safe:    { flex: 1, backgroundColor: colors.bg },
   mapWrap: { flex: 1 },
 
   topOverlay: { position: 'absolute', top: 0, left: 0, right: 0, paddingTop: 10 },
   searchRow:  { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 12 },
   searchField: {
     flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8,
-    backgroundColor: '#fff', borderRadius: 12, paddingHorizontal: 12, height: 44,
-    shadowColor: '#000', shadowOpacity: 0.15, shadowRadius: 6, shadowOffset: { width: 0, height: 2 }, elevation: 4,
+    backgroundColor: colors.white, borderRadius: radius.md, paddingHorizontal: 12, height: 44,
+    ...shadow.raised,
   },
-  searchInput: { flex: 1, fontSize: 14, color: '#0f172a', paddingVertical: 0 },
+  searchInput: { flex: 1, fontFamily: fonts.regular, fontSize: 14, color: colors.ink, paddingVertical: 0 },
   filterBtn: {
-    width: 44, height: 44, borderRadius: 12, backgroundColor: BRAND, alignItems: 'center', justifyContent: 'center',
-    shadowColor: '#000', shadowOpacity: 0.15, shadowRadius: 6, shadowOffset: { width: 0, height: 2 }, elevation: 4,
+    width: 44, height: 44, borderRadius: radius.md, backgroundColor: BRAND, alignItems: 'center', justifyContent: 'center',
+    ...shadow.raised,
   },
 
   chipsRow: { paddingHorizontal: 12, paddingTop: 10, gap: 8 },
   chip: {
-    paddingHorizontal: 14, paddingVertical: 8, borderRadius: 999, backgroundColor: 'rgba(255,255,255,0.92)',
-    shadowColor: '#000', shadowOpacity: 0.12, shadowRadius: 3, elevation: 2,
+    paddingHorizontal: 14, paddingVertical: 8, borderRadius: radius.pill, backgroundColor: 'rgba(255,255,255,0.92)',
+    ...shadow.card,
   },
   chipOn:     { backgroundColor: BRAND },
-  chipText:   { fontSize: 13, color: '#334155', fontWeight: '600' },
-  chipTextOn: { color: '#fff', fontWeight: '700' },
+  chipText:   { fontFamily: fonts.semibold, fontSize: 13, color: '#334155' },
+  chipTextOn: { fontFamily: fonts.bold, color: '#fff' },
 
   loadingOverlay: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(248,250,252,0.6)' },
   emptyOverlay:   { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, alignItems: 'center', justifyContent: 'center' },
-  emptyCard:      { alignItems: 'center', gap: 8, backgroundColor: '#fff', paddingHorizontal: 20, paddingVertical: 16, borderRadius: 12, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 6, elevation: 3 },
-  emptyText:      { fontSize: 13, color: '#64748b', fontWeight: '500' },
+  emptyCard:      { alignItems: 'center', gap: 8, backgroundColor: colors.white, paddingHorizontal: 20, paddingVertical: 16, borderRadius: radius.md, ...shadow.raised },
+  emptyText:      { fontFamily: fonts.medium, fontSize: 13, color: colors.muted },
 
   carouselWrap: { position: 'absolute', left: 0, right: 0, bottom: 84 },
 })

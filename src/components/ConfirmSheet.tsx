@@ -1,9 +1,10 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { DraggableSheet } from './DraggableSheet'
+import { colors, fonts, radius } from '../theme'
 
-const BRAND = '#185FA5'
-const DANGER = '#dc2626'
+const BRAND = colors.brand
+const DANGER = colors.danger
 
 export interface ConfirmSheetProps {
   visible: boolean
@@ -58,13 +59,13 @@ const styles = StyleSheet.create({
   sheet:        { alignItems: 'center' },
 
   iconWrap:     { width: 56, height: 56, borderRadius: 28, borderWidth: 1, alignItems: 'center', justifyContent: 'center', marginTop: 6, marginBottom: 14 },
-  title:        { fontSize: 18, fontWeight: '800', color: '#0f172a', textAlign: 'center' },
+  title:        { fontFamily: fonts.extra, fontSize: 18, color: colors.ink, textAlign: 'center' },
   accentBar:    { width: 36, height: 3, borderRadius: 2, marginTop: 8, marginBottom: 10 },
-  body:         { fontSize: 14, color: '#64748b', textAlign: 'center', lineHeight: 21, marginBottom: 20, paddingHorizontal: 8 },
+  body:         { fontFamily: fonts.regular, fontSize: 14, color: colors.muted, textAlign: 'center', lineHeight: 21, marginBottom: 20, paddingHorizontal: 8 },
 
   row:          { flexDirection: 'row', alignSelf: 'stretch', gap: 10, marginTop: 4 },
-  cancelBtn:    { flex: 1, borderRadius: 12, borderWidth: 1, borderColor: '#cbd5e1', backgroundColor: '#fff', paddingVertical: 13, alignItems: 'center' },
-  cancelBtnText:{ color: '#334155', fontWeight: '700', fontSize: 14 },
-  confirmBtn:   { flex: 1, borderRadius: 12, paddingVertical: 13, alignItems: 'center' },
-  confirmBtnText:{ color: '#fff', fontWeight: '700', fontSize: 14 },
+  cancelBtn:    { flex: 1, borderRadius: radius.sm, borderWidth: 1, borderColor: '#cbd5e1', backgroundColor: colors.white, paddingVertical: 13, alignItems: 'center' },
+  cancelBtnText:{ color: '#334155', fontFamily: fonts.bold, fontSize: 14 },
+  confirmBtn:   { flex: 1, borderRadius: radius.sm, paddingVertical: 13, alignItems: 'center' },
+  confirmBtnText:{ color: '#fff', fontFamily: fonts.bold, fontSize: 14 },
 })

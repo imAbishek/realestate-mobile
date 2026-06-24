@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import {
   Animated, Modal, PanResponder, Pressable, StyleSheet, View, type ViewStyle,
 } from 'react-native'
+import { colors, radius } from '../theme'
 
 /**
  * Bottom sheet that can be flicked/dragged down to dismiss — the behaviour every
@@ -55,7 +56,7 @@ export function DraggableSheet({
 
 const styles = StyleSheet.create({
   backdrop: { flex: 1, backgroundColor: 'rgba(15,23,42,0.45)' },
-  sheet:    { backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, paddingHorizontal: 20, paddingBottom: 32 },
+  sheet:    { backgroundColor: colors.white, borderTopLeftRadius: radius.xl, borderTopRightRadius: radius.xl, paddingHorizontal: 20, paddingBottom: 32 },
   grabber:  { alignSelf: 'stretch', alignItems: 'center', paddingTop: 12, paddingBottom: 6, marginHorizontal: -20 },
-  handle:   { width: 40, height: 4, borderRadius: 2, backgroundColor: '#e2e8f0' },
+  handle:   { width: 40, height: 4, borderRadius: 2, backgroundColor: colors.border },
 })

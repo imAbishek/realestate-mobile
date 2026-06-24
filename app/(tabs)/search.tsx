@@ -5,12 +5,15 @@ import {
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
+import { LinearGradient } from 'expo-linear-gradient'
 import { propertyApi } from '../../src/lib/api'
 import { useLocationStore } from '../../src/store/locationStore'
+import { colors, fonts, radius, shadow } from '../../src/theme'
 import type { ListingType, PriceUnit, PropertyCard, SearchParams } from '../../src/types'
 
-const BRAND = '#185FA5'
-const ACCENT = '#D85A30'
+const BRAND = colors.brand
+const ACCENT = colors.accent
+const HEADER_GRADIENT = ['#0c3a68', '#185FA5'] as const
 
 const TYPE_TABS: { key: ListingType | 'ALL'; label: string }[] = [
   { key: 'ALL',  label: 'All'  },
@@ -50,29 +53,29 @@ export default function SearchScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       {/* Header */}
-      <View style={styles.header}>
+      <LinearGradient colors={HEADER_GRADIENT} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.header}>
         <Pressable onPress={() => router.back()} hitSlop={8}>
           <Ionicons name="arrow-back" size={22} color="#fff" />
         </Pressable>
         <Text style={styles.headerTitle}>{city.name} Listings</Text>
         <View style={{ width: 22 }} />
-      </View>
+      </LinearGradient>
 
       {/* Search */}
       <View style={styles.searchWrap}>
-        <Ionicons name="search" size={18} color="#94a3b8" />
+        <Ionicons name="search" size={18} color={colors.mutedLight} />
         <TextInput
           value={keyword}
           onChangeText={setKeyword}
           onSubmitEditing={() => setQuery(keyword)}
           returnKeyType="search"
           placeholder="Search by title or locality"
-          placeholderTextColor="#94a3b8"
+          placeholderTextColor={colors.mutedLight}
           style={styles.searchInput}
         />
         {query.trim() ? (
           <Pressable onPress={() => { setKeyword(''); setQuery('') }} hitSlop={8}>
-            <Ionicons name="close-circle" size={18} color="#94a3b8" />
+            <Ionicons name="close-circle" size={18} color={colors.mutedLight} />
           </Pressable>
         ) : null}
       </View>
@@ -100,7 +103,7 @@ export default function SearchScreen() {
           renderItem={({ item }) => <Row item={item} onPress={() => router.push(`/properties/${item.id}`)} />}
           ListEmptyComponent={
             <View style={styles.center}>
-              <Ionicons name="search" size={36} color="#cbd5e1" />
+              <View style={styles.emptyIcon}><Ionicons name="search" size={34} color={colors.brand} /></View>
               <Text style={styles.empty}>No matches in {city.name} for this filter.</Text>
             </View>
           }
@@ -116,7 +119,7 @@ function Row({ item, onPress }: { item: PropertyCard; onPress: () => void }) {
       {item.primaryImageUrl ? (
         <Image source={{ uri: item.primaryImageUrl }} style={styles.cardImage} resizeMode="cover" />
       ) : (
-        <View style={[styles.cardImage, styles.noImage]}><Ionicons name="image-outline" size={28} color="#94a3b8" /></View>
+        <View style={[styles.cardImage, styles.noImage]}><Ionicons name="image-outline" size={28} color={colors.mutedLight} /></View>
       )}
       <View style={styles.cardBody}>
         <View style={styles.cardBadgeRow}>
@@ -125,7 +128,7 @@ function Row({ item, onPress }: { item: PropertyCard; onPress: () => void }) {
         </View>
         <Text style={styles.cardTitle} numberOfLines={1}>{item.title}</Text>
         <View style={styles.locRow}>
-          <Ionicons name="location-outline" size={12} color="#64748b" />
+          <Ionicons name="location-outline" size={12} color={colors.muted} />
           <Text style={styles.cardLoc} numberOfLines={1}>{item.localityName}, {item.cityName}</Text>
         </View>
         <View style={styles.metaRow}>
@@ -146,33 +149,34 @@ function formatPrice(price: number, unit: PriceUnit): string {
 }
 
 const styles = StyleSheet.create({
-  safe:        { flex: 1, backgroundColor: '#f8fafc' },
-  header:      { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: BRAND, paddingHorizontal: 16, paddingVertical: 14 },
-  headerTitle: { fontSize: 16, fontWeight: '700', color: '#fff' },
+  safe:        { flex: 1, backgroundColor: colors.bg },
+  header:      { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 16 },
+  headerTitle: { fontFamily: fonts.bold, fontSize: 18, color: '#fff' },
 
-  searchWrap:  { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#fff', margin: 16, marginBottom: 8, borderRadius: 12, paddingHorizontal: 12, paddingVertical: 10, borderWidth: 1, borderColor: '#e2e8f0' },
-  searchInput: { flex: 1, fontSize: 14, color: '#0f172a', padding: 0 },
+  searchWrap:  { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: colors.white, margin: 16, marginBottom: 8, borderRadius: radius.md, paddingHorizontal: 12, paddingVertical: 11, borderWidth: 1, borderColor: colors.border, ...shadow.card },
+  searchInput: { flex: 1, fontFamily: fonts.regular, fontSize: 14, color: colors.ink, padding: 0 },
 
   tabRow:      { flexDirection: 'row', gap: 8, paddingHorizontal: 16, marginBottom: 4 },
-  tab:         { paddingHorizontal: 14, paddingVertical: 7, borderRadius: 999, backgroundColor: '#f1f5f9' },
+  tab:         { paddingHorizontal: 14, paddingVertical: 7, borderRadius: radius.pill, backgroundColor: '#f1f5f9' },
   tabActive:   { backgroundColor: BRAND },
-  tabText:     { fontSize: 12, fontWeight: '600', color: '#64748b' },
-  tabTextActive:{ color: '#fff' },
+  tabText:     { fontFamily: fonts.semibold, fontSize: 12, color: colors.muted },
+  tabTextActive:{ fontFamily: fonts.bold, color: '#fff' },
 
   center:      { padding: 60, alignItems: 'center' },
-  empty:       { fontSize: 13, color: '#64748b', marginTop: 10, textAlign: 'center' },
+  emptyIcon:   { width: 84, height: 84, borderRadius: 42, backgroundColor: '#dbe7f5', alignItems: 'center', justifyContent: 'center' },
+  empty:       { fontFamily: fonts.regular, fontSize: 13, color: colors.muted, marginTop: 12, textAlign: 'center' },
 
-  card:        { flexDirection: 'row', backgroundColor: '#fff', borderRadius: 12, marginBottom: 10, borderWidth: 1, borderColor: '#e2e8f0', overflow: 'hidden' },
-  cardImage:   { width: 110, height: 120, backgroundColor: '#e2e8f0' },
+  card:        { flexDirection: 'row', backgroundColor: colors.white, borderRadius: radius.md, marginBottom: 10, borderWidth: 1, borderColor: colors.borderLight, overflow: 'hidden', ...shadow.card },
+  cardImage:   { width: 110, height: 120, backgroundColor: colors.border },
   noImage:     { alignItems: 'center', justifyContent: 'center' },
   cardBody:    { flex: 1, padding: 12, justifyContent: 'space-between' },
   cardBadgeRow:{ flexDirection: 'row', gap: 6 },
-  badge:       { backgroundColor: BRAND, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 999 },
-  badgeText:   { color: '#fff', fontSize: 10, fontWeight: '700' },
-  cardTitle:   { fontSize: 14, fontWeight: '700', color: '#0f172a', marginTop: 4 },
+  badge:       { backgroundColor: BRAND, paddingHorizontal: 8, paddingVertical: 2, borderRadius: radius.pill },
+  badgeText:   { color: '#fff', fontFamily: fonts.bold, fontSize: 10 },
+  cardTitle:   { fontFamily: fonts.bold, fontSize: 14, color: colors.ink, marginTop: 4 },
   locRow:      { flexDirection: 'row', alignItems: 'center', gap: 3 },
-  cardLoc:     { fontSize: 12, color: '#64748b' },
+  cardLoc:     { fontFamily: fonts.regular, fontSize: 12, color: colors.muted },
   metaRow:     { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' },
-  cardPrice:   { fontSize: 14, fontWeight: '700', color: BRAND },
-  cardMeta:    { fontSize: 11, color: '#64748b' },
+  cardPrice:   { fontFamily: fonts.extra, fontSize: 15, color: BRAND },
+  cardMeta:    { fontFamily: fonts.regular, fontSize: 11, color: colors.muted },
 })
