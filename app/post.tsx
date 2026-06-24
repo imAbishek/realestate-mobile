@@ -346,13 +346,19 @@ function Step3({ state, set, localities }: { state: WizardState; set: <K extends
       {isBuilding(state) ? (
         <>
           <FormField label="Carpet area (sqft)" placeholder="0" keyboardType="numeric" value={state.carpetAreaSqft} onChangeText={(t) => set('carpetAreaSqft', t)} />
+          <ChipRow
+            label="Bedrooms"
+            options={['0','1','2','3','4','5','6','7','8'].map(n => ({ value: n, label: n }))}
+            value={state.bedrooms || null}
+            onChange={(v) => set('bedrooms', v)}
+          />
           <View style={styles.row2}>
-            <View style={{ flex: 1 }}><FormField label="Bedrooms" placeholder="0" keyboardType="numeric" value={state.bedrooms} onChangeText={(t) => set('bedrooms', t)} /></View>
             <View style={{ flex: 1 }}><FormField label="Bathrooms" placeholder="0" keyboardType="numeric" value={state.bathrooms} onChangeText={(t) => set('bathrooms', t)} /></View>
+            <View style={{ flex: 1 }}><FormField label="Balconies" placeholder="0" keyboardType="numeric" value={state.balconies} onChangeText={(t) => set('balconies', t)} /></View>
           </View>
           <View style={styles.row2}>
-            <View style={{ flex: 1 }}><FormField label="Balconies" placeholder="0" keyboardType="numeric" value={state.balconies} onChangeText={(t) => set('balconies', t)} /></View>
             <View style={{ flex: 1 }}><FormField label="Floor #" placeholder="0" keyboardType="numeric" value={state.floorNumber} onChangeText={(t) => set('floorNumber', t)} /></View>
+            <View style={{ flex: 1 }} />
           </View>
           <FormField label="Total floors in building" placeholder="0" keyboardType="numeric" value={state.totalFloors} onChangeText={(t) => set('totalFloors', t)} />
           <ChipRow
@@ -367,6 +373,19 @@ function Step3({ state, set, localities }: { state: WizardState; set: <K extends
           />
           <FormField label="Age of property (years)" placeholder="0" keyboardType="numeric" value={state.ageOfProperty} onChangeText={(t) => set('ageOfProperty', t)} />
           <Toggle label="Parking available" value={state.parkingAvailable} onChange={(v) => set('parkingAvailable', v)} />
+          {(state.listingType === 'RENT' || state.listingType === 'PG') ? (
+            <ChipRow
+              label="Preferred tenant"
+              options={[
+                { value: 'FAMILY',         label: 'Family' },
+                { value: 'BACHELOR_MEN',   label: 'Bachelors (Men)' },
+                { value: 'BACHELOR_WOMEN', label: 'Bachelors (Women)' },
+                { value: 'ANYONE',         label: 'Anyone' },
+              ]}
+              value={state.preferredTenant}
+              onChange={(v) => set('preferredTenant', v as WizardState['preferredTenant'])}
+            />
+          ) : null}
         </>
       ) : null}
 
@@ -469,7 +488,7 @@ function Step3({ state, set, localities }: { state: WizardState; set: <K extends
         )}
       </View>
 
-      <FormField label="Address line (optional)" placeholder="House number, street, landmark" value={state.addressLine} onChangeText={(t) => set('addressLine', t)} />
+      <FormField label="Full address *" placeholder="House number, street, landmark" value={state.addressLine} onChangeText={(t) => set('addressLine', t)} />
 
       <MapPickerField state={state} set={set} />
     </View>

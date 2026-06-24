@@ -11,7 +11,11 @@ import { propertyApi, favoritesApi, bookingsApi } from '../../src/lib/api'
 import { useAuthStore } from '../../src/store/authStore'
 import { getLandmarks, landmarkIcon } from '../../src/lib/landmarks'
 import { ConfirmSheet } from '../../src/components/ConfirmSheet'
-import type { PriceUnit, PropertyDetail, PropertyType } from '../../src/types'
+import type { PriceUnit, PropertyDetail, PropertyType, PreferredTenant } from '../../src/types'
+
+const TENANT_LABELS: Record<PreferredTenant, string> = {
+  FAMILY: 'Family', BACHELOR_MEN: 'Bachelors (Men)', BACHELOR_WOMEN: 'Bachelors (Women)', ANYONE: 'Anyone',
+}
 
 const BRAND = '#185FA5'
 const ACCENT = '#D85A30'
@@ -456,6 +460,8 @@ function FeatureRows({ data }: { data: PropertyDetail }) {
       {data.facing                         ? <KV label="Facing"        value={data.facing} /> : null}
       {data.ageOfProperty != null         ? <KV label="Age"           value={data.ageOfProperty === 0 ? 'New' : `${data.ageOfProperty} yrs`} /> : null}
       <KV label="Parking"                  value={data.parkingAvailable ? 'Available' : 'Not available'} />
+      {(data.listingType === 'RENT' || data.listingType === 'PG') && data.preferredTenant
+        ? <KV label="Preferred Tenant" value={TENANT_LABELS[data.preferredTenant]} /> : null}
       {data.carpetAreaSqft != null        ? <KV label="Carpet Area"   value={`${data.carpetAreaSqft} sqft`} /> : null}
       {data.ownershipType                  ? <KV label="Ownership"     value={prettyEnum(data.ownershipType)} /> : null}
       {data.availableFrom                  ? <KV label="Available From" value={data.availableFrom} /> : null}

@@ -94,6 +94,7 @@ export default function HomeScreen() {
           style={styles.heroCard}
         >
           <Text style={styles.heroHeadline}>Unlock your Wealth</Text>
+          <Text style={styles.heroTagline}>Verified listings · Direct from owners · Zero brokerage</Text>
           <View style={styles.heroAccent} />
           <View style={styles.heroSearch}>
             <Ionicons name="search" size={18} color={colors.mutedLight} />
@@ -102,7 +103,7 @@ export default function HomeScreen() {
               onChangeText={setPropertyIdQuery}
               onSubmitEditing={goSearch}
               returnKeyType="search"
-              placeholder='Search by "Property ID"'
+              placeholder="Search locality, project or Property ID"
               placeholderTextColor={colors.mutedLight}
               style={styles.heroSearchInput}
             />
@@ -386,6 +387,7 @@ const styles = StyleSheet.create({
   // Dark charcoal hero card — overlaps the photo bottom and hangs below it
   heroCard:          { marginHorizontal: 14, marginTop: -114, borderRadius: 26, paddingHorizontal: 22, paddingTop: 10, paddingBottom: 20, zIndex: 5, overflow: 'hidden', backgroundColor: 'rgba(17,19,24,0.42)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.10)' },
   heroHeadline:      { fontFamily: fonts.extra, fontSize: 28, color: colors.white, letterSpacing: 0.2 },
+  heroTagline:       { fontFamily: fonts.medium, fontSize: 12, color: 'rgba(255,255,255,0.82)', marginTop: 6 },
   heroAccent:        { width: 46, height: 4, borderRadius: 2, backgroundColor: colors.accent, marginTop: 10, marginBottom: 16 },
   heroSearch:        { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: colors.white, borderRadius: radius.pill, paddingHorizontal: 20, paddingVertical: 15 },
   heroSearchInput:   { flex: 1, fontFamily: fonts.medium, fontSize: 15, color: colors.ink, padding: 0 },

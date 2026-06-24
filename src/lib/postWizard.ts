@@ -2,7 +2,7 @@
 // Single source of truth for the 6-step wizard. Keep this file framework-light.
 
 import type {
-  ListingType, PropertyType, ListedBy, FurnishingStatus,
+  ListingType, PropertyType, ListedBy, FurnishingStatus, PreferredTenant,
   ApprovalAuthority, OwnershipType, SoilType, WaterSource, ElectricService,
   PropertyCreateRequest,
 } from '../types'
@@ -50,6 +50,7 @@ export type WizardState = {
   parkingAvailable: boolean
   priceNegotiable:  boolean
   securityDeposit:  string
+  preferredTenant:  PreferredTenant | null  // RENT / PG only
 
   // Plot / land
   plotLengthFt:      string
@@ -115,6 +116,7 @@ export const initialWizardState: WizardState = {
   parkingAvailable: false,
   priceNegotiable: false,
   securityDeposit: '',
+  preferredTenant: null,
 
   plotLengthFt: '',
   plotBreadthFt: '',
@@ -188,6 +190,7 @@ export function validateStep(step: number, s: WizardState): string | null {
         return 'Years of experience is required.'
       if (!s.listingType)                return 'Choose the listing type (Sell, Rent or PG).'
       if (!s.localityId)                 return 'Choose a locality.'
+      if (!s.addressLine.trim())         return 'Full address is required.'
       return null
     }
     if (!s.title.trim())     return 'Title is required.'
@@ -196,7 +199,13 @@ export function validateStep(step: number, s: WizardState): string | null {
     if (!s.areaSqft.trim())  return 'Area is required.'
     if (Number(s.areaSqft) <= 0) return 'Area must be greater than 0.'
     if (!s.localityId)       return 'Choose a locality.'
+    if (!s.addressLine.trim()) return 'Full address is required.'
     if (isBuilding(s) && !s.propertyType) return 'Choose a property sub-type.'
+    return null
+  }
+  if (step === 5) {
+    // Photos are mandatory — a listing needs at least one image to go live.
+    if (!s.images.length) return 'Add at least one photo of the property.'
     return null
   }
   if (step === 6) {
@@ -240,6 +249,7 @@ export function buildCreateRequest(s: WizardState): PropertyCreateRequest {
     facing:       s.facing || null,
     ageOfProperty: isBuilding(s) ? num(s.ageOfProperty) : null,
     parkingAvailable: s.parkingAvailable,
+    preferredTenant: (s.listingType === 'RENT' || s.listingType === 'PG') ? s.preferredTenant : null,
     addressLine: s.addressLine || undefined,
     latitude: s.latitude,
     longitude: s.longitude,
