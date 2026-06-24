@@ -6,6 +6,7 @@ import {
 import * as ImagePicker from 'expo-image-picker'
 import * as DocumentPicker from 'expo-document-picker'
 import { Ionicons } from '@expo/vector-icons'
+import { LinearGradient } from 'expo-linear-gradient'
 import { Stack, useRouter } from 'expo-router'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 
@@ -21,10 +22,12 @@ import {
   resolvePropertyType, isPlotOrLand, isBuilding,
   type Category, type CategoryGroup, type WizardState,
 } from '../src/lib/postWizard'
+import { colors, fonts, radius, shadow } from '../src/theme'
 import type { Locality, Amenity, ListingType, ListedBy, PropertyType } from '../src/types'
 
-const BRAND = '#185FA5'
-const ACCENT = '#D85A30'
+const BRAND = colors.brand
+const ACCENT = colors.accent
+const HEADER_GRADIENT = ['#0c3a68', '#185FA5'] as const
 const COIMBATORE_SLUG = 'coimbatore'
 
 export default function PostScreen() {
@@ -128,7 +131,7 @@ export default function PostScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <Stack.Screen options={{ headerShown: false }} />
-      <View style={styles.header}>
+      <LinearGradient colors={HEADER_GRADIENT} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.header}>
         <Pressable onPress={step === 1 ? () => router.back() : goBack} hitSlop={8}>
           <Ionicons name="arrow-back" size={22} color="#fff" />
         </Pressable>
@@ -139,7 +142,7 @@ export default function PostScreen() {
         <Pressable onPress={() => setDiscardOpen(true)} hitSlop={8}>
           <Ionicons name="close" size={22} color="#fff" />
         </Pressable>
-      </View>
+      </LinearGradient>
 
       <ConfirmSheet
         visible={discardOpen}
@@ -504,7 +507,7 @@ function MapPickerField({ state, set }: { state: WizardState; set: <K extends ke
     <View style={{ marginTop: 4, marginBottom: 14 }}>
       <Text style={styles.stepHelp}>Exact location on map</Text>
       <Pressable onPress={() => setOpen(true)} style={[styles.mapField, hasPin && styles.mapFieldOn]}>
-        <Ionicons name={hasPin ? 'location' : 'map-outline'} size={20} color={hasPin ? '#16a34a' : BRAND} />
+        <Ionicons name={hasPin ? 'location' : 'map-outline'} size={20} color={hasPin ? colors.success : BRAND} />
         <View style={{ flex: 1 }}>
           <Text style={styles.cardTitle}>{hasPin ? 'Location pinned' : 'Pick location on map'}</Text>
           <Text style={styles.cardSub} numberOfLines={1}>
@@ -513,7 +516,7 @@ function MapPickerField({ state, set }: { state: WizardState; set: <K extends ke
               : 'Helps buyers find your property quickly'}
           </Text>
         </View>
-        <Ionicons name="chevron-forward" size={18} color="#94a3b8" />
+        <Ionicons name="chevron-forward" size={18} color={colors.mutedLight} />
       </Pressable>
       <MapLocationPicker
         visible={open}
@@ -728,12 +731,12 @@ function Step6({ state, set }: { state: WizardState; set: <K extends keyof Wizar
           const existing = state.documents.find((x) => x.docType === d.value)
           return (
             <Pressable key={d.value} onPress={() => pickDoc(d.value)} style={[styles.docCard, existing && styles.docCardOn]}>
-              <Ionicons name={existing ? 'checkmark-circle' : 'document-attach-outline'} size={22} color={existing ? '#16a34a' : BRAND} />
+              <Ionicons name={existing ? 'checkmark-circle' : 'document-attach-outline'} size={22} color={existing ? colors.success : BRAND} />
               <View style={{ flex: 1 }}>
                 <Text style={styles.cardTitle}>{d.label}</Text>
                 <Text style={styles.cardSub} numberOfLines={1}>{existing ? existing.name : d.hint}</Text>
               </View>
-              <Ionicons name="chevron-forward" size={18} color="#94a3b8" />
+              <Ionicons name="chevron-forward" size={18} color={colors.mutedLight} />
             </Pressable>
           )
         })}
@@ -772,55 +775,55 @@ function extractError(e: unknown): string | null {
 }
 
 const styles = StyleSheet.create({
-  safe:           { flex: 1, backgroundColor: '#f8fafc' },
-  center:         { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#f8fafc' },
-  header:         { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: BRAND, paddingHorizontal: 16, paddingVertical: 14 },
-  headerTitle:    { fontSize: 16, fontWeight: '700', color: '#fff' },
-  headerSub:      { fontSize: 11, color: '#cfe1f6', marginTop: 1 },
-  progressBar:    { height: 3, backgroundColor: '#e2e8f0' },
+  safe:           { flex: 1, backgroundColor: colors.bg },
+  center:         { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.bg },
+  header:         { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 16 },
+  headerTitle:    { fontFamily: fonts.bold, fontSize: 17, color: '#fff' },
+  headerSub:      { fontFamily: fonts.regular, fontSize: 11, color: '#cfe1f6', marginTop: 1 },
+  progressBar:    { height: 3, backgroundColor: colors.border },
   progressFill:   { height: 3, backgroundColor: ACCENT },
   body:           { padding: 18, paddingBottom: 32 },
 
-  stepHero:       { fontSize: 20, fontWeight: '700', color: '#0f172a', marginBottom: 6 },
-  stepHelp:       { fontSize: 13, color: '#64748b', marginBottom: 14 },
-  dimText:        { fontSize: 13, color: '#94a3b8' },
+  stepHero:       { fontFamily: fonts.extra, fontSize: 20, color: colors.ink, marginBottom: 6 },
+  stepHelp:       { fontFamily: fonts.regular, fontSize: 13, color: colors.muted, marginBottom: 14 },
+  dimText:        { fontFamily: fonts.regular, fontSize: 13, color: colors.mutedLight },
 
-  bigCard:        { flexDirection: 'row', alignItems: 'center', gap: 14, padding: 16, borderRadius: 14, borderWidth: 1, borderColor: '#e2e8f0', backgroundColor: '#fff' },
+  bigCard:        { flexDirection: 'row', alignItems: 'center', gap: 14, padding: 16, borderRadius: radius.md, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.white, ...shadow.card },
   bigCardOn:      { borderColor: BRAND, backgroundColor: '#f5faff' },
-  cardIcon:       { width: 44, height: 44, borderRadius: 22, backgroundColor: '#eff4fb', alignItems: 'center', justifyContent: 'center' },
-  cardTitle:      { fontSize: 15, fontWeight: '700', color: '#0f172a' },
-  cardSub:        { fontSize: 12, color: '#64748b', marginTop: 2 },
+  cardIcon:       { width: 44, height: 44, borderRadius: 22, backgroundColor: '#dbe7f5', alignItems: 'center', justifyContent: 'center' },
+  cardTitle:      { fontFamily: fonts.bold, fontSize: 15, color: colors.ink },
+  cardSub:        { fontFamily: fonts.regular, fontSize: 12, color: colors.muted, marginTop: 2 },
 
   row2:           { flexDirection: 'row', gap: 10 },
 
-  chip:           { borderWidth: 1, borderColor: '#cbd5e1', borderRadius: 999, paddingHorizontal: 14, paddingVertical: 8, backgroundColor: '#fff' },
-  chipOn:         { borderColor: BRAND, backgroundColor: '#eff4fb' },
-  chipText:       { fontSize: 13, color: '#334155', fontWeight: '500' },
-  chipTextOn:     { color: BRAND, fontWeight: '700' },
+  chip:           { borderWidth: 1, borderColor: '#cbd5e1', borderRadius: radius.pill, paddingHorizontal: 14, paddingVertical: 8, backgroundColor: colors.white },
+  chipOn:         { borderColor: BRAND, backgroundColor: '#dbe7f5' },
+  chipText:       { fontFamily: fonts.medium, fontSize: 13, color: '#334155' },
+  chipTextOn:     { fontFamily: fonts.bold, color: BRAND },
 
   localityWrap:   { marginBottom: 14 },
 
-  amCatLabel:     { fontSize: 11, color: '#64748b', fontWeight: '700', letterSpacing: 0.5, marginBottom: 8 },
+  amCatLabel:     { fontFamily: fonts.bold, fontSize: 11, color: colors.muted, letterSpacing: 0.5, marginBottom: 8 },
 
-  uploadCard:     { borderWidth: 1, borderStyle: 'dashed', borderColor: '#cbd5e1', borderRadius: 14, paddingVertical: 28, alignItems: 'center', backgroundColor: '#fff', marginBottom: 14 },
-  uploadTitle:    { fontSize: 14, fontWeight: '700', color: '#0f172a', marginTop: 8 },
-  uploadSub:      { fontSize: 12, color: '#64748b', marginTop: 2 },
+  uploadCard:     { borderWidth: 1, borderStyle: 'dashed', borderColor: '#cbd5e1', borderRadius: radius.md, paddingVertical: 28, alignItems: 'center', backgroundColor: colors.white, marginBottom: 14 },
+  uploadTitle:    { fontFamily: fonts.bold, fontSize: 14, color: colors.ink, marginTop: 8 },
+  uploadSub:      { fontFamily: fonts.regular, fontSize: 12, color: colors.muted, marginTop: 2 },
   grid:           { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  thumbWrap:      { width: '31%', aspectRatio: 1, borderRadius: 10, overflow: 'hidden', backgroundColor: '#e2e8f0', position: 'relative' },
+  thumbWrap:      { width: '31%', aspectRatio: 1, borderRadius: radius.sm, overflow: 'hidden', backgroundColor: colors.border, position: 'relative' },
   thumb:          { width: '100%', height: '100%' },
   coverTag:       { position: 'absolute', left: 4, bottom: 4, backgroundColor: BRAND, borderRadius: 6, paddingHorizontal: 6, paddingVertical: 2 },
-  coverTagText:   { color: '#fff', fontSize: 10, fontWeight: '700' },
+  coverTagText:   { color: '#fff', fontFamily: fonts.bold, fontSize: 10 },
   removeBtn:      { position: 'absolute', right: 4, top: 4, width: 22, height: 22, borderRadius: 11, backgroundColor: 'rgba(15,23,42,0.7)', alignItems: 'center', justifyContent: 'center' },
 
-  docCard:        { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, borderRadius: 12, borderWidth: 1, borderColor: '#e2e8f0', backgroundColor: '#fff' },
-  docCardOn:      { borderColor: '#16a34a', backgroundColor: '#f0fdf4' },
+  docCard:        { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, borderRadius: radius.sm, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.white },
+  docCardOn:      { borderColor: colors.success, backgroundColor: '#f0fdf4' },
 
-  mapField:       { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, borderRadius: 12, borderWidth: 1, borderColor: '#e2e8f0', backgroundColor: '#fff' },
-  mapFieldOn:     { borderColor: '#16a34a', backgroundColor: '#f0fdf4' },
+  mapField:       { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, borderRadius: radius.sm, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.white },
+  mapFieldOn:     { borderColor: colors.success, backgroundColor: '#f0fdf4' },
 
   toggleRow:      { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12, paddingVertical: 10 },
-  toggleLabel:    { flex: 1, fontSize: 13, color: '#334155' },
+  toggleLabel:    { flex: 1, fontFamily: fonts.regular, fontSize: 13, color: '#334155' },
 
   backLink:       { alignItems: 'center', paddingVertical: 14 },
-  backLinkText:   { color: '#64748b', fontSize: 13, fontWeight: '600' },
+  backLinkText:   { fontFamily: fonts.semibold, color: colors.muted, fontSize: 13 },
 })

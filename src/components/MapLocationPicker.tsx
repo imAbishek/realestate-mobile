@@ -5,11 +5,14 @@ import {
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
+import { LinearGradient } from 'expo-linear-gradient'
 import MapView, { Marker, PROVIDER_GOOGLE, type Region } from 'react-native-maps'
 import * as Location from 'expo-location'
+import { colors, fonts, radius, shadow } from '../theme'
 
-const BRAND = '#185FA5'
-const ACCENT = '#D85A30'
+const BRAND = colors.brand
+const ACCENT = colors.accent
+const HEADER_GRADIENT = ['#0c3a68', '#185FA5'] as const
 
 // Coimbatore city center — default starting point for the picker
 const COIMBATORE: Region = {
@@ -68,13 +71,13 @@ export function MapLocationPicker({
   return (
     <Modal visible={visible} animationType="slide" onRequestClose={onCancel}>
       <SafeAreaView style={styles.safe} edges={['top']}>
-        <View style={styles.header}>
+        <LinearGradient colors={HEADER_GRADIENT} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.header}>
           <Pressable onPress={onCancel} hitSlop={8}>
             <Ionicons name="close" size={22} color="#fff" />
           </Pressable>
           <Text style={styles.headerTitle}>Pick property location</Text>
           <View style={{ width: 22 }} />
-        </View>
+        </LinearGradient>
 
         <View style={styles.mapWrap}>
           <MapView
@@ -119,21 +122,20 @@ export function MapLocationPicker({
 }
 
 const styles = StyleSheet.create({
-  safe:        { flex: 1, backgroundColor: '#f8fafc' },
-  header:      { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: BRAND, paddingHorizontal: 16, paddingVertical: 14 },
-  headerTitle: { color: '#fff', fontSize: 16, fontWeight: '700' },
+  safe:        { flex: 1, backgroundColor: colors.bg },
+  header:      { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 16 },
+  headerTitle: { color: '#fff', fontFamily: fonts.bold, fontSize: 17 },
 
   mapWrap:     { flex: 1 },
   gpsBtn:      {
     position: 'absolute', right: 14, bottom: 14, width: 46, height: 46, borderRadius: 23,
-    backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center',
-    shadowColor: '#000', shadowOpacity: 0.15, shadowRadius: 8, shadowOffset: { width: 0, height: 4 },
-    elevation: 4,
+    backgroundColor: colors.white, alignItems: 'center', justifyContent: 'center',
+    ...shadow.raised,
   },
 
-  footer:      { padding: 16, backgroundColor: '#fff', borderTopWidth: 1, borderTopColor: '#e2e8f0', gap: 8 },
-  hint:        { fontSize: 12, color: '#64748b' },
-  coords:      { fontSize: 13, color: '#0f172a', fontFamily: Platform.select({ ios: 'Menlo', android: 'monospace' }) },
-  confirmBtn:  { marginTop: 6, backgroundColor: ACCENT, paddingVertical: 14, borderRadius: 12, alignItems: 'center' },
-  confirmText: { color: '#fff', fontSize: 15, fontWeight: '700' },
+  footer:      { padding: 16, backgroundColor: colors.white, borderTopWidth: 1, borderTopColor: colors.border, gap: 8 },
+  hint:        { fontFamily: fonts.regular, fontSize: 12, color: colors.muted },
+  coords:      { fontSize: 13, color: colors.ink, fontFamily: Platform.select({ ios: 'Menlo', android: 'monospace' }) },
+  confirmBtn:  { marginTop: 6, backgroundColor: ACCENT, paddingVertical: 14, borderRadius: radius.sm, alignItems: 'center', ...shadow.cta },
+  confirmText: { color: '#fff', fontFamily: fonts.bold, fontSize: 15 },
 })
