@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
 import type { TextInputProps } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
+import { colors, fonts, radius } from '../theme'
 
 interface Props extends TextInputProps {
   label: string
@@ -20,7 +21,7 @@ export function FormField({ label, error, style, secureTextEntry, ...rest }: Pro
         <TextInput
           {...rest}
           secureTextEntry={isPassword ? hidden : secureTextEntry}
-          placeholderTextColor="#94a3b8"
+          placeholderTextColor={colors.mutedLight}
           style={[styles.input, isPassword ? styles.inputWithIcon : null, error ? styles.inputError : null, style]}
         />
         {isPassword ? (
@@ -31,7 +32,7 @@ export function FormField({ label, error, style, secureTextEntry, ...rest }: Pro
             accessibilityLabel={hidden ? 'Show password' : 'Hide password'}
             style={styles.eyeBtn}
           >
-            <Ionicons name={hidden ? 'eye-off' : 'eye'} size={20} color="#64748b" />
+            <Ionicons name={hidden ? 'eye-off' : 'eye'} size={20} color={colors.muted} />
           </Pressable>
         ) : null}
       </View>
@@ -42,11 +43,11 @@ export function FormField({ label, error, style, secureTextEntry, ...rest }: Pro
 
 const styles = StyleSheet.create({
   wrap:          { marginBottom: 14 },
-  label:         { fontSize: 13, fontWeight: '600', color: '#334155', marginBottom: 6 },
+  label:         { fontFamily: fonts.semibold, fontSize: 13, color: colors.ink, marginBottom: 7 },
   inputRow:      { position: 'relative', justifyContent: 'center' },
-  input:         { borderWidth: 1, borderColor: '#cbd5e1', borderRadius: 10, paddingHorizontal: 12, paddingVertical: 12, fontSize: 15, color: '#0f172a', backgroundColor: '#fff' },
+  input:         { borderWidth: 1, borderColor: colors.border, borderRadius: radius.sm, paddingHorizontal: 14, paddingVertical: 14, fontFamily: fonts.medium, fontSize: 15, color: colors.ink, backgroundColor: colors.white },
   inputWithIcon: { paddingRight: 44 },
-  inputError:    { borderColor: '#dc2626' },
+  inputError:    { borderColor: colors.danger },
   eyeBtn:        { position: 'absolute', right: 10, padding: 4 },
-  error:         { fontSize: 12, color: '#dc2626', marginTop: 4 },
+  error:         { fontFamily: fonts.medium, fontSize: 12, color: colors.danger, marginTop: 4 },
 })
