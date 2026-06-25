@@ -106,6 +106,7 @@ export default function HomeScreen() {
               placeholder="Search locality, project or Property ID"
               placeholderTextColor={colors.mutedLight}
               style={styles.heroSearchInput}
+              numberOfLines={1}
             />
           </View>
         </BlurView>

@@ -127,6 +127,7 @@ export default function MapScreen() {
                 value={query}
                 onChangeText={(t) => { setQuery(t); setSelectedId(null) }}
                 returnKeyType="search"
+                numberOfLines={1}
               />
               {query.length > 0 ? (
                 <Pressable onPress={() => setQuery('')} hitSlop={8}>
