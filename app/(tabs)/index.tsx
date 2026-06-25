@@ -137,7 +137,7 @@ export default function HomeScreen() {
             {(recent.length ? recent : [undefined, undefined, undefined]).slice(0, 6).map((p, i) => (
               <FeaturedCollectionCard
                 key={p?.id ?? i}
-                imageUrl={p?.primaryImageUrl}
+                property={p}
                 onPress={() => p ? router.push(`/properties/${p.id}`) : goBrowse('SALE')}
               />
             ))}
@@ -291,20 +291,38 @@ function Section({ title, subtitle, background = colors.white, bleed = false, ch
   )
 }
 
-function FeaturedCollectionCard({ imageUrl, onPress }: { imageUrl?: string | null; onPress: () => void }) {
+function FeaturedCollectionCard({ property, onPress }: { property?: PropertyCard; onPress: () => void }) {
   return (
     <Pressable onPress={onPress} style={({ pressed }) => [styles.featured, pressed && { opacity: 0.9 }]}>
-      {imageUrl ? (
-        <Image source={{ uri: imageUrl }} style={styles.featuredImg} resizeMode="cover" />
+      {property?.primaryImageUrl ? (
+        <Image source={{ uri: property.primaryImageUrl }} style={styles.featuredImg} resizeMode="cover" />
       ) : (
         <View style={[styles.featuredImg, styles.noImage, { backgroundColor: colors.brandTint }]}>
           <Ionicons name="image-outline" size={36} color={colors.mutedLight} />
         </View>
       )}
-      {/* Orange circular agent badge, top-right */}
-      <View style={styles.featuredBadge}>
-        <Ionicons name="person" size={13} color="#fff" />
-      </View>
+      {property ? (
+        <>
+          {/* Listing-type pill, top-left */}
+          <View style={styles.featuredTypePill}>
+            <Text style={styles.featuredTypeText}>{property.listingType}</Text>
+          </View>
+          {/* Bottom scrim so white text stays legible over any photo */}
+          <LinearGradient
+            colors={['transparent', 'rgba(0,0,0,0.78)']}
+            style={styles.featuredScrim}
+            pointerEvents="none"
+          />
+          <View style={styles.featuredInfo}>
+            <Text style={styles.featuredPrice}>{formatPrice(property.price, property.priceUnit)}</Text>
+            <Text style={styles.featuredTitle} numberOfLines={1}>{property.title}</Text>
+            <View style={styles.featuredLocRow}>
+              <Ionicons name="location-outline" size={11} color="rgba(255,255,255,0.85)" />
+              <Text style={styles.featuredLoc} numberOfLines={1}>{property.localityName}, {property.cityName}</Text>
+            </View>
+          </View>
+        </>
+      ) : null}
     </Pressable>
   )
 }
@@ -415,10 +433,17 @@ const styles = StyleSheet.create({
   sectionTitle:      { ...typography.h2 },
   sectionSub:        { fontFamily: fonts.regular, fontSize: 13, color: colors.muted, marginTop: 6 },
 
-  // Featured collection cards — photo + orange agent badge
+  // Featured collection cards — photo + bottom scrim with price/title/location
   featured:          { width: 200, height: 150, borderRadius: radius.md, overflow: 'hidden', backgroundColor: colors.brandTint, ...shadow.card },
   featuredImg:       { width: '100%', height: '100%' },
-  featuredBadge:     { position: 'absolute', top: 10, right: 10, width: 28, height: 28, borderRadius: 14, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.accent },
+  featuredTypePill:  { position: 'absolute', top: 10, left: 10, backgroundColor: colors.brand, paddingHorizontal: 8, paddingVertical: 2, borderRadius: radius.pill },
+  featuredTypeText:  { fontFamily: fonts.bold, fontSize: 10, color: '#fff' },
+  featuredScrim:     { position: 'absolute', left: 0, right: 0, bottom: 0, height: 90 },
+  featuredInfo:      { position: 'absolute', left: 10, right: 10, bottom: 10, gap: 2 },
+  featuredPrice:     { fontFamily: fonts.extra, fontSize: 16, color: '#fff' },
+  featuredTitle:     { fontFamily: fonts.bold, fontSize: 13, color: '#fff' },
+  featuredLocRow:    { flexDirection: 'row', alignItems: 'center', gap: 3 },
+  featuredLoc:       { fontFamily: fonts.regular, fontSize: 11, color: 'rgba(255,255,255,0.85)', flexShrink: 1 },
 
   // Services — white card with a flat light-blue icon circle (matches quick actions)
   serviceRow:        { flexDirection: 'row', gap: 12 },
