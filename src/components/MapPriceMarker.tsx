@@ -40,13 +40,13 @@ function MapPriceMarkerBase({ item, selected, onPress }: Props) {
       tracksViewChanges={tracks}
       zIndex={selected ? 999 : 1}
     >
-      <View style={[styles.wrap, selected && styles.wrapSelected]}>
-        <View style={[styles.pill, { backgroundColor: tone }]}>
-          <Text style={styles.pillText} numberOfLines={1}>
+      <View style={styles.wrap}>
+        <View style={[styles.pill, { backgroundColor: tone }, selected && styles.pillSelected]}>
+          <Text style={[styles.pillText, selected && styles.pillTextSelected]} numberOfLines={1}>
             {formatPricePill(item.price, item.priceUnit)}
           </Text>
         </View>
-        <View style={[styles.tail, { borderTopColor: tone }]} />
+        <View style={[styles.tail, { borderTopColor: tone }, selected && styles.tailSelected]} />
       </View>
     </Marker>
   )
@@ -55,18 +55,22 @@ function MapPriceMarkerBase({ item, selected, onPress }: Props) {
 export const MapPriceMarker = memo(MapPriceMarkerBase)
 
 const styles = StyleSheet.create({
+  // The selected marker grows via real layout (padding/font/tail), NOT a
+  // transform — react-native-maps rasterises only the layout box, so a scaled
+  // transform clips the overflowing tail. Bigger layout keeps the tail intact.
   wrap:         { alignItems: 'center' },
-  // Scale the whole teardrop (pill + tail) so it pops as one connected unit.
-  wrapSelected: { transform: [{ scale: 1.15 }] },
   pill: {
     paddingHorizontal: 9, paddingVertical: 4, borderRadius: 999,
     borderWidth: 1.5, borderColor: '#fff',
     shadowColor: '#000', shadowOpacity: 0.25, shadowRadius: 3, shadowOffset: { width: 0, height: 1 }, elevation: 4,
   },
-  pillText:     { color: '#fff', fontFamily: fonts.extra, fontSize: 12 },
+  pillSelected:     { paddingHorizontal: 12, paddingVertical: 5 },
+  pillText:         { color: '#fff', fontFamily: fonts.extra, fontSize: 12 },
+  pillTextSelected: { fontSize: 14 },
   tail: {
     width: 0, height: 0, marginTop: -1,
     borderLeftWidth: 5, borderRightWidth: 5, borderTopWidth: 7,
     borderLeftColor: 'transparent', borderRightColor: 'transparent',
   },
+  tailSelected: { borderLeftWidth: 6, borderRightWidth: 6, borderTopWidth: 8 },
 })
