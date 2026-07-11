@@ -65,7 +65,7 @@ export function HeroCarousel({ images }: Props) {
 }
 
 const styles = StyleSheet.create({
-  wrap:   { height: HERO_PHOTO_H, backgroundColor: colors.brandDark, borderBottomLeftRadius: 22, borderBottomRightRadius: 22, overflow: 'hidden' },
+  wrap:   { height: HERO_PHOTO_H, backgroundColor: colors.brandDark, overflow: 'hidden' },
   photo:  { width: SCREEN_W, height: HERO_PHOTO_H },
   scrim:  { position: 'absolute', left: 0, right: 0, bottom: 0, height: 180 },
 })

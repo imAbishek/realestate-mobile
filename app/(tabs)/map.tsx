@@ -43,6 +43,9 @@ export default function MapScreen() {
   const [category, setCategory] = useState(0)
   const [query, setQuery] = useState('')
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  // Bumped on every focus so markers re-rasterise (tracksViewChanges) — without
+  // it, returning to the tab leaves the first price marker blank until scrolled.
+  const [focusEpoch, setFocusEpoch] = useState(0)
 
   const mapRef = useRef<MapView>(null)
   const listRef = useRef<FlatList<PropertyCard>>(null)
@@ -51,7 +54,11 @@ export default function MapScreen() {
     try {
       const { data } = await propertyApi.search({ citySlug: city.slug, size: 100 })
       // Only listings with real coordinates can be plotted.
-      setItems(data.content.filter((p) => p.latitude != null && p.longitude != null))
+      const mapped = data.content.filter((p) => p.latitude != null && p.longitude != null)
+      setItems(mapped)
+      // Highlight the first (carousel-visible) listing on load so it's selected
+      // without needing a scroll; keep any existing selection on refocus.
+      setSelectedId((prev) => prev ?? mapped[0]?.id ?? null)
     } catch {
       setItems([])
     } finally {
@@ -59,7 +66,10 @@ export default function MapScreen() {
     }
   }, [city.slug])
 
-  useFocusEffect(useCallback(() => { load() }, [load]))
+  useFocusEffect(useCallback(() => {
+    load()
+    setFocusEpoch((e) => e + 1)
+  }, [load]))
 
   // Visible set = category filter + locality/title text search. Recomputed
   // together so markers and carousel always stay in lock-step.
@@ -110,6 +120,7 @@ export default function MapScreen() {
               key={p.id}
               item={p}
               selected={p.id === selectedId}
+              refresh={focusEpoch}
               onPress={onMarkerPress}
             />
           ))}

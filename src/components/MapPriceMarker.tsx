@@ -11,6 +11,8 @@ const ACCENT = colors.accent
 interface Props {
   item: PropertyCard
   selected: boolean
+  /** Changes when the map screen refocuses — forces a re-rasterise. */
+  refresh: number
   onPress: (item: PropertyCard) => void
 }
 
@@ -22,7 +24,7 @@ interface Props {
  * leaving it on tanks frame-rate with many markers — so we keep it true only
  * briefly after mount and whenever `selected` flips, then switch it off.
  */
-function MapPriceMarkerBase({ item, selected, onPress }: Props) {
+function MapPriceMarkerBase({ item, selected, refresh, onPress }: Props) {
   const tone = item.isFeatured ? ACCENT : BRAND
   const [tracks, setTracks] = useState(true)
 
@@ -30,7 +32,7 @@ function MapPriceMarkerBase({ item, selected, onPress }: Props) {
     setTracks(true)
     const t = setTimeout(() => setTracks(false), 500)
     return () => clearTimeout(t)
-  }, [selected])
+  }, [selected, refresh])
 
   return (
     <Marker
