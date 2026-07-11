@@ -27,7 +27,7 @@ import type { Locality, Amenity, ListingType, ListedBy, PropertyType } from '../
 
 const BRAND = colors.brand
 const ACCENT = colors.accent
-const HEADER_GRADIENT = ['#0c3a68', '#185FA5'] as const
+const HEADER_GRADIENT = ['#0f332f', '#184A45'] as const
 const COIMBATORE_SLUG = 'coimbatore'
 
 export default function PostScreen() {
@@ -789,15 +789,15 @@ const styles = StyleSheet.create({
   dimText:        { fontFamily: fonts.regular, fontSize: 13, color: colors.mutedLight },
 
   bigCard:        { flexDirection: 'row', alignItems: 'center', gap: 14, padding: 16, borderRadius: radius.md, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.white, ...shadow.card },
-  bigCardOn:      { borderColor: BRAND, backgroundColor: '#f5faff' },
-  cardIcon:       { width: 44, height: 44, borderRadius: 22, backgroundColor: '#dbe7f5', alignItems: 'center', justifyContent: 'center' },
+  bigCardOn:      { borderColor: BRAND, backgroundColor: '#eef2e8' },
+  cardIcon:       { width: 44, height: 44, borderRadius: 22, backgroundColor: '#e6ece1', alignItems: 'center', justifyContent: 'center' },
   cardTitle:      { fontFamily: fonts.bold, fontSize: 15, color: colors.ink },
   cardSub:        { fontFamily: fonts.regular, fontSize: 12, color: colors.muted, marginTop: 2 },
 
   row2:           { flexDirection: 'row', gap: 10 },
 
   chip:           { borderWidth: 1, borderColor: '#cbd5e1', borderRadius: radius.pill, paddingHorizontal: 14, paddingVertical: 8, backgroundColor: colors.white },
-  chipOn:         { borderColor: BRAND, backgroundColor: '#dbe7f5' },
+  chipOn:         { borderColor: BRAND, backgroundColor: '#e6ece1' },
   chipText:       { fontFamily: fonts.medium, fontSize: 13, color: '#334155' },
   chipTextOn:     { fontFamily: fonts.bold, color: BRAND },
 

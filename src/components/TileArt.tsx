@@ -3,9 +3,9 @@ import Svg, { Circle, Path, Rect, Text as SvgText } from 'react-native-svg'
 // Decorative vector illustrations for the home-screen quick tiles.
 // Hand-built to sit bottom-right on the translucent blue cards — no raster assets.
 
-const ROOF   = '#D85A30' // accent
+const ROOF   = '#C6A15B' // accent
 const WALL   = '#ffffff'
-const TRIM   = '#185FA5' // brand
+const TRIM   = '#184A45' // brand
 const GOLD   = '#f5c542'
 const GOLD_D = '#e0a82e'
 const GREEN  = '#5bbf7a'

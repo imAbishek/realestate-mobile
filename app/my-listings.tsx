@@ -14,7 +14,7 @@ import type { ListingStatus, PriceUnit, PropertyCard } from '../src/types'
 
 const BRAND  = colors.brand
 const ACCENT = colors.accent
-const HEADER_GRADIENT = ['#0c3a68', '#185FA5'] as const
+const HEADER_GRADIENT = ['#0f332f', '#184A45'] as const
 
 const STATUS_STYLE: Record<ListingStatus, { bg: string; fg: string; label: string }> = {
   DRAFT:          { bg: '#f1f5f9', fg: '#64748b', label: 'Draft' },
@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
   header:       { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 16 },
   headerTitle:  { fontFamily: fonts.bold, fontSize: 18, color: '#fff' },
   center:       { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 28 },
-  emptyIcon:    { width: 84, height: 84, borderRadius: 42, backgroundColor: '#dbe7f5', alignItems: 'center', justifyContent: 'center', marginBottom: 14 },
+  emptyIcon:    { width: 84, height: 84, borderRadius: 42, backgroundColor: '#e6ece1', alignItems: 'center', justifyContent: 'center', marginBottom: 14 },
   emptyTitle:   { fontFamily: fonts.bold, fontSize: 17, color: colors.ink, marginTop: 2 },
   emptySub:     { fontFamily: fonts.regular, fontSize: 13, color: colors.muted, marginTop: 6, textAlign: 'center', lineHeight: 19 },
   cta:          { marginTop: 18, backgroundColor: ACCENT, paddingHorizontal: 24, paddingVertical: 12, borderRadius: radius.sm, ...shadow.cta },

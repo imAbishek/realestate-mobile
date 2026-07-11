@@ -4,7 +4,7 @@ import {
   StyleSheet, Text, View,
 } from 'react-native'
 import { useRouter, useFocusEffect } from 'expo-router'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
 import { favoritesApi } from '../../src/lib/api'
 import { useAuthStore } from '../../src/store/authStore'
@@ -45,7 +45,7 @@ export default function SavedScreen() {
 
   if (!hydrated || loading) {
     return (
-      <SafeAreaView style={styles.safe} edges={['top']}>
+      <SafeAreaView style={styles.safe} edges={[]}>
         <Header />
         <View style={styles.center}><ActivityIndicator color={BRAND} /></View>
       </SafeAreaView>
@@ -54,7 +54,7 @@ export default function SavedScreen() {
 
   if (!isLoggedIn) {
     return (
-      <SafeAreaView style={styles.safe} edges={['top']}>
+      <SafeAreaView style={styles.safe} edges={[]}>
         <Header />
         <View style={styles.center}>
           <View style={styles.emptyIcon}><Ionicons name="heart-outline" size={44} color={colors.brand} /></View>
@@ -70,7 +70,7 @@ export default function SavedScreen() {
 
   if (items.length === 0) {
     return (
-      <SafeAreaView style={styles.safe} edges={['top']}>
+      <SafeAreaView style={styles.safe} edges={[]}>
         <Header />
         <View style={styles.center}>
           <View style={styles.emptyIcon}><Ionicons name="heart-outline" size={44} color={colors.brand} /></View>
@@ -82,7 +82,7 @@ export default function SavedScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <SafeAreaView style={styles.safe} edges={[]}>
       <Header count={items.length} />
       <FlatList
         data={items}
@@ -99,8 +99,9 @@ export default function SavedScreen() {
 }
 
 function Header({ count }: { count?: number }) {
+  const insets = useSafeAreaInsets()
   return (
-    <View style={styles.header}>
+    <View style={[styles.header, { paddingTop: insets.top + 14 }]}>
       <Text style={styles.headerTitle}>Saved Properties</Text>
       {count != null && <Text style={styles.headerCount}>{count} saved</Text>}
     </View>
@@ -147,11 +148,11 @@ function formatPrice(price: number, unit: string): string {
 
 const styles = StyleSheet.create({
   safe:         { flex: 1, backgroundColor: colors.bg },
-  header:       { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 16, backgroundColor: colors.white, borderBottomWidth: 1, borderBottomColor: colors.borderLight },
-  headerTitle:  { fontFamily: fonts.bold, fontSize: 20, color: colors.ink },
-  headerCount:  { fontFamily: fonts.semibold, fontSize: 12, color: colors.muted },
+  header:       { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingBottom: 16, backgroundColor: colors.brand },
+  headerTitle:  { fontFamily: fonts.bold, fontSize: 20, color: colors.white },
+  headerCount:  { fontFamily: fonts.semibold, fontSize: 12, color: 'rgba(255,255,255,0.85)' },
   center:       { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 28 },
-  emptyIcon:    { width: 84, height: 84, borderRadius: 42, backgroundColor: '#dbe7f5', alignItems: 'center', justifyContent: 'center', marginBottom: 14 },
+  emptyIcon:    { width: 84, height: 84, borderRadius: 42, backgroundColor: '#e6ece1', alignItems: 'center', justifyContent: 'center', marginBottom: 14 },
   emptyTitle:   { fontFamily: fonts.bold, fontSize: 17, color: colors.ink, marginTop: 2 },
   emptySub:     { fontFamily: fonts.regular, fontSize: 13, color: colors.muted, marginTop: 6, textAlign: 'center', lineHeight: 19 },
   cta:          { marginTop: 18, backgroundColor: ACCENT, paddingHorizontal: 24, paddingVertical: 12, borderRadius: radius.sm, ...shadow.cta },

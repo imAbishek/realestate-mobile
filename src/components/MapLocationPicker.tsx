@@ -12,7 +12,7 @@ import { colors, fonts, radius, shadow } from '../theme'
 
 const BRAND = colors.brand
 const ACCENT = colors.accent
-const HEADER_GRADIENT = ['#0c3a68', '#185FA5'] as const
+const HEADER_GRADIENT = ['#0f332f', '#184A45'] as const
 
 // Coimbatore city center — default starting point for the picker
 const COIMBATORE: Region = {

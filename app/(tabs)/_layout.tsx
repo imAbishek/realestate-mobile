@@ -19,9 +19,9 @@ export default function TabsLayout() {
       screenOptions={{
         headerShown: false,
         tabBarShowLabel: true,
-        tabBarActiveTintColor: colors.brand,
-        tabBarInactiveTintColor: '#d6d6d6ff',
-        tabBarLabelStyle: { fontFamily: fonts.semibold, fontSize: 11, marginTop: 2, color: '#d6d6d6ff' },
+        tabBarActiveTintColor: colors.accent,
+        tabBarInactiveTintColor: 'rgba(255,255,255,0.7)',
+        tabBarLabelStyle: { fontFamily: fonts.semibold, fontSize: 11, marginTop: 2 },
         // Frosted, floating bar with rounded top corners — content scrolls
         // underneath and blurs through.
         tabBarStyle: {
@@ -43,7 +43,7 @@ export default function TabsLayout() {
         tabBarBackground: () => (
           <View style={[StyleSheet.absoluteFill, styles.blurTint]}>
             <LinearGradient
-              colors={['#0c3a68', '#185FA5']}
+              colors={['#0f332f', '#184A45']}
               start={{ x: 0, y: 0 }}
               end={{ x: 0, y: 1 }}
               style={StyleSheet.absoluteFill}
@@ -69,10 +69,9 @@ export default function TabsLayout() {
   )
 }
 
-function TabIcon({ name, color, size, focused }: { name: IconName; color: ColorValue; size: number; focused?: boolean }) {
-  // Rounded highlight behind the active icon (matches the design mockup).
+function TabIcon({ name, color, size }: { name: IconName; color: ColorValue; size: number }) {
   return (
-    <View style={[styles.iconWrap, focused && styles.iconWrapActive]}>
+    <View style={styles.iconWrap}>
       <Ionicons name={name} size={size} color={color as string} />
     </View>
   )
@@ -81,7 +80,5 @@ function TabIcon({ name, color, size, focused }: { name: IconName; color: ColorV
 const styles = StyleSheet.create({
   // Frosted wash over the blur — clipped to the bar's rounded top corners.
   blurTint:       { borderTopLeftRadius: 24, borderTopRightRadius: 24, overflow: 'hidden' },
-  // Light blue-grey squircle highlight behind the active icon (matches the mockup).
-  iconWrap:       { width: 52, height: 34, borderRadius: 17, alignItems: 'center', justifyContent: 'center' },
-  iconWrapActive: { backgroundColor: '#dbe7f5'},
+  iconWrap:       { width: 52, height: 34, alignItems: 'center', justifyContent: 'center' },
 })

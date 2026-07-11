@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
   safe:       { flex: 1, backgroundColor: colors.bg },
   flex:       { flex: 1 },
   scroll:     { padding: 22, paddingTop: 28 },
-  iconCircle: { width: 60, height: 60, borderRadius: 30, backgroundColor: '#dbe7f5', alignItems: 'center', justifyContent: 'center', marginBottom: 18 },
+  iconCircle: { width: 60, height: 60, borderRadius: 30, backgroundColor: '#e6ece1', alignItems: 'center', justifyContent: 'center', marginBottom: 18 },
   heading:    { fontFamily: fonts.extra, fontSize: 26, color: colors.ink },
   accentBar:  { width: 38, height: 4, borderRadius: 2, backgroundColor: colors.accent, marginTop: 10 },
   sub:        { fontFamily: fonts.regular, fontSize: 14, color: colors.muted, marginTop: 12, marginBottom: 24, lineHeight: 20 },

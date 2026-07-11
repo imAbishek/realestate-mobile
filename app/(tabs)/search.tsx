@@ -13,7 +13,7 @@ import type { ListingType, PriceUnit, PropertyCard, SearchParams } from '../../s
 
 const BRAND = colors.brand
 const ACCENT = colors.accent
-const HEADER_GRADIENT = ['#0c3a68', '#185FA5'] as const
+const HEADER_GRADIENT = ['#0f332f', '#184A45'] as const
 
 const TYPE_TABS: { key: ListingType | 'ALL'; label: string }[] = [
   { key: 'ALL',  label: 'All'  },
@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
   tabTextActive:{ fontFamily: fonts.bold, color: '#fff' },
 
   center:      { padding: 60, alignItems: 'center' },
-  emptyIcon:   { width: 84, height: 84, borderRadius: 42, backgroundColor: '#dbe7f5', alignItems: 'center', justifyContent: 'center' },
+  emptyIcon:   { width: 84, height: 84, borderRadius: 42, backgroundColor: '#e6ece1', alignItems: 'center', justifyContent: 'center' },
   empty:       { fontFamily: fonts.regular, fontSize: 13, color: colors.muted, marginTop: 12, textAlign: 'center' },
 
   card:        { flexDirection: 'row', backgroundColor: colors.white, borderRadius: radius.md, marginBottom: 10, borderWidth: 1, borderColor: colors.borderLight, overflow: 'hidden', ...shadow.card },

@@ -1,20 +1,22 @@
 // Centralized colour tokens — single source of truth for the app's palette.
-// Previously each screen re-declared `const BRAND = '#185FA5'` inline; import
+// Previously each screen re-declared `const BRAND = '#184A45'` inline; import
 // from here instead so the brand aesthetic stays consistent everywhere.
+// Palette: "Green Growth" (Eco-Suburban) — Forest Green + Brass Gold on Warm Ivory.
 export const colors = {
-  // Brand
-  brand:      '#185FA5',
-  brandDark:  '#0e447a',
-  brandTint:  '#eff4fb',
-  accent:     '#D85A30',
+  // Brand — Forest Green
+  brand:      '#184A45',
+  brandDark:  '#0f332f',
+  brandTint:  '#e6ece1', // pale sage — icon circles / soft fills
+  sage:       '#A3B18A', // secondary UI (chips, tabs)
+  accent:     '#C6A15B', // Brass Gold — CTA / badges / premium
 
-  // Text
+  // Text — Stone Gray for body, near-black for headings
   ink:        '#0f172a',
-  muted:      '#64748b',
-  mutedLight: '#94a3b8',
+  muted:      '#6E6E6E',
+  mutedLight: '#9a9a94',
 
-  // Surfaces & borders
-  bg:         '#f8fafc',
+  // Surfaces & borders — Warm Ivory bg, white cards
+  bg:         '#F7F3ED',
   white:      '#fff',
   border:     '#e2e8f0',
   borderLight:'#eef2f7',
@@ -25,7 +27,8 @@ export const colors = {
   danger:     '#dc2626',
 } as const
 
-// Hero gradient — used as the fallback backdrop when no listing photos exist.
-export const heroGradient = ['#1c6cba', '#15589c', '#0e447a'] as const
+// Forest gradient — floating headers + tab bar + hero fallback backdrop.
+export const headerGradient = ['#0f332f', '#184A45'] as const
+export const heroGradient = ['#2a6d63', '#184A45', '#0f332f'] as const
 
 export type ColorToken = keyof typeof colors

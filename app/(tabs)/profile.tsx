@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { Link, useRouter } from 'expo-router'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { InfoSheet, type InfoSheetContent } from '../../src/components/InfoSheet'
 import { ConfirmSheet } from '../../src/components/ConfirmSheet'
 import { useAuthStore } from '../../src/store/authStore'
@@ -10,6 +10,7 @@ import { colors, fonts, radius, shadow } from '../../src/theme'
 
 export default function ProfileScreen() {
   const router = useRouter()
+  const insets = useSafeAreaInsets()
   const user = useAuthStore((s) => s.user)
   const isLoggedIn = useAuthStore((s) => s.isLoggedIn)
   const clearSession = useAuthStore((s) => s.clearSession)
@@ -36,8 +37,8 @@ export default function ProfileScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
-      <View style={styles.header}>
+    <SafeAreaView style={styles.safe} edges={[]}>
+      <View style={[styles.header, { paddingTop: insets.top + 20 }]}>
         <View style={styles.avatar}>
           <Text style={styles.avatarText}>{user?.name.charAt(0).toUpperCase() ?? '?'}</Text>
         </View>
@@ -95,7 +96,7 @@ function Row({ icon, label, onPress, danger }: { icon: React.ComponentProps<type
 const styles = StyleSheet.create({
   safe:           { flex: 1, backgroundColor: colors.bg },
   center:         { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
-  guestIcon:      { width: 96, height: 96, borderRadius: 48, backgroundColor: '#dbe7f5', alignItems: 'center', justifyContent: 'center' },
+  guestIcon:      { width: 96, height: 96, borderRadius: 48, backgroundColor: '#e6ece1', alignItems: 'center', justifyContent: 'center' },
   title:          { fontFamily: fonts.bold, fontSize: 18, color: colors.ink, marginTop: 16, textAlign: 'center' },
   sub:            { fontFamily: fonts.regular, fontSize: 13, color: colors.muted, marginTop: 6, textAlign: 'center', marginBottom: 20, lineHeight: 19 },
   primaryBtn:     { backgroundColor: colors.brand, borderRadius: radius.sm, paddingHorizontal: 28, paddingVertical: 13, marginTop: 8, ...shadow.cta },
@@ -103,16 +104,16 @@ const styles = StyleSheet.create({
   secondaryBtn:   { borderRadius: radius.sm, paddingHorizontal: 28, paddingVertical: 12, marginTop: 10 },
   secondaryBtnText:{ color: colors.brand, fontFamily: fonts.semibold, fontSize: 14 },
 
-  header:         { alignItems: 'center', paddingVertical: 30, backgroundColor: colors.white, borderBottomWidth: 1, borderBottomColor: colors.borderLight },
-  avatar:         { width: 76, height: 76, borderRadius: 38, backgroundColor: colors.brand, alignItems: 'center', justifyContent: 'center', marginBottom: 12, ...shadow.card },
-  avatarText:     { color: '#fff', fontFamily: fonts.extra, fontSize: 30 },
-  name:           { fontFamily: fonts.bold, fontSize: 19, color: colors.ink },
-  email:          { fontFamily: fonts.regular, fontSize: 13, color: colors.muted, marginTop: 3 },
-  roleChip:       { fontFamily: fonts.bold, fontSize: 10, color: colors.brand, backgroundColor: colors.brandTint, paddingHorizontal: 10, paddingVertical: 4, borderRadius: radius.pill, marginTop: 10, overflow: 'hidden', letterSpacing: 0.5 },
+  header:         { alignItems: 'center', paddingBottom: 30, backgroundColor: colors.brand },
+  avatar:         { width: 76, height: 76, borderRadius: 38, backgroundColor: colors.white, alignItems: 'center', justifyContent: 'center', marginBottom: 12, ...shadow.card },
+  avatarText:     { color: colors.brand, fontFamily: fonts.extra, fontSize: 30 },
+  name:           { fontFamily: fonts.bold, fontSize: 19, color: colors.white },
+  email:          { fontFamily: fonts.regular, fontSize: 13, color: 'rgba(255,255,255,0.85)', marginTop: 3 },
+  roleChip:       { fontFamily: fonts.bold, fontSize: 10, color: colors.white, backgroundColor: 'rgba(255,255,255,0.18)', paddingHorizontal: 10, paddingVertical: 4, borderRadius: radius.pill, marginTop: 10, overflow: 'hidden', letterSpacing: 0.5 },
 
   list:           { paddingHorizontal: 16, marginTop: 16 },
   row:            { flexDirection: 'row', alignItems: 'center', backgroundColor: colors.white, paddingHorizontal: 14, paddingVertical: 13, borderRadius: radius.md, marginBottom: 10, borderWidth: 1, borderColor: colors.borderLight, ...shadow.card },
   rowPressed:     { opacity: 0.7 },
-  rowIcon:        { width: 40, height: 40, borderRadius: 20, backgroundColor: '#dbe7f5', alignItems: 'center', justifyContent: 'center' },
+  rowIcon:        { width: 40, height: 40, borderRadius: 20, backgroundColor: '#e6ece1', alignItems: 'center', justifyContent: 'center' },
   rowLabel:       { flex: 1, fontFamily: fonts.semibold, fontSize: 14, color: colors.ink, marginLeft: 12 },
 })

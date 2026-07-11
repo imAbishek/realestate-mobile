@@ -828,7 +828,7 @@ const styles = StyleSheet.create({
   amenityText:    { fontFamily: fonts.semibold, fontSize: 12, color: BRAND },
 
   invRow:         { flexDirection: 'row', alignItems: 'flex-start', gap: 12 },
-  invDot:         { width: 28, height: 28, borderRadius: 14, backgroundColor: '#dbe7f5', alignItems: 'center', justifyContent: 'center', marginTop: 1 },
+  invDot:         { width: 28, height: 28, borderRadius: 14, backgroundColor: '#e6ece1', alignItems: 'center', justifyContent: 'center', marginTop: 1 },
   invText:        { flex: 1, fontFamily: fonts.regular, fontSize: 13, color: '#334155', lineHeight: 20 },
 
   mapWrap:        { height: 170, marginTop: 10, borderRadius: radius.md, overflow: 'hidden', backgroundColor: colors.border, position: 'relative' },
@@ -837,7 +837,7 @@ const styles = StyleSheet.create({
   muted:         { fontFamily: fonts.regular, fontSize: 12, color: colors.muted, marginTop: 8 },
 
   landmarkRow:    { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 9, borderBottomWidth: 1, borderBottomColor: colors.borderLight },
-  landmarkIcon:   { width: 28, height: 28, borderRadius: 14, backgroundColor: '#dbe7f5', alignItems: 'center', justifyContent: 'center' },
+  landmarkIcon:   { width: 28, height: 28, borderRadius: 14, backgroundColor: '#e6ece1', alignItems: 'center', justifyContent: 'center' },
   landmarkName:   { flex: 1, fontFamily: fonts.medium, fontSize: 13, color: colors.ink },
   landmarkDist:   { fontFamily: fonts.semibold, fontSize: 12, color: colors.muted },
 
