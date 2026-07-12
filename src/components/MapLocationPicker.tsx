@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import {
-  ActivityIndicator, Alert, Modal, Platform, Pressable,
+  ActivityIndicator, Modal, Platform, Pressable,
   StyleSheet, Text, View,
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -8,6 +8,7 @@ import { Ionicons } from '@expo/vector-icons'
 import { LinearGradient } from 'expo-linear-gradient'
 import MapView, { Marker, PROVIDER_GOOGLE, type Region } from 'react-native-maps'
 import * as Location from 'expo-location'
+import { appAlert } from './AppAlert'
 import { colors, fonts, radius, shadow } from '../theme'
 
 const BRAND = colors.brand
@@ -54,7 +55,7 @@ export function MapLocationPicker({
       setLocating(true)
       const { status } = await Location.requestForegroundPermissionsAsync()
       if (status !== 'granted') {
-        Alert.alert('Permission needed', 'Allow location access to use your current location.')
+        appAlert('Permission needed', 'Allow location access to use your current location.')
         return
       }
       const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced })
@@ -62,7 +63,7 @@ export function MapLocationPicker({
       setPin(next)
       mapRef.current?.animateToRegion({ ...next, latitudeDelta: 0.005, longitudeDelta: 0.005 }, 500)
     } catch (e) {
-      Alert.alert('Could not get location', 'Please pick the spot on the map manually.')
+      appAlert('Could not get location', 'Please pick the spot on the map manually.')
     } finally {
       setLocating(false)
     }

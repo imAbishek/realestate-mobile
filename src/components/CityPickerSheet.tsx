@@ -134,7 +134,7 @@ export function CityPickerSheet({ visible, onClose }: { visible: boolean; onClos
 const styles = StyleSheet.create({
   title:       { fontFamily: fonts.bold, fontSize: 18, color: colors.ink, marginTop: 6, marginBottom: 12 },
 
-  detectRow:   { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 12, paddingHorizontal: 14, borderRadius: radius.sm, borderWidth: 1, borderColor: '#bfdbfe', backgroundColor: colors.brandTint, marginBottom: 12 },
+  detectRow:   { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 12, paddingHorizontal: 14, borderRadius: radius.sm, borderWidth: 1, borderColor: '#d3ddc9', backgroundColor: colors.brandTint, marginBottom: 12 },
   detectText:  { fontFamily: fonts.semibold, fontSize: 14, color: BRAND },
 
   soonBox:     { flexDirection: 'row', gap: 10, alignItems: 'flex-start', backgroundColor: '#fff7ed', borderWidth: 1, borderColor: '#fed7aa', borderRadius: radius.sm, padding: 12, marginBottom: 12 },

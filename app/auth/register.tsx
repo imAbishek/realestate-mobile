@@ -1,10 +1,11 @@
 import { useState } from 'react'
-import { Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { Link, Stack, useRouter } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
 import { z } from 'zod'
 import { authApi } from '../../src/lib/api'
+import { appAlert } from '../../src/components/AppAlert'
 import { useAuthStore } from '../../src/store/authStore'
 import { FormField } from '../../src/components/FormField'
 import { PrimaryButton } from '../../src/components/PrimaryButton'
@@ -53,7 +54,7 @@ export default function RegisterScreen() {
       router.replace('/')
     } catch (e: unknown) {
       const msg = extractError(e) || 'Registration failed. Try again.'
-      Alert.alert('Registration failed', msg)
+      appAlert('Registration failed', msg)
     } finally {
       setSubmitting(false)
     }

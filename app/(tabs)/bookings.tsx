@@ -1,13 +1,15 @@
 import { useCallback, useState } from 'react'
 import {
-  ActivityIndicator, Alert, FlatList, Image, Pressable, RefreshControl,
+  ActivityIndicator, FlatList, Image, Pressable, RefreshControl,
   StyleSheet, Text, View,
 } from 'react-native'
+import { ListSkeleton } from '../../src/components/Skeleton'
 import { useRouter, useFocusEffect } from 'expo-router'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
 import { bookingsApi } from '../../src/lib/api'
 import { ConfirmSheet } from '../../src/components/ConfirmSheet'
+import { appAlert } from '../../src/components/AppAlert'
 import { useAuthStore } from '../../src/store/authStore'
 import { colors, fonts, radius, shadow } from '../../src/theme'
 import type { BookingStatus, SiteVisitBooking } from '../../src/types'
@@ -62,7 +64,7 @@ export default function BookingsScreen() {
       await bookingsApi.cancel(b.id)
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : 'Could not cancel'
-      Alert.alert('Cancel failed', msg)
+      appAlert('Cancel failed', msg)
       load() // reconcile with server state
     } finally {
       setCancelling(null)
@@ -73,7 +75,7 @@ export default function BookingsScreen() {
     return (
       <SafeAreaView style={styles.safe} edges={[]}>
         <Header />
-        <View style={styles.center}><ActivityIndicator color={BRAND} /></View>
+        <ListSkeleton />
       </SafeAreaView>
     )
   }

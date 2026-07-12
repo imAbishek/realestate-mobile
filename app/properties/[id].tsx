@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
-  ActivityIndicator, Alert, Dimensions, Image, KeyboardAvoidingView, Linking,
+  ActivityIndicator, Dimensions, Image, KeyboardAvoidingView, Linking,
   Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View,
 } from 'react-native'
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router'
@@ -8,6 +8,8 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps'
 import { propertyApi, favoritesApi, bookingsApi } from '../../src/lib/api'
+import { DetailSkeleton } from '../../src/components/Skeleton'
+import { appAlert } from '../../src/components/AppAlert'
 import { useAuthStore } from '../../src/store/authStore'
 import { getLandmarks, landmarkIcon } from '../../src/lib/landmarks'
 import { ConfirmSheet } from '../../src/components/ConfirmSheet'
@@ -20,7 +22,6 @@ const TENANT_LABELS: Record<PreferredTenant, string> = {
 
 const BRAND = colors.brand
 const ACCENT = colors.accent
-const GREEN  = colors.success
 const screenW = Dimensions.get('window').width
 
 // Coimbatore center — fallback when a property has no coords.
@@ -93,7 +94,7 @@ export default function PropertyDetailScreen() {
       else await favoritesApi.remove(id)
     } catch (e: unknown) {
       setLiked(!next)     // revert
-      Alert.alert('Could not update', e instanceof Error ? e.message : 'Please try again.')
+      appAlert('Could not update', e instanceof Error ? e.message : 'Please try again.')
     } finally {
       setLikeBusy(false)
     }
@@ -103,7 +104,7 @@ export default function PropertyDetailScreen() {
     return (
       <SafeAreaView style={styles.safe} edges={['top']}>
         <Stack.Screen options={{ headerShown: false }} />
-        <View style={styles.center}><ActivityIndicator size="large" color={BRAND} /></View>
+        <DetailSkeleton />
       </SafeAreaView>
     )
   }
@@ -133,13 +134,13 @@ export default function PropertyDetailScreen() {
                      || data.approvalAuthority === 'CMA'  || data.approvalAuthority === 'RERA'
 
   const callOwner = () => {
-    if (!fullPhone) return Alert.alert('No phone number', 'The owner has not shared a phone number.')
-    Linking.openURL(`tel:+${fullPhone}`).catch(() => Alert.alert('Could not open dialer'))
+    if (!fullPhone) return appAlert('No phone number', 'The owner has not shared a phone number.')
+    Linking.openURL(`tel:+${fullPhone}`).catch(() => appAlert('Could not open dialer'))
   }
   const whatsappOwner = () => {
-    if (!fullPhone) return Alert.alert('No phone number', 'The owner has not shared a phone number.')
+    if (!fullPhone) return appAlert('No phone number', 'The owner has not shared a phone number.')
     const text = encodeURIComponent(`Hi, I'm interested in your listing "${data.title}" on PropFind.`)
-    Linking.openURL(`https://wa.me/${fullPhone}?text=${text}`).catch(() => Alert.alert('WhatsApp not installed'))
+    Linking.openURL(`https://wa.me/${fullPhone}?text=${text}`).catch(() => appAlert('WhatsApp not installed'))
   }
 
   return (
@@ -226,14 +227,14 @@ export default function PropertyDetailScreen() {
           <View style={styles.badgeRow}>
             {isApproved ? <ApprovedBadge /> : null}
             {data.isFeatured ? (
-              <View style={[styles.badge, { backgroundColor: '#fff7ed', borderColor: '#fdba74' }]}>
+              <View style={[styles.badge, { backgroundColor: '#f9f3e8', borderColor: '#e5d3ac' }]}>
                 <Ionicons name="star" size={11} color={ACCENT} />
                 <Text style={[styles.badgeText, { color: ACCENT }]}>Featured</Text>
               </View>
             ) : null}
             {data.priceNegotiable ? (
-              <View style={[styles.badge, { backgroundColor: '#ecfdf5', borderColor: '#86efac' }]}>
-                <Text style={[styles.badgeText, { color: GREEN }]}>Negotiable</Text>
+              <View style={[styles.badge, { backgroundColor: colors.brandTint, borderColor: '#d3ddc9' }]}>
+                <Text style={[styles.badgeText, { color: BRAND }]}>Negotiable</Text>
               </View>
             ) : null}
           </View>
@@ -315,8 +316,8 @@ export default function PropertyDetailScreen() {
           <Text style={[styles.actionBtnText, { color: BRAND }]}>Call</Text>
         </Pressable>
         <Pressable onPress={whatsappOwner} style={[styles.actionBtn, styles.actionBtnWhatsApp]}>
-          <Ionicons name="logo-whatsapp" size={16} color="#25D366" />
-          <Text style={[styles.actionBtnText, { color: '#25D366' }]}>WhatsApp</Text>
+          <Ionicons name="logo-whatsapp" size={16} color={BRAND} />
+          <Text style={[styles.actionBtnText, { color: BRAND }]}>WhatsApp</Text>
         </Pressable>
         <Pressable onPress={() => setVisitOpen(true)} style={[styles.actionBtn, styles.actionBtnPrimary]}>
           <Ionicons name="calendar" size={16} color="#fff" />
@@ -352,9 +353,9 @@ export default function PropertyDetailScreen() {
 
 function ApprovedBadge() {
   return (
-    <View style={[styles.badge, { backgroundColor: '#ecfdf5', borderColor: '#86efac' }]}>
-      <Ionicons name="shield-checkmark" size={11} color={GREEN} />
-      <Text style={[styles.badgeText, { color: GREEN }]}>Approved</Text>
+    <View style={[styles.badge, { backgroundColor: colors.brandTint, borderColor: '#d3ddc9' }]}>
+      <Ionicons name="shield-checkmark" size={11} color={BRAND} />
+      <Text style={[styles.badgeText, { color: BRAND }]}>Approved</Text>
     </View>
   )
 }
@@ -560,7 +561,7 @@ function LocationPreview({ data }: { data: PropertyDetail }) {
       android: `geo:${lat},${lng}?q=${lat},${lng}(${encodeURIComponent(data.title)})`,
       default: `https://www.google.com/maps?q=${lat},${lng}`,
     })!
-    Linking.openURL(url).catch(() => Alert.alert('Could not open map'))
+    Linking.openURL(url).catch(() => appAlert('Could not open map'))
   }
 
   return (
@@ -647,7 +648,7 @@ function BookSiteVisitSheet({
     // The booking API always requires a name plus phone OR email — logged-in users too
     // (a profile registered without a phone would otherwise submit no reachable contact).
     if (!trimmedName || (!trimmedPhone && !trimmedEmail)) {
-      return Alert.alert('Contact details required', 'Please share your name and at least a phone or email.')
+      return appAlert('Contact details required', 'Please share your name and at least a phone or email.')
     }
 
     setSending(true)
@@ -663,10 +664,10 @@ function BookSiteVisitSheet({
       onClose()
       // Reset transient fields
       setDate(''); setTime(''); setNotes(''); setGuestEmail('')
-      Alert.alert('Visit requested', 'The owner will reach out to confirm a slot. Track it in the Bookings tab.')
+      appAlert('Visit requested', 'The owner will reach out to confirm a slot. Track it in the Bookings tab.')
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : 'Failed to send request'
-      Alert.alert('Could not send', msg)
+      appAlert('Could not send', msg)
     } finally {
       setSending(false)
     }
@@ -801,7 +802,7 @@ const styles = StyleSheet.create({
 
   badgeRow:       { flexDirection: 'row', gap: 6, marginBottom: 8 },
   badge:          { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6, borderWidth: 1 },
-  badgeText:      { fontFamily: fonts.bold, fontSize: 11 },
+  badgeText:      { fontFamily: fonts.bold, fontSize: 11, lineHeight: 14, includeFontPadding: false },
 
   title:          { fontFamily: fonts.bold, fontSize: 19, color: colors.ink },
   locRow:         { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 6 },
@@ -850,7 +851,7 @@ const styles = StyleSheet.create({
   actionBar:      { position: 'absolute', left: 0, right: 0, bottom: 0, flexDirection: 'row', gap: 8, paddingHorizontal: 12, paddingTop: 10, backgroundColor: colors.white, borderTopWidth: 1, borderTopColor: colors.border },
   actionBtn:      { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: 12, borderRadius: radius.sm },
   actionBtnOutline:{ borderWidth: 1, borderColor: BRAND, backgroundColor: colors.white },
-  actionBtnWhatsApp:{ borderWidth: 1, borderColor: '#25D366', backgroundColor: '#f0fdf4' },
+  actionBtnWhatsApp:{ borderWidth: 1, borderColor: BRAND, backgroundColor: colors.brandTint },
   actionBtnPrimary:{ backgroundColor: ACCENT, flex: 1.3 },
   actionBtnText:  { fontFamily: fonts.bold, fontSize: 13 },
 

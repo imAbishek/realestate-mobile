@@ -31,7 +31,7 @@ export function ConfirmSheet({
   const accent = destructive ? DANGER : BRAND
   return (
     <DraggableSheet visible={visible} onClose={onClose} contentStyle={styles.sheet}>
-      <View style={[styles.iconWrap, { backgroundColor: destructive ? '#fef2f2' : '#eff6ff', borderColor: destructive ? '#fecaca' : '#bfdbfe' }]}>
+      <View style={[styles.iconWrap, { backgroundColor: destructive ? '#fef2f2' : colors.brandTint, borderColor: destructive ? '#fecaca' : '#d3ddc9' }]}>
         <Ionicons name={icon ?? (destructive ? 'alert-circle-outline' : 'help-circle-outline')} size={26} color={accent} />
       </View>
 

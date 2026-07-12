@@ -1,8 +1,9 @@
 import { useCallback, useState } from 'react'
 import {
-  ActivityIndicator, FlatList, Image, Pressable, RefreshControl,
+  FlatList, Image, Pressable, RefreshControl,
   StyleSheet, Text, View,
 } from 'react-native'
+import { ListSkeleton } from '../../src/components/Skeleton'
 import { useRouter, useFocusEffect } from 'expo-router'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
@@ -47,7 +48,7 @@ export default function SavedScreen() {
     return (
       <SafeAreaView style={styles.safe} edges={[]}>
         <Header />
-        <View style={styles.center}><ActivityIndicator color={BRAND} /></View>
+        <ListSkeleton />
       </SafeAreaView>
     )
   }

@@ -11,8 +11,13 @@ import {
   PlusJakartaSans_700Bold,
   PlusJakartaSans_800ExtraBold,
 } from '@expo-google-fonts/plus-jakarta-sans'
+import {
+  PlayfairDisplay_600SemiBold,
+  PlayfairDisplay_700Bold,
+} from '@expo-google-fonts/playfair-display'
 import * as Sentry from '@sentry/react-native'
 import { useAuthStore } from '../src/store/authStore'
+import { AppAlertHost } from '../src/components/AppAlert'
 import { colors, fonts } from '../src/theme'
 
 // Make Plus Jakarta Sans the default family for every <Text> so screens we
@@ -50,6 +55,8 @@ function RootLayout() {
     PlusJakartaSans_600SemiBold,
     PlusJakartaSans_700Bold,
     PlusJakartaSans_800ExtraBold,
+    PlayfairDisplay_600SemiBold,
+    PlayfairDisplay_700Bold,
   })
 
   useEffect(() => { void hydrate() }, [hydrate])
@@ -75,6 +82,7 @@ function RootLayout() {
         <Stack.Screen name="my-listings" options={{ headerShown: false }} />
         <Stack.Screen name="emi-calculator" options={{ headerShown: false }} />
       </Stack>
+      <AppAlertHost />
     </SafeAreaProvider>
   )
 }

@@ -23,6 +23,11 @@ interface Props {
  * `tracksViewChanges` must be true for the custom child to rasterise, but
  * leaving it on tanks frame-rate with many markers — so we keep it true only
  * briefly after mount and whenever `selected` flips, then switch it off.
+ *
+ * Exception: the selected marker (there is only ever one) tracks permanently.
+ * The 500ms window loses the race against the map surface on initial load and
+ * on tab refocus, freezing a blank rasterisation — scrolling the carousel away
+ * and back only "fixed" it because the selected flip re-armed the timer.
  */
 function MapPriceMarkerBase({ item, selected, refresh, onPress }: Props) {
   const tone = item.isFeatured ? ACCENT : BRAND
@@ -39,7 +44,7 @@ function MapPriceMarkerBase({ item, selected, refresh, onPress }: Props) {
       coordinate={{ latitude: item.latitude as number, longitude: item.longitude as number }}
       onPress={(e) => { e.stopPropagation?.(); onPress(item) }}
       anchor={{ x: 0.5, y: 1 }}
-      tracksViewChanges={tracks}
+      tracksViewChanges={tracks || selected}
       zIndex={selected ? 999 : 1}
     >
       <View style={styles.wrap}>

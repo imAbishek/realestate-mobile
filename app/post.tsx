@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import {
-  ActivityIndicator, Alert, Image, KeyboardAvoidingView, Platform,
+  ActivityIndicator, Image, KeyboardAvoidingView, Platform,
   Pressable, ScrollView, StyleSheet, Switch, Text, View,
 } from 'react-native'
 import * as ImagePicker from 'expo-image-picker'
@@ -15,6 +15,7 @@ import { ChipRow } from '../src/components/ChipRow'
 import { PrimaryButton } from '../src/components/PrimaryButton'
 import { MapLocationPicker } from '../src/components/MapLocationPicker'
 import { ConfirmSheet } from '../src/components/ConfirmSheet'
+import { appAlert } from '../src/components/AppAlert'
 import { useAuthStore } from '../src/store/authStore'
 import { propertyApi, searchApi } from '../src/lib/api'
 import {
@@ -77,7 +78,7 @@ export default function PostScreen() {
 
   const goNext = () => {
     const err = validateStep(step, state)
-    if (err) { Alert.alert('Missing info', err); return }
+    if (err) { appAlert('Missing info', err); return }
     // Promoters skip Step 2 — they go straight from 1 → 3
     if (step === 1 && state.listedBy === 'PROMOTER') { setStep(3); return }
     if (step === 2 && state.listedBy === 'PROMOTER') { setStep(3); return }
@@ -90,7 +91,7 @@ export default function PostScreen() {
 
   const submit = async () => {
     const err = validateStep(6, state)
-    if (err) { Alert.alert('Missing info', err); return }
+    if (err) { appAlert('Missing info', err); return }
     setSubmitting(true)
     try {
       const payload = buildCreateRequest(state)
@@ -111,14 +112,14 @@ export default function PostScreen() {
           )
         } catch (e) { /* skip one bad doc, keep going */ }
       }
-      Alert.alert(
+      appAlert(
         'Submitted',
         'Your listing has been submitted for review. You will be notified once approved.',
-        [{ text: 'OK', onPress: () => router.replace('/') }],
+        () => router.replace('/'),
       )
     } catch (e: unknown) {
       const msg = extractError(e) ?? 'Could not submit listing. Please try again.'
-      Alert.alert('Submission failed', msg)
+      appAlert('Submission failed', msg)
     } finally {
       setSubmitting(false)
     }
@@ -646,7 +647,7 @@ function Step4({ state, set, amenities }: { state: WizardState; set: <K extends 
 function Step5({ state, set }: { state: WizardState; set: <K extends keyof WizardState>(k: K, v: WizardState[K]) => void }) {
   const pick = async () => {
     const perm = await ImagePicker.requestMediaLibraryPermissionsAsync()
-    if (!perm.granted) { Alert.alert('Permission needed', 'Allow photo access to upload images.'); return }
+    if (!perm.granted) { appAlert('Permission needed', 'Allow photo access to upload images.'); return }
     const res = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],
       allowsMultipleSelection: true,

@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
-import { Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
 import { z } from 'zod'
 import { authApi } from '../../src/lib/api'
+import { appAlert } from '../../src/components/AppAlert'
 import { useAuthStore } from '../../src/store/authStore'
 import { FormField } from '../../src/components/FormField'
 import { PrimaryButton } from '../../src/components/PrimaryButton'
@@ -44,7 +45,7 @@ export default function ResetPasswordScreen() {
 
   const resend = async () => {
     if (!z.string().email().safeParse(email).success) {
-      Alert.alert('Enter your email', 'Please enter a valid email address first.')
+      appAlert('Enter your email', 'Please enter a valid email address first.')
       return
     }
     setResending(true)
@@ -55,7 +56,7 @@ export default function ResetPasswordScreen() {
     } finally {
       setResending(false)
       setCooldown(30)
-      Alert.alert('OTP resent', `A new OTP has been sent to ${email}.`)
+      appAlert('OTP resent', `A new OTP has been sent to ${email}.`)
     }
   }
 
@@ -75,7 +76,7 @@ export default function ResetPasswordScreen() {
     try {
       await authApi.resetPassword(parsed.data.email, parsed.data.otp, parsed.data.newPassword)
     } catch (e: unknown) {
-      Alert.alert('Reset failed', extractError(e) || 'Invalid or expired OTP. Please try again.')
+      appAlert('Reset failed', extractError(e) || 'Invalid or expired OTP. Please try again.')
       setSubmitting(false)
       return
     }
@@ -85,7 +86,7 @@ export default function ResetPasswordScreen() {
       await setSession(data.accessToken, data.refreshToken, data.user)
       router.replace('/')
     } catch {
-      Alert.alert('Password reset', 'Your password has been reset. Please sign in.')
+      appAlert('Password reset', 'Your password has been reset. Please sign in.')
       router.replace('/auth/login')
     } finally {
       setSubmitting(false)

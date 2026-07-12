@@ -31,7 +31,7 @@ export function DraggableSheet({
       onMoveShouldSetPanResponder: (_, g) => g.dy > 4 && Math.abs(g.dy) > Math.abs(g.dx),
       onPanResponderMove: (_, g) => { if (g.dy > 0) translateY.setValue(g.dy) },
       onPanResponderRelease: (_, g) => {
-        if (g.dy > 110 || g.vy > 0.8) {
+        if (g.dy > 90 || g.vy > 0.65) {
           Animated.timing(translateY, { toValue: 700, duration: 180, useNativeDriver: true })
             .start(() => onCloseRef.current())
         } else {
@@ -44,8 +44,11 @@ export function DraggableSheet({
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <Pressable style={styles.backdrop} onPress={onClose} />
-      <Animated.View style={[styles.sheet, contentStyle, { transform: [{ translateY }] }]}>
-        <View {...pan.panHandlers} style={styles.grabber}>
+      {/* Pan handlers on the whole sheet (Instagram-style): dragging the handle,
+          title or any padding pulls the sheet down. Inner ScrollViews still win
+          the gesture for touches that start on them, so lists keep scrolling. */}
+      <Animated.View {...pan.panHandlers} style={[styles.sheet, contentStyle, { transform: [{ translateY }] }]}>
+        <View style={styles.grabber}>
           <View style={styles.handle} />
         </View>
         {children}

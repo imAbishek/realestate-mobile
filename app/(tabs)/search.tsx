@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
 import {
-  ActivityIndicator, FlatList, Image, Pressable, RefreshControl, StyleSheet, Text, TextInput, View,
+  FlatList, Image, Pressable, RefreshControl, StyleSheet, Text, TextInput, View,
 } from 'react-native'
+import { ListSkeleton } from '../../src/components/Skeleton'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
@@ -93,7 +94,7 @@ export default function SearchScreen() {
       </View>
 
       {loading ? (
-        <View style={styles.center}><ActivityIndicator size="large" color={BRAND} /></View>
+        <ListSkeleton />
       ) : (
         <FlatList
           data={items}
@@ -171,8 +172,10 @@ const styles = StyleSheet.create({
   noImage:     { alignItems: 'center', justifyContent: 'center' },
   cardBody:    { flex: 1, padding: 12, justifyContent: 'space-between' },
   cardBadgeRow:{ flexDirection: 'row', gap: 6 },
-  badge:       { backgroundColor: BRAND, paddingHorizontal: 8, paddingVertical: 2, borderRadius: radius.pill },
-  badgeText:   { color: '#fff', fontFamily: fonts.bold, fontSize: 10 },
+  badge:       { backgroundColor: BRAND, paddingHorizontal: 8, paddingVertical: 3, borderRadius: radius.pill, justifyContent: 'center' },
+  // includeFontPadding — Jakarta's Android font metrics reserve uneven top/bottom
+  // space, which read as "margin-top-heavy" text inside small pills.
+  badgeText:   { color: '#fff', fontFamily: fonts.bold, fontSize: 10, lineHeight: 13, includeFontPadding: false },
   cardTitle:   { fontFamily: fonts.bold, fontSize: 14, color: colors.ink, marginTop: 4 },
   locRow:      { flexDirection: 'row', alignItems: 'center', gap: 3 },
   cardLoc:     { fontFamily: fonts.regular, fontSize: 12, color: colors.muted },

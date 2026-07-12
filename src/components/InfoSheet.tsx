@@ -53,12 +53,12 @@ export function InfoSheet({
 const styles = StyleSheet.create({
   sheet:        { alignItems: 'center' },
 
-  iconWrap:     { width: 56, height: 56, borderRadius: 28, backgroundColor: '#fff3ec', borderWidth: 1, borderColor: '#f6cdb9', alignItems: 'center', justifyContent: 'center', marginTop: 6, marginBottom: 14 },
+  iconWrap:     { width: 56, height: 56, borderRadius: 28, backgroundColor: colors.brandTint, borderWidth: 1, borderColor: '#d3ddc9', alignItems: 'center', justifyContent: 'center', marginTop: 6, marginBottom: 14 },
   title:        { fontFamily: fonts.extra, fontSize: 18, color: colors.ink, textAlign: 'center' },
   accentBar:    { width: 36, height: 3, borderRadius: 2, backgroundColor: ACCENT, marginTop: 8, marginBottom: 10 },
   body:         { fontFamily: fonts.regular, fontSize: 14, color: colors.muted, textAlign: 'center', lineHeight: 21, marginBottom: 20, paddingHorizontal: 8 },
 
-  secondaryBtn: { alignSelf: 'stretch', borderRadius: radius.sm, borderWidth: 1, borderColor: '#bfdbfe', backgroundColor: colors.brandTint, paddingVertical: 13, alignItems: 'center', marginBottom: 10 },
+  secondaryBtn: { alignSelf: 'stretch', borderRadius: radius.sm, borderWidth: 1, borderColor: '#d3ddc9', backgroundColor: colors.brandTint, paddingVertical: 13, alignItems: 'center', marginBottom: 10 },
   secondaryBtnText: { color: BRAND, fontFamily: fonts.bold, fontSize: 14 },
   primaryBtn:   { alignSelf: 'stretch', borderRadius: radius.sm, backgroundColor: BRAND, paddingVertical: 13, alignItems: 'center' },
   primaryBtnText: { color: '#fff', fontFamily: fonts.bold, fontSize: 14 },

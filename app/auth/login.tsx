@@ -1,10 +1,11 @@
 import { useState } from 'react'
-import { Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { Link, Stack, useRouter } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
 import { z } from 'zod'
 import { authApi } from '../../src/lib/api'
+import { appAlert } from '../../src/components/AppAlert'
 import { useAuthStore } from '../../src/store/authStore'
 import { FormField } from '../../src/components/FormField'
 import { PrimaryButton } from '../../src/components/PrimaryButton'
@@ -43,7 +44,7 @@ export default function LoginScreen() {
       router.replace('/')
     } catch (e: unknown) {
       const msg = extractError(e) || 'Login failed. Check your credentials.'
-      Alert.alert('Login failed', msg)
+      appAlert('Login failed', msg)
     } finally {
       setSubmitting(false)
     }
