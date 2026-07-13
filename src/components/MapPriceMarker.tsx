@@ -22,12 +22,14 @@ interface Props {
  *
  * `tracksViewChanges` must be true for the custom child to rasterise, but
  * leaving it on tanks frame-rate with many markers — so we keep it true only
- * briefly after mount and whenever `selected` flips, then switch it off.
+ * briefly after mount and whenever `selected`/`refresh` changes, then off.
  *
- * Exception: the selected marker (there is only ever one) tracks permanently.
- * The 500ms window loses the race against the map surface on initial load and
- * on tab refocus, freezing a blank rasterisation — scrolling the carousel away
- * and back only "fixed" it because the selected flip re-armed the timer.
+ * Android only re-captures the marker bitmap on a false→true EDGE of
+ * tracksViewChanges. Holding the selected marker permanently true (the old
+ * `|| selected`) gave it no edge, so the first marker kept the blank bitmap it
+ * captured before the map GL surface was ready — until a carousel scroll flipped
+ * `selected` and forced a render change. The parent now re-arms `refresh` on
+ * `onMapReady` (surface guaranteed ready) so the initial edge lands in time.
  */
 function MapPriceMarkerBase({ item, selected, refresh, onPress }: Props) {
   const tone = item.isFeatured ? ACCENT : BRAND
@@ -44,7 +46,7 @@ function MapPriceMarkerBase({ item, selected, refresh, onPress }: Props) {
       coordinate={{ latitude: item.latitude as number, longitude: item.longitude as number }}
       onPress={(e) => { e.stopPropagation?.(); onPress(item) }}
       anchor={{ x: 0.5, y: 1 }}
-      tracksViewChanges={tracks || selected}
+      tracksViewChanges={tracks}
       zIndex={selected ? 999 : 1}
     >
       <View style={styles.wrap}>

@@ -83,6 +83,16 @@ export default function MapScreen() {
     })
   }, [items, category, query])
 
+  // Draw the selected marker LAST — Android's Google Maps ignores marker zIndex
+  // for custom views on overlap and paints in child order, so the active pill
+  // would otherwise hide behind a neighbour at the same spot.
+  const ordered = useMemo(() => {
+    if (!selectedId) return visible
+    const sel = visible.find((p) => p.id === selectedId)
+    if (!sel) return visible
+    return [...visible.filter((p) => p.id !== selectedId), sel]
+  }, [visible, selectedId])
+
   const selectAt = useCallback((item: PropertyCard) => {
     setSelectedId(item.id)
     mapRef.current?.animateToRegion({
@@ -113,9 +123,13 @@ export default function MapScreen() {
           initialRegion={COIMBATORE}
           mapType="hybrid"
           onPress={resetSelection}
+          // Re-arm marker rasterisation once the GL surface is truly ready — the
+          // mount/focus timers alone fire before this and lose the race, leaving
+          // the first (selected) marker's price pill blank until a carousel scroll.
+          onMapReady={() => setFocusEpoch((e) => e + 1)}
           showsMyLocationButton={false}
         >
-          {visible.map((p) => (
+          {ordered.map((p) => (
             <MapPriceMarker
               key={p.id}
               item={p}
