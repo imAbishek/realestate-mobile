@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import {
   ActivityIndicator, FlatList, Pressable, StyleSheet, Text, TextInput, View,
 } from 'react-native'
@@ -46,6 +46,12 @@ export default function MapScreen() {
   // Bumped on every focus so markers re-rasterise (tracksViewChanges) — without
   // it, returning to the tab leaves the first price marker blank until scrolled.
   const [focusEpoch, setFocusEpoch] = useState(0)
+  // Markers are gated on this: react-native-maps only rasterises a custom
+  // marker's child while tracksViewChanges is true, and that capture is blank
+  // if it runs before the map's GL surface exists. Mounting markers only AFTER
+  // onMapReady guarantees every capture (initial + re-key remount) lands on a
+  // live surface — the deterministic fix the timer/epoch attempts kept missing.
+  const [mapReady, setMapReady] = useState(false)
 
   const mapRef = useRef<MapView>(null)
   const listRef = useRef<FlatList<PropertyCard>>(null)
@@ -70,16 +76,6 @@ export default function MapScreen() {
     load()
     setFocusEpoch((e) => e + 1)
   }, [load]))
-
-  // onMapReady re-arms rasterisation, but the async property fetch usually
-  // resolves AFTER the map is ready — so markers mount with no further
-  // tracksViewChanges edge and the initially-selected pill captures blank until
-  // a carousel scroll. Re-arm once the listings have actually mounted, GL ready.
-  useEffect(() => {
-    if (items.length === 0) return
-    const t = setTimeout(() => setFocusEpoch((e) => e + 1), 350)
-    return () => clearTimeout(t)
-  }, [items])
 
   // Visible set = category filter + locality/title text search. Recomputed
   // together so markers and carousel always stay in lock-step.
@@ -133,13 +129,12 @@ export default function MapScreen() {
           initialRegion={COIMBATORE}
           mapType="hybrid"
           onPress={resetSelection}
-          // Re-arm marker rasterisation once the GL surface is truly ready — the
-          // mount/focus timers alone fire before this and lose the race, leaving
-          // the first (selected) marker's price pill blank until a carousel scroll.
-          onMapReady={() => setFocusEpoch((e) => e + 1)}
+          // GL surface is now ready: unblock marker rendering (so their first
+          // rasterisation captures a real bitmap) and re-arm any that mounted.
+          onMapReady={() => { setMapReady(true); setFocusEpoch((e) => e + 1) }}
           showsMyLocationButton={false}
         >
-          {ordered.map((p) => (
+          {mapReady && ordered.map((p) => (
             <MapPriceMarker
               // Re-key the selected marker so it remounts → Android re-ADDS its
               // native marker (a plain array reorder is only a "move" and keeps
