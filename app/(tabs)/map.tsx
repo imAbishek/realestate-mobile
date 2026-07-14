@@ -43,14 +43,13 @@ export default function MapScreen() {
   const [category, setCategory] = useState(0)
   const [query, setQuery] = useState('')
   const [selectedId, setSelectedId] = useState<string | null>(null)
-  // Bumped on every focus so markers re-rasterise (tracksViewChanges) — without
-  // it, returning to the tab leaves the first price marker blank until scrolled.
+  // Bumped on every screen focus. Feeds each marker's `refresh` prop (re-arms its
+  // tracksViewChanges so the pill re-rasterises) and, via the selected marker's
+  // key, forces that marker to re-add on top when you return to the tab — see the
+  // key expression below.
   const [focusEpoch, setFocusEpoch] = useState(0)
-  // Markers are gated on this: react-native-maps only rasterises a custom
-  // marker's child while tracksViewChanges is true, and that capture is blank
-  // if it runs before the map's GL surface exists. Mounting markers only AFTER
-  // onMapReady guarantees every capture (initial + re-key remount) lands on a
-  // live surface — the deterministic fix the timer/epoch attempts kept missing.
+  // True once the map's GL surface is ready. The camera-centring effect waits on
+  // it so animateToRegion isn't called before the map can actually move.
   const [mapReady, setMapReady] = useState(false)
 
   const mapRef = useRef<MapView>(null)
@@ -140,12 +139,10 @@ export default function MapScreen() {
           initialRegion={COIMBATORE}
           mapType="hybrid"
           onPress={resetSelection}
-          // GL surface is now ready: unblock marker rendering (so their first
-          // rasterisation captures a real bitmap) and re-arm any that mounted.
-          onMapReady={() => { setMapReady(true); setFocusEpoch((e) => e + 1) }}
+          onMapReady={() => setMapReady(true)}
           showsMyLocationButton={false}
         >
-          {mapReady && ordered.map((p) => (
+          {ordered.map((p) => (
             <MapPriceMarker
               // Re-key the selected marker so it remounts → Android re-ADDS its
               // native marker last (a plain array reorder is only a "move" and

@@ -23,13 +23,7 @@ interface Props {
  * `tracksViewChanges` must be true for the custom child to rasterise, but
  * leaving it on tanks frame-rate with many markers — so we keep it true only
  * briefly after mount and whenever `selected`/`refresh` changes, then off.
- *
- * Android only re-captures the marker bitmap on a false→true EDGE of
- * tracksViewChanges. Holding the selected marker permanently true (the old
- * `|| selected`) gave it no edge, so the first marker kept the blank bitmap it
- * captured before the map GL surface was ready — until a carousel scroll flipped
- * `selected` and forced a render change. The parent now re-arms `refresh` on
- * `onMapReady` (surface guaranteed ready) so the initial edge lands in time.
+ * `refresh` (parent's focusEpoch) re-arms it on tab refocus.
  */
 function MapPriceMarkerBase({ item, selected, refresh, onPress }: Props) {
   const tone = item.isFeatured ? ACCENT : BRAND
