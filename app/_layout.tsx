@@ -16,6 +16,7 @@ import {
   PlayfairDisplay_700Bold,
 } from '@expo-google-fonts/playfair-display'
 import * as Sentry from '@sentry/react-native'
+import Constants from 'expo-constants'
 import { useAuthStore } from '../src/store/authStore'
 import { AppAlertHost } from '../src/components/AppAlert'
 import { colors, fonts } from '../src/theme'
@@ -88,4 +89,7 @@ function RootLayout() {
 }
 
 // Sentry.wrap adds the error boundary + native crash/touch instrumentation.
-export default Sentry.wrap(RootLayout)
+// Skip it in Expo Go — the @sentry/react-native native module isn't bundled
+// there, so wrapping would red-screen on boot. Dev/preview/prod builds wrap.
+const isExpoGo = Constants.executionEnvironment === 'storeClient'
+export default isExpoGo ? RootLayout : Sentry.wrap(RootLayout)
