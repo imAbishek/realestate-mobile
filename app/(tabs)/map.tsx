@@ -148,10 +148,13 @@ export default function MapScreen() {
           {mapReady && ordered.map((p) => (
             <MapPriceMarker
               // Re-key the selected marker so it remounts → Android re-ADDS its
-              // native marker (a plain array reorder is only a "move" and keeps
-              // the old draw order, so zIndex/ordered-last alone left the active
-              // pill hidden behind an overlapping neighbour).
-              key={p.id === selectedId ? `${p.id}:sel` : p.id}
+              // native marker last (a plain array reorder is only a "move" and
+              // keeps the old draw order, so zIndex/ordered-last alone left the
+              // active pill hidden behind an overlapping neighbour). Include
+              // focusEpoch so this re-add also happens on every tab refocus —
+              // otherwise a preserved selection keeps a stable key, never remounts,
+              // and sinks back behind its cluster twin when you return to the tab.
+              key={p.id === selectedId ? `${p.id}:sel:${focusEpoch}` : p.id}
               item={p}
               selected={p.id === selectedId}
               refresh={focusEpoch}
