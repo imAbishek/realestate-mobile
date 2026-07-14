@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   ActivityIndicator, FlatList, Pressable, StyleSheet, Text, TextInput, View,
 } from 'react-native'
@@ -71,6 +71,16 @@ export default function MapScreen() {
     setFocusEpoch((e) => e + 1)
   }, [load]))
 
+  // onMapReady re-arms rasterisation, but the async property fetch usually
+  // resolves AFTER the map is ready — so markers mount with no further
+  // tracksViewChanges edge and the initially-selected pill captures blank until
+  // a carousel scroll. Re-arm once the listings have actually mounted, GL ready.
+  useEffect(() => {
+    if (items.length === 0) return
+    const t = setTimeout(() => setFocusEpoch((e) => e + 1), 350)
+    return () => clearTimeout(t)
+  }, [items])
+
   // Visible set = category filter + locality/title text search. Recomputed
   // together so markers and carousel always stay in lock-step.
   const visible = useMemo(() => {
@@ -131,7 +141,11 @@ export default function MapScreen() {
         >
           {ordered.map((p) => (
             <MapPriceMarker
-              key={p.id}
+              // Re-key the selected marker so it remounts → Android re-ADDS its
+              // native marker (a plain array reorder is only a "move" and keeps
+              // the old draw order, so zIndex/ordered-last alone left the active
+              // pill hidden behind an overlapping neighbour).
+              key={p.id === selectedId ? `${p.id}:sel` : p.id}
               item={p}
               selected={p.id === selectedId}
               refresh={focusEpoch}
