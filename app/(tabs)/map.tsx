@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   ActivityIndicator, FlatList, Pressable, StyleSheet, Text, TextInput, View,
 } from 'react-native'
@@ -99,15 +99,26 @@ export default function MapScreen() {
     return [...visible.filter((p) => p.id !== selectedId), sel]
   }, [visible, selectedId])
 
-  const selectAt = useCallback((item: PropertyCard) => {
-    setSelectedId(item.id)
+  // Keep the camera on the selected property. The auto-selection (first listing
+  // on load, and the preserved selection on tab refocus) only sets selectedId —
+  // it never moved the camera, so a selected marker sitting outside the default
+  // Coimbatore viewport (many listings are well north/east of centre) showed no
+  // pill until a carousel scroll finally panned to it. Runs on load, on every
+  // selection change, and on refocus (items is a fresh array each load); a manual
+  // pan changes none of these, so the user's own panning is never yanked back.
+  useEffect(() => {
+    if (!mapReady || !selectedId) return
+    const sel = items.find((p) => p.id === selectedId)
+    if (sel?.latitude == null || sel.longitude == null) return
     mapRef.current?.animateToRegion({
-      latitude: item.latitude as number,
-      longitude: item.longitude as number,
+      latitude: sel.latitude,
+      longitude: sel.longitude,
       latitudeDelta: 0.05,
       longitudeDelta: 0.05,
-    }, 250)
-  }, [])
+    }, 300)
+  }, [mapReady, selectedId, items])
+
+  const selectAt = useCallback((item: PropertyCard) => setSelectedId(item.id), [])
 
   // Marker tap → select + scroll the carousel to its card.
   const onMarkerPress = useCallback((item: PropertyCard) => {
