@@ -54,6 +54,8 @@ export default function ProfileScreen() {
           body: 'Save the properties you love and find them all here — this is coming soon.',
         })} />
         <Row icon="calendar-outline"        label="Bookings"      onPress={() => router.push('/bookings')} />
+        {/* Moved here when Home's quick actions became Buy/Rent/Commercial/Plots */}
+        <Row icon="calculator-outline"      label="EMI Calculator" onPress={() => router.push('/emi-calculator')} />
         <Row icon="settings-outline"        label="Settings"       onPress={() => setInfo({
           icon: 'settings-outline', title: 'Settings',
           body: 'Profile and notification settings are coming soon.',

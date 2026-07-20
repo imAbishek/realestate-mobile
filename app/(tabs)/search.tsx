@@ -1,12 +1,11 @@
 import { useCallback, useEffect, useState } from 'react'
-import {
-  FlatList, Image, Pressable, RefreshControl, StyleSheet, Text, TextInput, View,
-} from 'react-native'
+import { FlatList, Image, Pressable, RefreshControl, StyleSheet, Text, TextInput, View } from 'react-native'
 import { ListSkeleton } from '../../src/components/Skeleton'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
 import { LinearGradient } from 'expo-linear-gradient'
+import { FilterSheet, activeFilterCount, type SearchFilters } from '../../src/components/FilterSheet'
 import { propertyApi } from '../../src/lib/api'
 import { useLocationStore } from '../../src/store/locationStore'
 import { colors, fonts, radius, shadow } from '../../src/theme'
@@ -25,7 +24,10 @@ const TYPE_TABS: { key: ListingType | 'ALL'; label: string }[] = [
 
 export default function SearchScreen() {
   const router = useRouter()
-  const params = useLocalSearchParams<{ listingType?: string; q?: string }>()
+  const params = useLocalSearchParams<{
+    listingType?: string; q?: string; propertyType?: string; propertyTypes?: string | string[]
+    minPrice?: string; maxPrice?: string; minBedrooms?: string
+  }>()
   const initial = TYPE_TABS.find((t) => t.key === params.listingType)?.key ?? 'ALL'
 
   const city = useLocationStore((s) => s.city)
@@ -34,20 +36,34 @@ export default function SearchScreen() {
   // Submitted keyword — sent to the server so matches beyond the fetched page are found
   // (the old client-only filter silently missed anything past the first 30 results).
   const [query, setQuery] = useState(params.q ?? '')
+  // Everything except listing type (the tabs own that) — seeded from route params
+  // so the home-screen filter button lands here with its selection applied.
+  const [filters, setFilters] = useState<SearchFilters>({
+    propertyType:  params.propertyType as SearchFilters['propertyType'],
+    // Home's "Commercial" tile sends two types at once.
+    propertyTypes: params.propertyTypes
+      ? ([] as string[]).concat(params.propertyTypes) as SearchFilters['propertyTypes']
+      : undefined,
+    minPrice:     num(params.minPrice),
+    maxPrice:     num(params.maxPrice),
+    minBedrooms:  num(params.minBedrooms),
+  })
+  const [filterOpen, setFilterOpen] = useState(false)
+  const filterCount = activeFilterCount({ ...filters, listingType: active === 'ALL' ? undefined : active })
   const [items, setItems] = useState<PropertyCard[]>([])
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
 
   const load = useCallback(async () => {
     try {
-      const apiParams: SearchParams = { citySlug: city.slug, page: 0, size: 30 }
+      const apiParams: SearchParams = { citySlug: city.slug, page: 0, size: 30, ...filters }
       if (active !== 'ALL') apiParams.listingType = active
       if (query.trim()) apiParams.keyword = query.trim()
       const { data } = await propertyApi.search(apiParams)
       setItems(data.content)
     } catch { setItems([]) }
     finally { setLoading(false); setRefreshing(false) }
-  }, [active, query, city.slug])
+  }, [active, query, city.slug, filters])
 
   useEffect(() => { setLoading(true); void load() }, [load])
 
@@ -79,6 +95,12 @@ export default function SearchScreen() {
             <Ionicons name="close-circle" size={18} color={colors.mutedLight} />
           </Pressable>
         ) : null}
+        <Pressable onPress={() => setFilterOpen(true)} style={({ pressed }) => [styles.filterBtn, pressed && { opacity: 0.85 }]} hitSlop={6}>
+          <Ionicons name="options-outline" size={18} color="#fff" />
+          {filterCount > 0 ? (
+            <View style={styles.filterCount}><Text style={styles.filterCountText}>{filterCount}</Text></View>
+          ) : null}
+        </Pressable>
       </View>
 
       {/* Type tabs */}
@@ -110,8 +132,21 @@ export default function SearchScreen() {
           }
         />
       )}
+
+      <FilterSheet
+        visible={filterOpen}
+        onClose={() => setFilterOpen(false)}
+        value={{ ...filters, listingType: active === 'ALL' ? undefined : active }}
+        onApply={({ listingType, ...rest }) => { setActive(listingType ?? 'ALL'); setFilters(rest) }}
+      />
     </SafeAreaView>
   )
+}
+
+/** Route params arrive as strings; drop anything non-numeric. */
+function num(v?: string): number | undefined {
+  const n = Number(v)
+  return v && Number.isFinite(n) ? n : undefined
 }
 
 function Row({ item, onPress }: { item: PropertyCard; onPress: () => void }) {
@@ -154,8 +189,11 @@ const styles = StyleSheet.create({
   header:      { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 16 },
   headerTitle: { fontFamily: fonts.bold, fontSize: 18, color: '#fff' },
 
-  searchWrap:  { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: colors.white, margin: 16, marginBottom: 8, borderRadius: radius.md, paddingHorizontal: 12, paddingVertical: 11, borderWidth: 1, borderColor: colors.border, ...shadow.card },
+  searchWrap:  { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: colors.white, margin: 16, marginBottom: 8, borderRadius: radius.md, paddingHorizontal: 10, paddingLeft: 12, paddingVertical: 8, borderWidth: 1, borderColor: colors.border, ...shadow.card },
   searchInput: { flex: 1, fontFamily: fonts.regular, fontSize: 14, color: colors.ink, padding: 0 },
+  filterBtn:   { width: 34, height: 34, borderRadius: radius.sm, backgroundColor: BRAND, alignItems: 'center', justifyContent: 'center' },
+  filterCount: { position: 'absolute', top: -3, right: -3, minWidth: 16, height: 16, paddingHorizontal: 4, borderRadius: 8, backgroundColor: ACCENT, alignItems: 'center', justifyContent: 'center' },
+  filterCountText: { fontFamily: fonts.bold, fontSize: 9, lineHeight: 12, color: BRAND },
 
   tabRow:      { flexDirection: 'row', gap: 8, paddingHorizontal: 16, marginBottom: 4 },
   tab:         { paddingHorizontal: 14, paddingVertical: 7, borderRadius: radius.pill, backgroundColor: '#f1f5f9' },
@@ -173,9 +211,7 @@ const styles = StyleSheet.create({
   cardBody:    { flex: 1, padding: 12, justifyContent: 'space-between' },
   cardBadgeRow:{ flexDirection: 'row', gap: 6 },
   badge:       { backgroundColor: BRAND, paddingHorizontal: 8, paddingVertical: 3, borderRadius: radius.pill, justifyContent: 'center' },
-  // includeFontPadding — Jakarta's Android font metrics reserve uneven top/bottom
-  // space, which read as "margin-top-heavy" text inside small pills.
-  badgeText:   { color: '#fff', fontFamily: fonts.bold, fontSize: 10, lineHeight: 13, includeFontPadding: false },
+  badgeText:   { color: '#fff', fontFamily: fonts.bold, fontSize: 10, lineHeight: 13 },
   cardTitle:   { fontFamily: fonts.bold, fontSize: 14, color: colors.ink, marginTop: 4 },
   locRow:      { flexDirection: 'row', alignItems: 'center', gap: 3 },
   cardLoc:     { fontFamily: fonts.regular, fontSize: 12, color: colors.muted },

@@ -1,8 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import {
-  Image, Pressable, ScrollView, StyleSheet,
-  Text, TextInput, View,
-} from 'react-native'
+import { Dimensions, Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
 import { useRouter, useFocusEffect } from 'expo-router'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { LinearGradient } from 'expo-linear-gradient'
@@ -11,6 +8,7 @@ import { HeroCarousel } from '../../src/components/HeroCarousel'
 import { ListSkeleton } from '../../src/components/Skeleton'
 import { CityPickerSheet } from '../../src/components/CityPickerSheet'
 import { NotificationsSheet } from '../../src/components/NotificationsSheet'
+import { FilterSheet, activeFilterCount, type SearchFilters } from '../../src/components/FilterSheet'
 import { InfoSheet, type InfoSheetContent } from '../../src/components/InfoSheet'
 import { propertyApi, favoritesApi } from '../../src/lib/api'
 import { appAlert } from '../../src/components/AppAlert'
@@ -18,6 +16,9 @@ import { useAuthStore } from '../../src/store/authStore'
 import { useLocationStore } from '../../src/store/locationStore'
 import { colors, fonts, radius, shadow, typography } from '../../src/theme'
 import type { ListingType, PriceUnit, PropertyCard } from '../../src/types'
+
+// One large featured card per carousel page — full content width.
+const FEATURED_W = Dimensions.get('window').width - 32
 
 export default function HomeScreen() {
   const router = useRouter()
@@ -62,7 +63,27 @@ export default function HomeScreen() {
     router.push(q ? { pathname: '/search', params: { q } } : '/search')
   }
   const goPost = () => router.push(isLoggedIn ? '/post' : '/auth/login')
-  const goLoan = () => router.push('/emi-calculator')
+
+  // Filters live on the Search screen; home's filter button just collects them
+  // and hands them over as route params (no duplicate result list here).
+  const [filterOpen, setFilterOpen] = useState(false)
+  const [filters, setFilters] = useState<SearchFilters>({})
+  const filterCount = activeFilterCount(filters)
+  const applyFilters = (f: SearchFilters) => {
+    setFilters(f)
+    const q = propertyIdQuery.trim()
+    router.push({
+      pathname: '/search',
+      params: {
+        ...(q && { q }),
+        ...Object.fromEntries(Object.entries(f).filter(([, v]) => v !== undefined).map(([k, v]) => [k, String(v)])),
+      },
+    })
+  }
+
+  // Commercial covers both office and shop — sent as a repeated propertyTypes param.
+  const goCommercial = () => router.push({ pathname: '/search', params: { propertyTypes: ['COMMERCIAL_OFFICE', 'COMMERCIAL_SHOP'] } })
+  const goPlots      = () => router.push({ pathname: '/search', params: { propertyType: 'PLOT' } })
 
   // Bell opens a client-derived feed (NotificationsSheet). ponytail: unread dot
   // stays off — no server-side read tracking yet; wire when push notifications land.
@@ -120,6 +141,13 @@ export default function HomeScreen() {
             Headline, trust badges and CTA sit directly on the photo. */}
         <View style={styles.heroWrap}>
           <HeroCarousel images={heroImages} />
+          {/* Top scrim — the header floats transparently on the photo, this keeps
+              the location/bell legible over a bright shot. */}
+          <LinearGradient
+            colors={['rgba(15,51,47,0.85)', 'transparent']}
+            style={styles.heroTopScrim}
+            pointerEvents="none"
+          />
           <View style={styles.heroOverlay} pointerEvents="box-none">
             <LinearGradient
               colors={['transparent', 'rgba(15,51,47,0.92)']}
@@ -127,19 +155,10 @@ export default function HomeScreen() {
               pointerEvents="none"
             />
             <View style={styles.heroContent}>
-              <Text style={styles.heroHeadline}>Find Your{'\n'}Dream Property</Text>
-              <View style={styles.trustRow}>
-                <TrustBadge icon="shield-checkmark-outline" label="Verified Listings" />
-                <TrustBadge icon="person-outline"          label="Direct Owners" />
-              </View>
-              <View style={styles.heroAccent} />
-              <Pressable
-                onPress={() => router.push('/search')}
-                style={({ pressed }) => [styles.exploreBtn, pressed && { opacity: 0.9 }]}
-              >
-                <Text style={styles.exploreText}>Explore Properties</Text>
-                <Ionicons name="arrow-forward" size={14} color={colors.brand} style={styles.exploreIcon} />
-              </Pressable>
+              <Text style={styles.heroHeadline}>
+                Find Your{'\n'}<Text style={styles.heroHeadlineAccent}>Dream</Text> Property
+              </Text>
+              <Text style={styles.trustLine}>Verified Listings  •  Direct Owners</Text>
             </View>
           </View>
         </View>
@@ -159,6 +178,12 @@ export default function HomeScreen() {
               style={styles.searchInput}
               numberOfLines={1}
             />
+            <Pressable onPress={() => setFilterOpen(true)} style={({ pressed }) => [styles.filterBtn, pressed && { opacity: 0.85 }]} hitSlop={6}>
+              <Ionicons name="options-outline" size={20} color="#fff" />
+              {filterCount > 0 ? (
+                <View style={styles.filterCount}><Text style={styles.filterCountText}>{filterCount}</Text></View>
+              ) : null}
+            </Pressable>
           </View>
           {/* Quick actions — sage card with vertical dividers between each */}
           <View style={styles.quickCard}>
@@ -166,9 +191,9 @@ export default function HomeScreen() {
             <View style={styles.quickDivider} />
             <QuickAction icon="key-outline"      label="Rent" onPress={() => goBrowse('RENT')} />
             <View style={styles.quickDivider} />
-            <QuickAction icon="pricetag-outline" label="Post Property" onPress={goPost} />
+            <QuickAction icon="business-outline" label="Commercial" onPress={goCommercial} />
             <View style={styles.quickDivider} />
-            <QuickAction icon="card-outline"     label="Loan" onPress={goLoan} />
+            <QuickAction icon="leaf-outline"     label="Plots" onPress={goPlots} />
           </View>
 
           {/* Trust / stats card */}
@@ -182,8 +207,14 @@ export default function HomeScreen() {
         </View>
 
         {/* Featured Properties */}
-        <Section title="Featured Properties" bleed action={{ label: 'View All', onPress: () => router.push('/search') }}>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 8, gap: 12 }}>
+        <Section title="Featured Property" icon="star" bleed action={{ label: 'View All', onPress: () => router.push('/search') }}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            snapToInterval={FEATURED_W + 12}
+            decelerationRate="fast"
+            contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 8, gap: 12, alignItems: 'flex-start' }}
+          >
             {(recent.length ? recent : [undefined, undefined, undefined]).slice(0, 6).map((p, i) => (
               <FeaturedCollectionCard
                 key={p?.id ?? i}
@@ -230,16 +261,15 @@ export default function HomeScreen() {
         ) : null}
       </ScrollView>
 
-      {/* Fixed header — pinned on top of the hero photo, which runs up behind it. */}
-      <LinearGradient colors={['#0f332f', '#184A45']} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} style={styles.header}>
+      {/* Fixed header — transparent, blended into the hero photo behind it
+          (the hero's own top scrim provides the contrast). */}
+      <View style={styles.header}>
         <SafeAreaView edges={['top']}>
           <View style={styles.topBarInner}>
             <Pressable style={styles.locationPill} onPress={() => setCityPickerOpen(true)}>
-              <Ionicons name="location" size={15} color="#fff" />
-              <View>
-                <Text style={styles.locationCity}>{city.name}, {city.state}</Text>
-                <Text style={styles.subState}>{city.state}</Text>
-              </View>
+              <Ionicons name="location" size={17} color="#fff" />
+              <Text style={styles.locationCity}>{city.name}</Text>
+              <Ionicons name="chevron-down" size={17} color="#fff" />
             </Pressable>
             <Pressable style={styles.bellBtn} onPress={() => setNotifOpen(true)} hitSlop={6}>
               <Ionicons name="notifications-outline" size={24} color="#fff" />
@@ -247,9 +277,10 @@ export default function HomeScreen() {
             </Pressable>
           </View>
         </SafeAreaView>
-      </LinearGradient>
+      </View>
 
       <CityPickerSheet visible={cityPickerOpen} onClose={() => setCityPickerOpen(false)} />
+      <FilterSheet visible={filterOpen} onClose={() => setFilterOpen(false)} value={filters} onApply={applyFilters} />
       <NotificationsSheet visible={notifOpen} onClose={() => setNotifOpen(false)} />
       <InfoSheet
         visible={info !== null}
@@ -261,6 +292,10 @@ export default function HomeScreen() {
 }
 
 // ─── helpers ────────────────────────────────────────────────────
+
+function propertyTypeLabel(t: PropertyCard['propertyType']): string {
+  return t.split('_').map((w) => w[0] + w.slice(1).toLowerCase()).join(' ')
+}
 
 // Pull non-empty primary-image URLs off a list of cards.
 function photosOf(cards: PropertyCard[]): string[] {
@@ -280,15 +315,6 @@ function QuickAction({ icon, label, onPress }: { icon: React.ComponentProps<type
   )
 }
 
-function TrustBadge({ icon, label }: { icon: React.ComponentProps<typeof Ionicons>['name']; label: string }) {
-  return (
-    <View style={styles.trustBadge}>
-      <Ionicons name={icon} size={15} color={colors.accent} />
-      <Text style={styles.trustText} numberOfLines={1}>{label}</Text>
-    </View>
-  )
-}
-
 function Stat({ icon, value, label }: { icon: React.ComponentProps<typeof Ionicons>['name']; value: string; label: string }) {
   return (
     <View style={styles.stat}>
@@ -299,12 +325,15 @@ function Stat({ icon, value, label }: { icon: React.ComponentProps<typeof Ionico
   )
 }
 
-function Section({ title, subtitle, background = colors.white, bleed = false, action, children }: { title: string; subtitle?: string; background?: string; bleed?: boolean; action?: { label: string; onPress: () => void }; children: React.ReactNode }) {
+function Section({ title, subtitle, icon, background = colors.white, bleed = false, action, children }: { title: string; subtitle?: string; icon?: React.ComponentProps<typeof Ionicons>['name']; background?: string; bleed?: boolean; action?: { label: string; onPress: () => void }; children: React.ReactNode }) {
   const headerPad = bleed ? { paddingHorizontal: 16 } : null
   return (
     <View style={[styles.section, bleed && { paddingHorizontal: 0 }, { backgroundColor: background }]}>
       <View style={[styles.sectionHeaderRow, headerPad]}>
-        <Text style={styles.sectionTitle}>{title}</Text>
+        <View style={styles.sectionTitleRow}>
+          {icon ? <Ionicons name={icon} size={20} color={colors.accent} /> : null}
+          <Text style={styles.sectionTitle}>{title}</Text>
+        </View>
         {action ? (
           <Pressable onPress={action.onPress} hitSlop={8} style={({ pressed }) => [styles.sectionAction, pressed && { opacity: 0.7 }]}>
             <Text style={styles.sectionActionText}>{action.label}</Text>
@@ -312,7 +341,8 @@ function Section({ title, subtitle, background = colors.white, bleed = false, ac
           </Pressable>
         ) : null}
       </View>
-      <View style={[styles.sectionAccentBar, bleed && { marginLeft: 16 }]} />
+      {/* Icon-led headers (Featured) carry the gold accent in the icon already. */}
+      {icon ? null : <View style={[styles.sectionAccentBar, bleed && { marginLeft: 16 }]} />}
       {subtitle ? <Text style={[styles.sectionSub, headerPad]}>{subtitle}</Text> : null}
       <View style={{ marginTop: 12 }}>{children}</View>
     </View>
@@ -331,10 +361,9 @@ function FeaturedCollectionCard({ property, saved, onToggleSave, onPress }: { pr
       )}
       {property ? (
         <>
-          {/* Verified / Premium badge, top-left — per the Green Growth mock */}
+          {/* Featured / Verified badge, top-left */}
           <View style={[styles.featuredBadge, property.isFeatured && styles.featuredBadgePremium]}>
-            <Ionicons name={property.isFeatured ? 'diamond' : 'shield-checkmark'} size={10} color="#fff" />
-            <Text style={styles.featuredBadgeText}>{property.isFeatured ? 'Premium' : 'Verified'}</Text>
+            <Text style={styles.featuredBadgeText}>{property.isFeatured ? 'Featured' : 'Verified'}</Text>
           </View>
           {/* Heart, top-right — frosted circle per the Green Growth mock */}
           <Pressable
@@ -342,25 +371,45 @@ function FeaturedCollectionCard({ property, saved, onToggleSave, onPress }: { pr
             hitSlop={8}
             style={({ pressed }) => [styles.featuredHeart, pressed && { opacity: 0.8 }]}
           >
-            <Ionicons name={saved ? 'heart' : 'heart-outline'} size={16} color={saved ? colors.accent : '#fff'} />
+            <Ionicons name={saved ? 'heart' : 'heart-outline'} size={18} color={saved ? colors.accent : '#fff'} />
           </Pressable>
-          {/* Bottom scrim so white text stays legible over any photo */}
-          <LinearGradient
-            colors={['transparent', 'rgba(0,0,0,0.78)']}
-            style={styles.featuredScrim}
-            pointerEvents="none"
-          />
+
+          {/* White info panel under the photo */}
           <View style={styles.featuredInfo}>
-            <Text style={styles.featuredPrice}>{formatPrice(property.price, property.priceUnit)}</Text>
             <Text style={styles.featuredTitle} numberOfLines={1}>{property.title}</Text>
             <View style={styles.featuredLocRow}>
-              <Ionicons name="location-outline" size={11} color="rgba(255,255,255,0.85)" />
+              <Ionicons name="location-outline" size={13} color={colors.muted} />
               <Text style={styles.featuredLoc} numberOfLines={1}>{property.localityName}, {property.cityName}</Text>
             </View>
+            <View style={styles.featuredMetaRow}>
+              <Text style={styles.featuredPrice}>{formatPrice(property.price, property.priceUnit)}</Text>
+              <View style={styles.featuredSpecs}>
+                {property.bedrooms ? <FeaturedSpec icon="bed-outline" label={`${property.bedrooms} BHK`} /> : null}
+                {property.bedrooms ? <View style={styles.featuredSpecDivider} /> : null}
+                <FeaturedSpec icon="scan-outline" label={`${property.areaSqft} sq.ft`} />
+                <View style={styles.featuredSpecDivider} />
+                <FeaturedSpec icon="business-outline" label={propertyTypeLabel(property.propertyType)} />
+              </View>
+            </View>
+            {property.isVerified ? (
+              <View style={styles.verifiedPill}>
+                <Ionicons name="shield-checkmark-outline" size={13} color={colors.brand} />
+                <Text style={styles.verifiedPillText}>Verified Property</Text>
+              </View>
+            ) : null}
           </View>
         </>
       ) : null}
     </Pressable>
+  )
+}
+
+function FeaturedSpec({ icon, label }: { icon: React.ComponentProps<typeof Ionicons>['name']; label: string }) {
+  return (
+    <View style={styles.featuredSpec}>
+      <Ionicons name={icon} size={16} color={colors.brand} />
+      <Text style={styles.featuredSpecLabel}>{label}</Text>
+    </View>
   )
 }
 
@@ -403,31 +452,29 @@ function formatPrice(price: number, unit: PriceUnit): string {
 
 const styles = StyleSheet.create({
   // Fixed top bar — absolute overlay above the hero photo, rounded bottom
-  header:            { position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10, elevation: 12, borderBottomLeftRadius: 18, borderBottomRightRadius: 18, overflow: 'hidden' },
+  header:            { position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10, backgroundColor: 'transparent' },
   topBarInner:       { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingTop: 6, paddingBottom: 12 },
-  locationPill:      { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  locationCity:      { color: '#fff', fontFamily: fonts.display, fontSize: 18, lineHeight: 24 },
-  subState:          { color: 'rgba(255,255,255,0.7)', fontFamily: fonts.medium, fontSize: 11, marginTop: 0 },
+  locationPill:      { flexDirection: 'row', alignItems: 'center', gap: 7 },
+  locationCity:      { color: '#fff', fontFamily: fonts.display, fontSize: 19, lineHeight: 25 },
   bellBtn:           { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
   bellDot:           { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.accent, position: 'absolute', top: 7, right: 7, borderWidth: 1.5, borderColor: colors.brand },
 
   // Hero content sits directly on the photo (bottom-anchored over a forest scrim)
   heroWrap:          { position: 'relative' },
+  heroTopScrim:      { position: 'absolute', top: 0, left: 0, right: 0, height: 130 },
   heroOverlay:       { position: 'absolute', left: 0, right: 0, bottom: 0, justifyContent: 'flex-end' },
-  heroOverlayScrim:  { position: 'absolute', left: 0, right: 0, bottom: 0, height: 260 },
-  heroContent:       { paddingHorizontal: 22, paddingBottom: 26 },
-  heroHeadline:      { fontFamily: fonts.display, fontSize: 30, lineHeight: 38, color: colors.white },
-  trustRow:          { flexDirection: 'row', flexWrap: 'wrap', gap: 14, marginTop: 14 },
-  trustBadge:        { flexDirection: 'row', alignItems: 'center', gap: 5 },
-  trustText:         { fontFamily: fonts.semibold, fontSize: 12, color: 'rgba(255,255,255,0.92)' },
-  heroAccent:        { width: 46, height: 4, borderRadius: 2, backgroundColor: colors.accent, marginTop: 14 },
-  exploreBtn:        { flexDirection: 'row', alignItems: 'center', gap: 8, alignSelf: 'flex-start', backgroundColor: colors.accent, paddingHorizontal: 20, paddingVertical: 14, borderRadius: radius.sm, marginTop: 13, ...shadow.cta },
-  exploreText:       { fontFamily: fonts.bold, fontSize: 14, lineHeight: 18, color: colors.brand, includeFontPadding: false },
-  exploreIcon:       { marginTop: 1 },
+  heroOverlayScrim:  { position: 'absolute', left: 0, right: 0, bottom: 0, height: 200 },
+  heroContent:       { paddingHorizontal: 22, paddingBottom: 34 },
+  heroHeadline:      { fontFamily: fonts.display, fontSize: 32, lineHeight: 40, color: colors.white },
+  heroHeadlineAccent:{ color: colors.accent },
+  trustLine:         { fontFamily: fonts.semibold, fontSize: 13, color: 'rgba(255,255,255,0.92)', marginTop: 10 },
 
   // Search — ivory pill with a forest border (per the mock) + a soft lift
-  searchBar:         { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: colors.bg, borderRadius: radius.pill, paddingLeft: 14, paddingRight: 20, paddingVertical: 15, marginHorizontal: 16, marginTop: 18, borderWidth: 1.5, borderColor: colors.brand, ...shadow.card },
-  searchInput:       { flex: 1, fontFamily: fonts.medium, fontSize: 14, color: colors.ink, padding: 0, includeFontPadding: false, textAlignVertical: 'center' },
+  searchBar:         { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: colors.white, borderRadius: radius.lg, paddingLeft: 16, paddingRight: 8, paddingVertical: 8, marginHorizontal: 16, marginTop: 18, ...shadow.card },
+  filterBtn:         { width: 44, height: 44, borderRadius: radius.md, backgroundColor: colors.brand, alignItems: 'center', justifyContent: 'center' },
+  filterCount:       { position: 'absolute', top: -3, right: -3, minWidth: 18, height: 18, paddingHorizontal: 4, borderRadius: 9, backgroundColor: colors.accent, alignItems: 'center', justifyContent: 'center' },
+  filterCountText:   { fontFamily: fonts.bold, fontSize: 10, lineHeight: 13, color: colors.brand },
+  searchInput:       { flex: 1, fontFamily: fonts.medium, fontSize: 14, color: colors.ink, padding: 0, textAlignVertical: 'center' },
 
   // Light-grey band behind the quick-actions + stats card
   quickStatsBand:    { backgroundColor: '#F7F3ED' },
@@ -450,24 +497,31 @@ const styles = StyleSheet.create({
   section:           { paddingHorizontal: 16, paddingVertical: 24 },
   sectionHeaderRow:  { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   sectionAccentBar:  { width: 32, height: 3, borderRadius: 2, backgroundColor: colors.accent, marginTop: 8 },
+  sectionTitleRow:   { flexDirection: 'row', alignItems: 'center', gap: 7 },
   sectionTitle:      { ...typography.h2 },
   sectionAction:     { flexDirection: 'row', alignItems: 'center', gap: 4 },
   sectionActionText: { fontFamily: fonts.bold, fontSize: 13, color: colors.accent },
   sectionSub:        { fontFamily: fonts.regular, fontSize: 13, color: colors.muted, marginTop: 6 },
 
-  // Featured collection cards — photo + bottom scrim with price/title/location
-  featured:          { width: 200, height: 150, borderRadius: radius.md, overflow: 'hidden', backgroundColor: colors.brandTint, ...shadow.card },
-  featuredImg:       { width: '100%', height: '100%' },
-  featuredBadge:        { position: 'absolute', top: 10, left: 10, flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: colors.brand, paddingHorizontal: 9, paddingVertical: 4, borderRadius: radius.pill },
-  featuredBadgePremium: { backgroundColor: colors.accent },
-  featuredBadgeText:    { fontFamily: fonts.semibold, fontSize: 10, color: '#fff', lineHeight: 13, includeFontPadding: false },
-  featuredHeart:        { position: 'absolute', top: 8, right: 8, width: 30, height: 30, borderRadius: 15, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.3)' },
-  featuredScrim:     { position: 'absolute', left: 0, right: 0, bottom: 0, height: 90 },
-  featuredInfo:      { position: 'absolute', left: 10, right: 10, bottom: 10, gap: 2 },
-  featuredPrice:     { fontFamily: fonts.extra, fontSize: 16, color: '#fff' },
-  featuredTitle:     { fontFamily: fonts.bold, fontSize: 13, color: '#fff' },
-  featuredLocRow:    { flexDirection: 'row', alignItems: 'center', gap: 3 },
-  featuredLoc:       { fontFamily: fonts.regular, fontSize: 11, color: 'rgba(255,255,255,0.85)', flexShrink: 1 },
+  // Featured — one large card per page: photo on top, white info panel below
+  featured:          { width: FEATURED_W, borderRadius: radius.lg, overflow: 'hidden', backgroundColor: colors.white, ...shadow.card },
+  featuredImg:       { width: '100%', height: 210 },
+  featuredBadge:        { position: 'absolute', top: 12, left: 12, backgroundColor: colors.brand, paddingHorizontal: 12, paddingVertical: 6, borderRadius: radius.sm },
+  featuredBadgePremium: { backgroundColor: colors.brand },
+  featuredBadgeText:    { fontFamily: fonts.semibold, fontSize: 12, color: '#fff', lineHeight: 15 },
+  featuredHeart:        { position: 'absolute', top: 12, right: 12, width: 34, height: 34, borderRadius: 17, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.32)' },
+  featuredInfo:      { padding: 16, gap: 6 },
+  featuredPrice:     { fontFamily: fonts.extra, fontSize: 18, color: colors.brand, flexShrink: 1 },
+  featuredTitle:     { fontFamily: fonts.extra, fontSize: 18, color: colors.ink },
+  featuredLocRow:    { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  featuredLoc:       { fontFamily: fonts.regular, fontSize: 13, color: colors.muted, flexShrink: 1 },
+  featuredMetaRow:   { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginTop: 6 },
+  featuredSpecs:     { flexDirection: 'row', alignItems: 'center', gap: 9 },
+  featuredSpec:      { alignItems: 'center', gap: 3 },
+  featuredSpecLabel: { fontFamily: fonts.medium, fontSize: 10, color: colors.muted },
+  featuredSpecDivider:{ width: 1, height: 26, backgroundColor: colors.borderLight },
+  verifiedPill:      { flexDirection: 'row', alignItems: 'center', gap: 5, alignSelf: 'flex-start', backgroundColor: colors.brandTint, paddingHorizontal: 10, paddingVertical: 6, borderRadius: radius.sm, marginTop: 6 },
+  verifiedPillText:  { fontFamily: fonts.semibold, fontSize: 12, color: colors.brand },
 
   // Budget — white card + sage icon circle
   budgetRow:         { flexDirection: 'row', gap: 12 },

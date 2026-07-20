@@ -17,6 +17,9 @@ const api = axios.create({
   baseURL,
   headers: { 'Content-Type': 'application/json' },
   timeout: 45_000,
+  // Repeat array params (`propertyTypes=A&propertyTypes=B`) — axios's default
+  // `key[]=` form doesn't bind to Spring's List<T> request params.
+  paramsSerializer: { indexes: null },
 })
 
 api.interceptors.request.use((config) => {
