@@ -8,9 +8,16 @@ import type { ConfigContext, ExpoConfig } from 'expo/config'
  *   Expo Go ignores it anyway — maps in Expo Go use Expo's own key.
  * - EAS builds: `eas env:create --name GOOGLE_MAPS_API_KEY --value <key>` so the
  *   key is injected at build time only.
+ *
+ * EXPO_PUBLIC_API_URL does the same for the backend: unset it and the app talks
+ * to prod (app.json); set it in `.env` to point at a local API over the LAN.
  */
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...(config as ExpoConfig),
+  extra: {
+    ...config.extra,
+    apiUrl: process.env.EXPO_PUBLIC_API_URL || config.extra?.apiUrl,
+  },
   ios: {
     ...config.ios,
     config: {
