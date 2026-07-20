@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
-import { FlatList, Image, Pressable, RefreshControl, StyleSheet, Text, TextInput, View } from 'react-native'
+import { FlatList, Image, Pressable, RefreshControl, StyleSheet, View } from 'react-native'
+import { Text, TextInput } from '../../src/components/Text'
 import { ListSkeleton } from '../../src/components/Skeleton'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'

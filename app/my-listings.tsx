@@ -1,8 +1,6 @@
 import { useCallback, useState } from 'react'
-import {
-  FlatList, Image, Pressable, RefreshControl,
-  StyleSheet, Text, View,
-} from 'react-native'
+import { FlatList, Image, Pressable, RefreshControl, StyleSheet, View } from 'react-native'
+import { Text } from '../src/components/Text'
 import { ListSkeleton } from '../src/components/Skeleton'
 import { useRouter, useFocusEffect } from 'expo-router'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'

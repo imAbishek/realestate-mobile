@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
-import { Text } from 'react-native'
+import { StyleSheet } from 'react-native'
+import { Text } from '../src/components/Text'
 import { Stack, SplashScreen } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
@@ -75,7 +76,9 @@ function RootLayout() {
         screenOptions={{
           headerStyle: { backgroundColor: colors.brand },
           headerTintColor: '#fff',
-          headerTitleStyle: { fontFamily: fonts.bold },
+          // Native-stack's headerTitleStyle only honours font family/size/colour,
+          // so the shared Text (src/components/Text.tsx) never applied here.
+          headerTitle: ({ children }) => <Text style={styles.headerTitle}>{children}</Text>,
         }}
       >
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
@@ -87,6 +90,10 @@ function RootLayout() {
     </SafeAreaProvider>
   )
 }
+
+const styles = StyleSheet.create({
+  headerTitle: { fontFamily: fonts.bold, fontSize: 18, color: '#fff' },
+})
 
 // Sentry.wrap adds the error boundary + native crash/touch instrumentation.
 // Skip it in Expo Go — the @sentry/react-native native module isn't bundled

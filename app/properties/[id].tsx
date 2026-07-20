@@ -1,8 +1,18 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
-  ActivityIndicator, Dimensions, Image, KeyboardAvoidingView, Linking,
-  Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View,
+  ActivityIndicator,
+  Dimensions,
+  Image,
+  KeyboardAvoidingView,
+  Linking,
+  Modal,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  View,
 } from 'react-native'
+import { Text, TextInput } from '../../src/components/Text'
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
@@ -802,7 +812,7 @@ const styles = StyleSheet.create({
 
   badgeRow:       { flexDirection: 'row', gap: 6, marginBottom: 8 },
   badge:          { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6, borderWidth: 1 },
-  badgeText:      { fontFamily: fonts.bold, fontSize: 11, lineHeight: 14, includeFontPadding: false },
+  badgeText:      { fontFamily: fonts.bold, fontSize: 11, lineHeight: 14 },
 
   title:          { fontFamily: fonts.bold, fontSize: 19, color: colors.ink },
   locRow:         { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 6 },

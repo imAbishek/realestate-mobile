@@ -1,5 +1,6 @@
 import { memo, useEffect, useState } from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
+import { Text } from './Text'
 import { Marker } from 'react-native-maps'
 import { formatPricePill } from '../lib/format'
 import { colors, fonts } from '../theme'

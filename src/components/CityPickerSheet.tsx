@@ -1,5 +1,13 @@
 import { useEffect, useState } from 'react'
-import { ActivityIndicator, Dimensions, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import {
+  ActivityIndicator,
+  Dimensions,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  View,
+} from 'react-native'
+import { Text } from './Text'
 import { Ionicons } from '@expo/vector-icons'
 import * as Location from 'expo-location'
 import { searchApi } from '../lib/api'

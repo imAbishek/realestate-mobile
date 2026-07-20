@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Dimensions, Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
+import { Dimensions, Image, Pressable, ScrollView, StyleSheet, View } from 'react-native'
+import { Text, TextInput } from '../../src/components/Text'
 import { useRouter, useFocusEffect } from 'expo-router'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { LinearGradient } from 'expo-linear-gradient'

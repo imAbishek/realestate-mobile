@@ -1,8 +1,16 @@
 import { useEffect, useMemo, useState } from 'react'
 import {
-  ActivityIndicator, Image, KeyboardAvoidingView, Platform,
-  Pressable, ScrollView, StyleSheet, Switch, Text, View,
+  ActivityIndicator,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Switch,
+  View,
 } from 'react-native'
+import { Text } from '../src/components/Text'
 import * as ImagePicker from 'expo-image-picker'
 import * as DocumentPicker from 'expo-document-picker'
 import { Ionicons } from '@expo/vector-icons'

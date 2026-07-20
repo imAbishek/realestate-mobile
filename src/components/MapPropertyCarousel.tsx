@@ -1,8 +1,15 @@
 import { forwardRef } from 'react'
 import {
-  Dimensions, FlatList, Image, Pressable, StyleSheet, Text, View,
-  type NativeScrollEvent, type NativeSyntheticEvent,
+  Dimensions,
+  FlatList,
+  Image,
+  Pressable,
+  StyleSheet,
+  View,
+  type NativeScrollEvent,
+  type NativeSyntheticEvent,
 } from 'react-native'
+import { Text } from './Text'
 import { Ionicons } from '@expo/vector-icons'
 import { formatPrice } from '../lib/format'
 import { colors, fonts, radius, shadow } from '../theme'

@@ -1,5 +1,6 @@
 import { Tabs, useRouter } from 'expo-router'
-import { Platform, Pressable, StyleSheet, Text, View } from 'react-native'
+import { View, Pressable, StyleSheet, Platform } from 'react-native'
+import { Text } from '../../src/components/Text'
 import type { ColorValue } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { BlurView } from 'expo-blur'

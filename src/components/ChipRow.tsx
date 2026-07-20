@@ -1,4 +1,5 @@
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native'
+import { Text } from './Text'
 import { colors, fonts, radius } from '../theme'
 
 export type ChipOption<T extends string = string> = { label: string; value: T }

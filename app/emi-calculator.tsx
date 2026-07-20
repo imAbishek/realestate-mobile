@@ -1,7 +1,6 @@
 import { useMemo, useRef, useState } from 'react'
-import {
-  PanResponder, Pressable, ScrollView, StyleSheet, Text, View,
-} from 'react-native'
+import { PanResponder, Pressable, ScrollView, StyleSheet, View } from 'react-native'
+import { Text } from '../src/components/Text'
 import { useRouter } from 'expo-router'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'

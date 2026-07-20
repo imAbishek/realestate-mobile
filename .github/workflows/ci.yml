@@ -20,5 +20,7 @@ jobs:
       - run: npm ci
       - name: Type check
         run: npx tsc --noEmit
+      - name: Text import guard
+        run: npm run check:text
       - name: Dependency audit (report-only)
         run: npm audit --audit-level=high || true
