@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios, { type InternalAxiosRequestConfig } from 'axios'
 import Constants from 'expo-constants'
 import { getAccessToken, useAuthStore } from '../store/authStore'
 import type {
@@ -31,11 +31,34 @@ api.interceptors.request.use((config) => {
   return config
 })
 
+// One in-flight refresh shared across concurrent 401s (a burst of parallel
+// requests shouldn't fire N refresh calls). Uses a bare axios.post so it
+// skips these interceptors — otherwise a failed refresh would recurse.
+let refreshing: Promise<string | null> | null = null
+async function refreshAccessToken(): Promise<string | null> {
+  const rt = useAuthStore.getState().refreshToken
+  if (!rt) return null
+  try {
+    const { data } = await axios.post<AuthResponse>(`${baseURL}/auth/refresh-token`, { refreshToken: rt })
+    await useAuthStore.getState().setSession(data.accessToken, data.refreshToken, data.user)
+    return data.accessToken
+  } catch {
+    await useAuthStore.getState().clearSession()
+    return null
+  }
+}
+
 api.interceptors.response.use(
   (res) => res,
   async (err) => {
-    if (err?.response?.status === 401) {
-      await useAuthStore.getState().clearSession()
+    const original = err?.config as (InternalAxiosRequestConfig & { _retry?: boolean }) | undefined
+    if (err?.response?.status === 401 && original && !original._retry) {
+      original._retry = true
+      const token = await (refreshing ??= refreshAccessToken().finally(() => { refreshing = null }))
+      if (token) {
+        original.headers.Authorization = `Bearer ${token}`
+        return api(original)
+      }
     }
     return Promise.reject(err)
   },

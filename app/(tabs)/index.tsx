@@ -10,7 +10,6 @@ import { ListSkeleton } from '../../src/components/Skeleton'
 import { CityPickerSheet } from '../../src/components/CityPickerSheet'
 import { NotificationsSheet } from '../../src/components/NotificationsSheet'
 import { FilterSheet, activeFilterCount, type SearchFilters } from '../../src/components/FilterSheet'
-import { InfoSheet, type InfoSheetContent } from '../../src/components/InfoSheet'
 import { propertyApi, favoritesApi } from '../../src/lib/api'
 import { appAlert } from '../../src/components/AppAlert'
 import { useAuthStore } from '../../src/store/authStore'
@@ -127,12 +126,10 @@ export default function HomeScreen() {
     }
   }, [isLoggedIn, savedIds, router])
 
-  // Branded "coming soon" sheet instead of a bare Alert box.
-  const [info, setInfo] = useState<InfoSheetContent | null>(null)
-  const goBudget = (label: string) => setInfo({
-    icon: 'wallet-outline', title: `Budget: ${label}`,
-    body: 'Budget-filtered browsing is coming soon. For now, explore every listing and sort by what fits you.',
-    actionLabel: 'Browse all listings', onAction: () => router.push('/search'),
+  // Budget chips → search screen with min/max price params (already parsed there).
+  const goBudget = (min?: number, max?: number) => router.push({
+    pathname: '/search',
+    params: { ...(min ? { minPrice: String(min) } : {}), ...(max ? { maxPrice: String(max) } : {}) },
   })
 
   return (
@@ -231,9 +228,9 @@ export default function HomeScreen() {
         {/* Customize Budget */}
         <Section title="Customize Budget" background={colors.bg}>
           <View style={styles.budgetRow}>
-            <BudgetChip label="Under 10L" onPress={() => goBudget('Under 10L')} />
-            <BudgetChip label="10L – 20L" onPress={() => goBudget('10L–20L')} />
-            <BudgetChip label="20L – 50L" onPress={() => goBudget('20L–50L')} />
+            <BudgetChip label="Under 10L" onPress={() => goBudget(undefined, 1000000)} />
+            <BudgetChip label="10L – 20L" onPress={() => goBudget(1000000, 2000000)} />
+            <BudgetChip label="20L – 50L" onPress={() => goBudget(2000000, 5000000)} />
           </View>
         </Section>
 
@@ -283,11 +280,6 @@ export default function HomeScreen() {
       <CityPickerSheet visible={cityPickerOpen} onClose={() => setCityPickerOpen(false)} />
       <FilterSheet visible={filterOpen} onClose={() => setFilterOpen(false)} value={filters} onApply={applyFilters} />
       <NotificationsSheet visible={notifOpen} onClose={() => setNotifOpen(false)} />
-      <InfoSheet
-        visible={info !== null}
-        onClose={() => setInfo(null)}
-        {...(info ?? { title: '', body: '' })}
-      />
     </View>
   )
 }
