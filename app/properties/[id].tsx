@@ -825,7 +825,7 @@ const styles = StyleSheet.create({
   specLabel:      { fontFamily: fonts.semibold, fontSize: 10, color: colors.mutedLight, letterSpacing: 0.6 },
   specValue:      { fontFamily: fonts.bold, fontSize: 14, color: colors.ink, marginTop: 4 },
 
-  sectionTitle:   { fontFamily: fonts.bold, fontSize: 16, color: colors.ink },
+  sectionTitle:   { fontFamily: fonts.display, fontSize: 16, lineHeight: 22, color: colors.ink },
   linkText:       { fontFamily: fonts.semibold, fontSize: 13, color: BRAND },
 
   descBody:       { fontFamily: fonts.regular, fontSize: 14, color: '#334155', lineHeight: 21, marginTop: 8 },
